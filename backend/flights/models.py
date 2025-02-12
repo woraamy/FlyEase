@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import datetime
 
 class Airport(models.Model):
@@ -8,6 +8,13 @@ class Airport(models.Model):
     name = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
+    image = models.URLField(max_length=500, blank=True)
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['city']),
+            models.Index(fields=['code']),
+        ]
 
     def __str__(self):
         return f"{self.code} - {self.city}"
@@ -16,18 +23,19 @@ class Aircraft(models.Model):
     model = models.CharField(max_length=100)
     registration_number = models.CharField(max_length=20, unique=True)
     total_seats = models.IntegerField()
+    
 
     def __str__(self):
         return f"{self.model} ({self.registration_number})"
 
 class Flight(models.Model):
     flight_number = models.CharField(max_length=10, unique=True)
-    aircraft = models.ForeignKey(Aircraft, on_delete=models.PROTECT)
     departure_airport = models.ForeignKey(
         Airport,
         related_name='departures',
         on_delete=models.PROTECT
     )
+
     arrival_airport = models.ForeignKey(
         Airport,
         related_name='arrivals',
@@ -41,11 +49,19 @@ class Flight(models.Model):
         validators=[MinValueValidator(0)]
     )
     available_seats = models.IntegerField()
+    rating = models.FloatField(
+        validators=[MinValueValidator(0), MaxValueValidator(5)],
+        default=0
+    )
+    featured_image = models.URLField(max_length=500, blank=True)
+    duration = models.DurationField(null=True)
 
     class Meta:
         indexes = [
-            models.Index(fields=['departure_time', 'arrival_time']),
+            models.Index(fields=['departure_time']),
             models.Index(fields=['flight_number']),
+            models.Index(fields=['base_price']),
+            models.Index(fields=['rating']),
         ]
 
     def __str__(self):
@@ -114,3 +130,16 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"{self.transaction_id} - {self.booking.booking_reference}"
+    
+class Review(models.Model):
+    flight = models.ForeignKey(Flight, related_name='reviews', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['flight', 'user']
+        indexes = [
+            models.Index(fields=['rating']),
+        ]
