@@ -1,44 +1,22 @@
-import { Link } from "react-router-dom";
-import { Search, User, ShoppingCart } from "lucide-react";
+"use client";
 
-const Navbar = () => {
+import Link from "next/link";
+import { FaSearch, FaUser } from "react-icons/fa";
+
+export default function Navbar() {
   return (
-    <nav className="bg-brand-primary py-4 px-6 fixed w-full top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/" className="text-white text-2xl font-semibold hover:opacity-90 transition-opacity">
-          flyease
-        </Link>
-        
-        <div className="hidden md:flex items-center space-x-8">
-          <NavLink href="/">Home</NavLink>
-          <NavLink href="/flights">Flights</NavLink>
-          <NavLink href="/travel-plan">Travel Plan</NavLink>
-          <NavLink href="/chat-bot">Chat Bot</NavLink>
-        </div>
-
-        <div className="flex items-center space-x-6">
-          <button className="text-white hover:opacity-80 transition-opacity">
-            <Search className="w-5 h-5" />
-          </button>
-          <button className="text-white hover:opacity-80 transition-opacity">
-            <User className="w-5 h-5" href="/account"/>
-          </button>
-          <button className="text-white hover:opacity-80 transition-opacity">
-            <ShoppingCart className="w-5 h-5" href="shopping-cart"/>
-          </button>
-        </div>
+    <nav className="bg-white shadow-md p-4 flex justify-between items-center">
+      <h1 className="ml-8 text-2xl font-bold text-green-700">flyease</h1>
+      <div className="flex space-x-6 text-gray-600 font-medium">
+        <Link href="/" className="hover:text-green-700">Home</Link>
+        <Link href="/flights" className="hover:text-green-700">Flights</Link>
+        <Link href="/travel-plan" className="hover:text-green-700">Travel Plan</Link>
+        <Link href="/chat-bot" className="hover:text-green-700">Chat Bot</Link>
+      </div>
+      <div className="flex space-x-4">
+        <FaSearch className="text-gray-600 cursor-pointer hover:text-green-700" />
+        <FaUser className="text-gray-600 cursor-pointer hover:text-green-700" />
       </div>
     </nav>
   );
-};
-
-const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <Link
-    to={href}
-    className="text-white hover:opacity-80 transition-opacity text-sm font-medium"
-  >
-    {children}
-  </Link>
-);
-
-export default Navbar;
+}
