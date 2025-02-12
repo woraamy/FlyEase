@@ -1,5 +1,5 @@
 django-ninja
 django 
 django-cors-headers
-python-dotenv
+Django-environ
 psycopg2-binary
