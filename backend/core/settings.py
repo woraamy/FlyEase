@@ -11,16 +11,21 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 
-from dotenv import load_dotenv
 from urllib.parse import urlparse
 from pathlib import Path
+import environ
 
 
-load_dotenv()
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+# BASE_DIR = /backend
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+environ.Env.read_env(env_file=BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -37,6 +42,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'flights.apps.FlightsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -82,14 +88,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': tmpPostgres.path.replace('/', ''),
-        'USER': tmpPostgres.username,
-        'PASSWORD': tmpPostgres.password,
-        'HOST': tmpPostgres.hostname,
-        'PORT': 5432,
-    }
+    "default": env.db(
+        "DATABASE_URL",
+        default="postgres://postgres:postgres@localhost:5432/postgres",
+    ),
 }
 
 
