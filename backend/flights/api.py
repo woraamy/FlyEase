@@ -1,65 +1,112 @@
-from ninja import NinjaAPI, Schema
-from typing import List, Optional
+from ninja import Router, Query
+from typing import List
+from django.db.models import Q
+from .schemaPayload import FlightListSchema, FlightClassSchema
+from .models import Flight
 from datetime import datetime
-from .models import Flight, Airport, Review
-from django.db.models import Avg
-from .schemaPayload import AirportSchema, FlightListSchema
-from django.utils import timezone
 
-api = NinjaAPI()
+router = Router()
 
-@api.get("/flights", response=List[FlightListSchema])
-def list_flights(
+@router.get("/flights", response=List[FlightListSchema])
+def get_all_flights(
     request,
-    from_city: Optional[str] = None,
-    to_city: Optional[str] = None,
-    min_price: Optional[float] = None,
-    max_price: Optional[float] = None,
-    min_rating: Optional[float] = None
+    page: int = Query(1, gt=0),
+    page_size: int = Query(10, gt=0, le=100),
+    sort_by: str = Query("departure_time", enum=["departure_time", "arrival_time", "base_price", "rating"]),
+    sort_order: str = Query("asc", enum=["asc", "desc"]),
+    departure_city: str = None,
+    arrival_city: str = None,
+    departure_date: datetime = None,
+    min_price: float = None,
+    max_price: float = None,
+    travel_class: str = None,
+    has_wifi: bool = None,
+    has_entertainment: bool = None,
+    has_meals: bool = None
 ):
+    """
+    Get all flights with comprehensive filtering options
+    """
+    # Start with all flights
     queryset = Flight.objects.select_related(
         'departure_airport',
         'arrival_airport'
-    ).filter(
-        departure_time__gte=timezone.now()
+    ).prefetch_related(
+        'travel_classes',
+        'travel_classes__travel_class'
     )
 
-    if from_city:
-        queryset = queryset.filter(
-            departure_airport__city__icontains=from_city
-        )
+    # Apply filters
+    filters = Q()
 
-    if to_city:
-        queryset = queryset.filter(
-            arrival_airport__city__icontains=to_city
-        )
+    if departure_city:
+        filters &= Q(departure_airport__city__icontains=departure_city)
+
+    if arrival_city:
+        filters &= Q(arrival_airport__city__icontains=arrival_city)
+
+    if departure_date:
+        filters &= Q(departure_time__date=departure_date)
 
     if min_price is not None:
-        queryset = queryset.filter(base_price__gte=min_price)
+        filters &= Q(base_price__gte=min_price)
 
     if max_price is not None:
-        queryset = queryset.filter(base_price__lte=max_price)
+        filters &= Q(base_price__lte=max_price)
 
-    if min_rating is not None:
-        queryset = queryset.filter(rating__gte=min_rating)
+    if travel_class:
+        filters &= Q(travel_classes__travel_class__name=travel_class)
 
-    # Convert the queryset to a list of dictionaries with proper formatting
-    flights_list = []
-    for flight in queryset:
-        flight_dict = {
-            'id': flight.id,
-            'flight_number': flight.flight_number,
-            'departure_airport': flight.departure_airport,
-            'arrival_airport': flight.arrival_airport,
-            'departure_time': flight.departure_time,
-            'arrival_time': flight.arrival_time,
-            'base_price': float(flight.base_price),
-            'available_seats': flight.available_seats,
-            'rating': float(flight.rating),
-            'featured_image': flight.featured_image,
-            'duration': str(flight.duration) if flight.duration else None,
-            'image': flight.featured_image
-        }
-        flights_list.append(flight_dict)
+    if has_wifi is not None:
+        filters &= Q(has_wifi=has_wifi)
 
-    return flights_list
+    if has_entertainment is not None:
+        filters &= Q(has_entertainment=has_entertainment)
+
+    if has_meals is not None:
+        filters &= Q(has_meals=has_meals)
+
+    if filters:
+        queryset = queryset.filter(filters)
+
+    # Apply sorting
+    sort_field = f"{'-' if sort_order == 'desc' else ''}{sort_by}"
+    queryset = queryset.order_by(sort_field)
+
+    # Apply pagination
+    start = (page - 1) * page_size
+    end = start + page_size
+
+    # Ensure distinct results
+    queryset = queryset.distinct()
+
+    return queryset[start:end]
+
+# Add an endpoint to get flight details by ID
+@router.get("/flights/{flight_id}", response=FlightListSchema)
+def get_flight_detail(request, flight_id: int):
+    """
+    Get detailed information about a specific flight
+    """
+    flight = Flight.objects.select_related(
+        'departure_airport',
+        'arrival_airport'
+    ).prefetch_related(
+        'travel_classes',
+        'travel_classes__travel_class'
+    ).get(id=flight_id)
+
+    return flight
+
+# Add an endpoint to get available travel classes for a flight
+@router.get("/flights/{flight_id}/travel-classes", response=List[FlightClassSchema])
+def get_flight_travel_classes(request, flight_id: int):
+    """
+    Get available travel classes for a specific flight
+    """
+    flight = Flight.objects.prefetch_related(
+        'travel_classes',
+        'travel_classes__travel_class'
+    ).get(id=flight_id)
+
+    return flight.travel_classes.all()

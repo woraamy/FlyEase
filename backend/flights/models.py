@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
 from datetime import datetime
 
 class Airport(models.Model):
@@ -24,9 +25,37 @@ class Aircraft(models.Model):
     registration_number = models.CharField(max_length=20, unique=True)
     total_seats = models.IntegerField()
     
-
     def __str__(self):
         return f"{self.model} ({self.registration_number})"
+
+class TripType(models.Model):
+    TRIP_TYPES = (
+        ('SOLO', 'Solo'),
+        ('ROUND_TRIP', 'Round Trip'),
+        ('MULTI_CITY', 'Multi City'),
+    )
+
+    name = models.CharField(max_length=20, choices=TRIP_TYPES, unique=True)
+
+    def __str__(self):
+        return self.get_name_display()
+    
+class TravelClass(models.Model):
+    CLASS_TYPES = (
+        ('ECONOMY', 'Economy'),
+        ('BUSINESS', 'Business'),
+        ('FIRST', 'First Class'),
+    )
+
+    name = models.CharField(max_length=20, choices=CLASS_TYPES, unique=True)
+    price_multiplier = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        validators=[MinValueValidator(1.0)]
+    )
+
+    def __str__(self):
+        return self.get_name_display()
 
 class Flight(models.Model):
     flight_number = models.CharField(max_length=10, unique=True)
@@ -54,7 +83,15 @@ class Flight(models.Model):
         default=0
     )
     featured_image = models.URLField(max_length=500, blank=True)
+
     duration = models.DurationField(null=True)
+    has_wifi = models.BooleanField(default=False)
+    has_entertainment = models.BooleanField(default=False)
+    has_meals = models.BooleanField(default=False)
+    travel_classes = models.ManyToManyField(
+        TravelClass,
+        through='FlightClass'
+    )
 
     class Meta:
         indexes = [
@@ -67,6 +104,14 @@ class Flight(models.Model):
     def __str__(self):
         return f"{self.flight_number}: {self.departure_airport} to {self.arrival_airport}"
 
+class FlightClass(models.Model):
+    flight = models.ForeignKey(Flight, on_delete=models.CASCADE)
+    travel_class = models.ForeignKey(TravelClass, on_delete=models.PROTECT)
+    available_seats = models.IntegerField(validators=[MinValueValidator(0)])
+
+    class Meta:
+        unique_together = ['flight', 'travel_class']
+
 class Passenger(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     passport_number = models.CharField(max_length=20, unique=True)
@@ -75,6 +120,51 @@ class Passenger(models.Model):
 
     def __str__(self):
         return f"{self.user.get_full_name()} ({self.passport_number})"
+
+class Trip(models.Model):
+    trip_type = models.ForeignKey(TripType, on_delete=models.PROTECT)
+    passenger = models.ForeignKey(Passenger, on_delete=models.PROTECT)
+    travel_class = models.ForeignKey(TravelClass, on_delete=models.PROTECT)
+
+    # Passenger counts
+    adults = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(9)]
+    )
+    children = models.PositiveIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(9)],
+        default=0
+    )
+    infants = models.PositiveIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(1)],
+        default=0
+    )
+
+    def clean(self):
+        # Validate total passengers
+        total_passengers = self.adults + self.children + self.infants
+        if total_passengers > 9:
+            raise ValidationError('Total number of passengers cannot exceed 9')
+
+        # Validate infants count
+        if self.infants > 1:
+            raise ValidationError('Maximum number of infants allowed is 1')
+
+        # Ensure there's at least one adult
+        if self.adults < 1:
+            raise ValidationError('At least one adult is required')
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
+class TripFlight(models.Model):
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name='trip_flights')
+    flight = models.ForeignKey(Flight, on_delete=models.PROTECT)
+    sequence = models.PositiveIntegerField()  # For ordering flights in multi-city trips
+
+    class Meta:
+        unique_together = ['trip', 'sequence']
+        ordering = ['sequence']
 
 class Booking(models.Model):
     BOOKING_STATUS = (
