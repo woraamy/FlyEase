@@ -18,7 +18,7 @@ def list_available_flights(request):
     )
     return flights
 
-@api.get("/search", response=List[FlightSchema])
+@api.get("/search/", response=List[FlightSchema])
 def search_flights(
     request,
     departure_airport_city: Optional[str] = None,
@@ -27,6 +27,7 @@ def search_flights(
     arrival_time: Optional[datetime] = None,
     travel_class_name: Optional[str] = None
 ):
+
     flights = Flight.objects.all()
 
     if departure_airport_city:
