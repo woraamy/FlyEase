@@ -1,28 +1,14 @@
 // app/page.tsx
 import { Suspense } from 'react';
-import { flightAPI } from '@/app/action';
+import { getFlights } from '@/app/action';
 import FlightList from '@/components/FlightList';
 import SearchForm from '@/components/SearchForm';
 import Loading from '@/components/Loading';
 
-// async function getFlights() {
-//   try {
-//     return await flightAPI.getFlights();
-//   } catch (error) {
-//     console.error('Error loading flights:', error);
-//     throw error;
-//   }
-// }
+
 
 export default async function Home() {
-  // const initialFlights = await getFlights();
-  let initialFlights = [];
-  try {
-    initialFlights = await flightAPI.getFlights();
-    // console.log('initialFlights:', initialFlights);
-  } catch (error) {
-    console.error('Error loading flights:', error);
-  }
+  const initialFlights = await getFlights();
 
   return (
     <div className="bg-white min-h-screen">

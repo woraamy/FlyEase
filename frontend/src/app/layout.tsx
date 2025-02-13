@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Plus_Jakarta_Sans } from 'next/font/google'
+import { Providers } from '@/components/Providers';
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -17,12 +18,15 @@ export const metadata: Metadata = {
   description: "Book your flights with ease and convenience",
 };
 
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={plusJakartaSans.className}>
       <body className={`bg-gray-50 min-h-screen flex flex-col`}>
+        <Providers>
         <Navbar />
         <main className="flex-grow">{children}</main>
+        </Providers>
         <Footer />
       </body>
     </html>

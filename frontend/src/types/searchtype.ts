@@ -1,10 +1,10 @@
 export interface SearchParams {
-    from_city?: string;
-    to_city?: string;
-    min_price?: string;
-    max_price?: string;
-    min_rating?: string;
-}
+    departure_airport_city?: string;
+    arrival_airport_city?: string;
+    departure_time?: string;
+    arrival_time?: string;
+    travel_class_name?: string;
+  }
 
 export interface Airport {
     id: number;
