@@ -37,7 +37,8 @@ class Flight(models.Model):
     has_wifi = models.BooleanField(default=False)
     has_entertainment = models.BooleanField(default=False)
     has_meals = models.BooleanField(default=False)
-    
+
+    travel_classes = models.ManyToManyField("TravelClass", through="FlightClassDetail")
 
     class Meta:
         indexes = [
@@ -82,3 +83,33 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.booking_reference} - {self.passenger}"
+
+class TravelClass(models.Model):
+    CLASS_CHOICES = (
+        ('ECONOMY', 'Economy'),
+        ('BUSINESS', 'Business'),
+        ('FIRST', 'First Class'),
+    )
+    name = models.CharField(max_length=20, choices=CLASS_CHOICES, unique=True)
+    
+    price_multiplier = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        default=1.00,
+        validators=[MinValueValidator(1.0)]
+    )
+
+    def __str__(self):
+        return dict(TravelClass.CLASS_CHOICES).get(self.name, self.name)
+
+
+class FlightClassDetail(models.Model):
+    flight = models.ForeignKey(Flight, on_delete=models.CASCADE)
+    travel_class = models.ForeignKey(TravelClass, on_delete=models.PROTECT)
+    available_seats = models.PositiveIntegerField(validators=[MinValueValidator(0)])
+
+    class Meta:
+        unique_together = ['flight', 'travel_class']
+
+    def __str__(self):
+        return f"{self.flight.flight_number} - {self.travel_class}"

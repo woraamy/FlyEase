@@ -1,6 +1,6 @@
 // app/page.tsx
 import { Suspense } from 'react';
-import { flightAPI } from '@/services/api';
+import { flightAPI } from '@/app/action';
 import FlightList from '@/components/FlightList';
 import SearchForm from '@/components/SearchForm';
 import Loading from '@/components/Loading';

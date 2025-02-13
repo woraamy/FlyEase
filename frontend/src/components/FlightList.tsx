@@ -13,9 +13,9 @@ export default function FlightList({ initialFlights }: FlightListProps) {
 
   return (
     <div className="flex flex-col gap-8">
-      {flights.map((flight) => (
-        <FlightCard key={flight.id} flight={flight} />
-      ))}
+        {flights.map((flight, index) => (
+        <FlightCard key={flight.id || index} flight={flight} />
+        ))}
     </div>
   );
 }
