@@ -103,7 +103,7 @@ const SearchForm = () => {
         arrival_time: arrivalDate ? format(arrivalDate, "yyyy-MM-dd") : "",
         travel_class_name: travelClass,
       }),
-    enabled: false, // ✅ Prevent auto-fetching
+    enabled: false,
   });
 
   // Function to trigger search
@@ -123,6 +123,10 @@ const SearchForm = () => {
     "Dubai",
     "Singapore",
     "Hong Kong",
+    "Los Angeles",
+    "Sydney",
+    "Frankfurt",
+    "Miami"
   ];
 
   return (
