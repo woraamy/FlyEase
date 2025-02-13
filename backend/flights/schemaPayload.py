@@ -3,6 +3,7 @@ from typing import List
 from ninja import Schema
 
 class AirportSchema(Schema):
+    id: int
     code: str
     name: str
     city: str
@@ -14,6 +15,7 @@ class AirportSchema(Schema):
 
 # Schema for representing a Flight in responses.
 class FlightSchema(Schema):
+    id: int
     flight_number: str
     departure_airport: AirportSchema
     arrival_airport: AirportSchema

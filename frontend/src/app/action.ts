@@ -6,9 +6,7 @@ export const flightAPI = {
     getFlights: async (params?: SearchParams) => {
       try {
         const queryString = params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : '';
-        const response = await fetch(`${API_BASE_URL}/flights/`, {
-          next: { revalidate: 3600 }, // Cache for 1 hour
-        });
+        const response = await fetch(`${API_BASE_URL}/flights/`)
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
