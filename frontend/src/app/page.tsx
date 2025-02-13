@@ -25,7 +25,7 @@ export default async function Home() {
             alt="Beach"
             className="w-full h-96 object-cover mt-6 rounded-lg"
           />
-          <div className="max-w-4xl mx-auto mt-8">
+          <div className="max-w-6xl mx-auto mt-8">
             <SearchForm />
           </div>
         </section>

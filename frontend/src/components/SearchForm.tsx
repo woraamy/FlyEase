@@ -83,13 +83,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import FlightList from '@/components/FlightList';
 
 const SearchForm = () => {
   const [departureCity, setDepartureCity] = useState<string>("");
   const [arrivalCity, setArrivalCity] = useState<string>("");
   const [departureDate, setDepartureDate] = useState<Date>();
   const [arrivalDate, setArrivalDate] = useState<Date>();
-  const [travelClass, setTravelClass] = useState<string>("Economy");
+  const [travelClass, setTravelClass] = useState<string>("");
 
   // React Query
   const { data, refetch, isLoading, error } = useQuery({
@@ -130,16 +131,16 @@ const SearchForm = () => {
         <h2 className="text-2xl font-semibold mb-6 text-center text-brand-text">
           Book Your Flight
         </h2>
-
+        {/* Departure City */}
         <form onSubmit={handleSearch}>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {/* Departure City */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-600">From</label>
+              <label className="text-base font-medium text-gray-700">From</label>
               <Select value={departureCity} onValueChange={setDepartureCity}>
-                <SelectTrigger className="w-full">
-                  <Plane className="w-5 h-5 text-gray-400 mr-2" />
-                  <SelectValue placeholder="Departure City" />
+                <SelectTrigger className="w-full h-14 rounded-2xl border-gray-200">
+                  <Plane className="w-6 h-6 text-gray-400 mr-2" />
+                  <SelectValue placeholder="Paris" />
                 </SelectTrigger>
                 <SelectContent>
                   {cities.map((city) => (
@@ -153,11 +154,11 @@ const SearchForm = () => {
 
             {/* Arrival City */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-600">To</label>
+              <label className="text-base font-medium text-gray-700">To</label>
               <Select value={arrivalCity} onValueChange={setArrivalCity}>
-                <SelectTrigger className="w-full">
-                  <PlaneLanding className="w-5 h-5 text-gray-400 mr-2" />
-                  <SelectValue placeholder="Arrival City" />
+                <SelectTrigger className="w-full h-14 rounded-2xl border-gray-200">
+                  <PlaneLanding className="w-6 h-6 text-gray-400 mr-2" />
+                  <SelectValue placeholder="New York" />
                 </SelectTrigger>
                 <SelectContent>
                   {cities.map((city) => (
@@ -169,65 +170,55 @@ const SearchForm = () => {
               </Select>
             </div>
 
+
             {/* Departure Date */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-600">Departure</label>
+              <label className="text-base font-medium text-gray-700">Departure</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={`w-full justify-start text-left font-normal ${
-                      !departureDate && "text-muted-foreground"
+                    className={`w-full h-14 rounded-2xl border-gray-200 justify-start text-left font-normal ${
+                      !departureDate && "text-gray-500"
                     }`}
                   >
-                    <CalendarIcon className="w-5 h-5 text-gray-400 mr-2" />
+                    <CalendarIcon className="w-6 h-6 text-gray-400 mr-2" />
                     {departureDate ? format(departureDate, "MMM dd, yyyy") : <span>Departure Date</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={departureDate}
-                    onSelect={setDepartureDate}
-                    initialFocus
-                  />
+                  <Calendar mode="single" selected={departureDate} onSelect={setDepartureDate} initialFocus />
                 </PopoverContent>
               </Popover>
             </div>
 
             {/* Arrival Date */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-600">Return</label>
+              <label className="text-base font-medium text-gray-700">Return</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={`w-full justify-start text-left font-normal ${
-                      !arrivalDate && "text-muted-foreground"
+                    className={`w-full h-14 rounded-2xl border-gray-200 justify-start text-left font-normal ${
+                      !arrivalDate && "text-gray-500"
                     }`}
                   >
-                    <CalendarIcon className="w-5 h-5 text-gray-400 mr-2" />
+                    <CalendarIcon className="w-6 h-6 text-gray-400 mr-2" />
                     {arrivalDate ? format(arrivalDate, "MMM dd, yyyy") : <span>Return Date</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={arrivalDate}
-                    onSelect={setArrivalDate}
-                    initialFocus
-                  />
+                  <Calendar mode="single" selected={arrivalDate} onSelect={setArrivalDate} initialFocus />
                 </PopoverContent>
               </Popover>
             </div>
-
-            {/* Travel Class */}
+            {/* Class */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-600">Class</label>
+              <label className="text-base font-medium text-gray-700">Class</label>
               <Select value={travelClass} onValueChange={setTravelClass}>
-                <SelectTrigger className="w-full">
-                  <Users className="w-5 h-5 text-gray-400 mr-2" />
-                  <SelectValue placeholder="Select Class" />
+                <SelectTrigger className="w-full h-14 rounded-2xl border-gray-200">
+                  <Users className="w-6 h-6 text-gray-400 mr-2" />
+                  <SelectValue placeholder="First Class" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Economy">Economy</SelectItem>
@@ -239,15 +230,13 @@ const SearchForm = () => {
 
             {/* Search Button */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-600 invisible">
-                Search
-              </label>
+              <label className="text-base font-medium text-gray-700 invisible">Search</label>
               <Button
                 type="submit"
-                className="w-full bg-[#3A7853] hover:bg-opacity-90 text-white"
+                className="w-full h-14 bg-[#3A7853] hover:bg-opacity-90 text-white rounded-2xl flex items-center justify-center gap-2 px-4 text-base font-medium whitespace-nowrap overflow-hidden"
               >
-                <Search className="w-5 h-5 mr-2" />
-                Search
+                <Search className="w-5 h-5 flex-shrink-0" />
+                <span className="truncate">Search</span>
               </Button>
             </div>
           </div>
@@ -263,7 +252,7 @@ const SearchForm = () => {
             <div>
               <h3 className="text-lg font-semibold">Available Flights:</h3>
               <pre className="bg-gray-100 p-4 rounded-md mt-2">
-                {JSON.stringify(data, null, 2)}
+                <FlightList initialFlights={data} />
               </pre>
             </div>
           )}
@@ -274,3 +263,4 @@ const SearchForm = () => {
 };
 
 export default SearchForm;
+
