@@ -1,4 +1,4 @@
-import { Calendar, Users, ChevronDown } from "lucide-react";
+import { Calendar, Users, ChevronDown, Search } from "lucide-react";
 
 const SearchForm = () => {
   return (
@@ -7,7 +7,7 @@ const SearchForm = () => {
         <h2 className="text-2xl font-semibold mb-6 text-center text-brand-text">
           Book Your Flight
         </h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-600">Date</label>
@@ -45,10 +45,15 @@ const SearchForm = () => {
             </div>
           </div>
 
-          <button className="bg-brand-primary text-white rounded-md py-3 px-6 hover:bg-opacity-90 transition-colors mt-6 md:mt-8">
-            Search Flights
-          </button>
-          
+          {/* Search Button Styled as an Input */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-600 invisible">Search</label>
+            <button className="flex items-center border bg-[#3A7853] border rounded-md p-3 bg-brand-primary text-white hover:bg-opacity-90 transition-colors w-full">
+              <Search className="w-5 h-5 text-white mr-2" />
+              Search Flights
+            </button>
+          </div>
+
         </div>
       </div>
     </div>

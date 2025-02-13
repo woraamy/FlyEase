@@ -10,7 +10,7 @@ interface FlightCardProps {
 
 const FlightCard = ({ from, to, price, rating, image }: FlightCardProps) => {
   return (
-    <div className="bg-[#D4EBDD] text-black rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 p-6 flex flex-col gap-6 w-full">
+    <div className="bg-[#EAF0EC] text-black rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 p-6 flex flex-col gap-6 w-full">
       <div className="flex items-start gap-6 justify-between w-full">
         <div className="flex gap-6">
           <img src={image} alt={`${from} to ${to}`} className="w-32 h-32 object-cover rounded-lg" />
