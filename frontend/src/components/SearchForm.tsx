@@ -91,6 +91,7 @@ const SearchForm = () => {
   const [arrivalDate, setArrivalDate] = useState<Date>();
   const [travelClass, setTravelClass] = useState<string>("Economy");
 
+  // React Query
   const { data, refetch, isLoading, error } = useQuery({
     queryKey: ["flights", departureCity, arrivalCity, departureDate, arrivalDate, travelClass],
     queryFn: () =>
@@ -101,13 +102,16 @@ const SearchForm = () => {
         arrival_time: arrivalDate ? format(arrivalDate, "yyyy-MM-dd") : "",
         travel_class_name: travelClass,
       }),
-    enabled: false,
+    enabled: false, // ✅ Prevent auto-fetching
   });
 
+  // Function to trigger search
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    refetch();
+    console.log("Fetching flights...");
+    await refetch(); // ✅ Manually trigger query
   };
+
 
   // Sample cities - replace with your actual city data
   const cities = [
