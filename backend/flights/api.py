@@ -23,11 +23,10 @@ def search_flights(
     request,
     departure_airport_city: Optional[str] = None,
     arrival_airport_city: Optional[str] = None,
-    departure_time: Optional[datetime] = None,
-    arrival_time: Optional[datetime] = None,
+    departure_date: Optional[str] = None,  # Changed from departure_time to departure_date
+    arrival_date: Optional[str] = None,    # Changed from arrival_time to arrival_date
     travel_class_name: Optional[str] = None
 ):
-
     flights = Flight.objects.all()
 
     if departure_airport_city:
@@ -36,15 +35,32 @@ def search_flights(
     if arrival_airport_city:
         flights = flights.filter(arrival_airport__city__iexact=arrival_airport_city)
 
-    if departure_time:
-        flights = flights.filter(departure_time__gte=departure_time)
+    if departure_date:
+        try:
+            # Convert string to datetime
+            departure_date = datetime.strptime(departure_date, '%Y-%m-%d')
+            # Create start and end of the day
+            departure_start = timezone.make_aware(datetime.combine(departure_date, datetime.min.time()))
+            departure_end = timezone.make_aware(datetime.combine(departure_date, datetime.max.time()))
+            # Filter flights between start and end of the day
+            flights = flights.filter(departure_time__range=(departure_start, departure_end))
+        except ValueError:
+            raise ValueError("Invalid departure date format. Use YYYY-MM-DD")
 
-    if arrival_time:
-        flights = flights.filter(arrival_time__lte=arrival_time)
+    if arrival_date:
+        try:
+            # Convert string to datetime
+            arrival_date = datetime.strptime(arrival_date, '%Y-%m-%d')
+            # Create start and end of the day
+            arrival_start = timezone.make_aware(datetime.combine(arrival_date, datetime.min.time()))
+            arrival_end = timezone.make_aware(datetime.combine(arrival_date, datetime.max.time()))
+            # Filter flights between start and end of the day
+            flights = flights.filter(arrival_time__range=(arrival_start, arrival_end))
+        except ValueError:
+            raise ValueError("Invalid arrival date format. Use YYYY-MM-DD")
 
     if travel_class_name:
         flights = flights.filter(travel_classes__name__iexact=travel_class_name).distinct()
-
     results = []
     for flight in flights:
         travel_details = [
