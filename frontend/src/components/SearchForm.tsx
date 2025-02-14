@@ -80,7 +80,7 @@ const SearchForm = () => {
               <Select value={departureCity} onValueChange={setDepartureCity}>
                 <SelectTrigger className="w-full h-14 rounded-2xl border-gray-200">
                   <Plane className="w-6 h-6 text-gray-400 mr-2" />
-                  <SelectValue placeholder="Paris" />
+                  <SelectValue placeholder="Department City" />
                 </SelectTrigger>
                 <SelectContent>
                   {cities.map((city) => (
@@ -98,7 +98,7 @@ const SearchForm = () => {
               <Select value={arrivalCity} onValueChange={setArrivalCity}>
                 <SelectTrigger className="w-full h-14 rounded-2xl border-gray-200">
                   <PlaneLanding className="w-6 h-6 text-gray-400 mr-2" />
-                  <SelectValue placeholder="New York" />
+                  <SelectValue placeholder="Arrival City" />
                 </SelectTrigger>
                 <SelectContent>
                   {cities.map((city) => (
@@ -123,7 +123,7 @@ const SearchForm = () => {
                     }`}
                   >
                     <CalendarIcon className="w-6 h-6 text-gray-400 mr-2" />
-                    {departureDate ? format(departureDate, "MMM dd, yyyy") : <span>Departure Date</span>}
+                    {departureDate ? format(departureDate, "MMM dd, yyyy") : <span>Select Date</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -144,7 +144,7 @@ const SearchForm = () => {
                     }`}
                   >
                     <CalendarIcon className="w-6 h-6 text-gray-400 mr-2" />
-                    {arrivalDate ? format(arrivalDate, "MMM dd, yyyy") : <span>Return Date</span>}
+                    {arrivalDate ? format(arrivalDate, "MMM dd, yyyy") : <span>Select Date</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -158,7 +158,7 @@ const SearchForm = () => {
               <Select value={travelClass} onValueChange={setTravelClass}>
                 <SelectTrigger className="w-full h-14 rounded-2xl border-gray-200">
                   <Users className="w-6 h-6 text-gray-400 mr-2" />
-                  <SelectValue placeholder="First Class" />
+                  <SelectValue placeholder="Select Class" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Economy">Economy</SelectItem>
