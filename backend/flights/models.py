@@ -48,6 +48,10 @@ class Flight(models.Model):
             models.Index(fields=['rating']),
         ]
 
+    @property
+    def class_details(self):
+        return list(self.flightclassdetail_set.all())
+
     def __str__(self):
         return f"{self.flight_number}: {self.departure_airport} to {self.arrival_airport}"
 
@@ -91,7 +95,7 @@ class TravelClass(models.Model):
         ('FIRST', 'First Class'),
     )
     name = models.CharField(max_length=20, choices=CLASS_CHOICES, unique=True)
-    
+
     price_multiplier = models.DecimalField(
         max_digits=3,
         decimal_places=2,
