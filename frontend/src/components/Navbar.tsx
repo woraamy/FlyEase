@@ -6,7 +6,9 @@ import { FaSearch, FaUser } from "react-icons/fa";
 export default function Navbar() {
   return (
     <nav className="bg-white shadow-md p-4 flex justify-between items-center">
-      <h1 className="ml-8 text-2xl font-bold text-green-700">flyease</h1>
+      <Link href="/" className="ml-8 text-2xl font-bold text-green-700">
+        flyease
+      </Link>
       <div className="flex space-x-6 text-gray-600 font-medium">
         <Link href="/" className="hover:text-green-700">Home</Link>
         <Link href="/flights" className="hover:text-green-700">Flights</Link>

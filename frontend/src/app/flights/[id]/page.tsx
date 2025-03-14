@@ -90,10 +90,10 @@ export default function FlightDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-600 to-green-600 text-white">
+    <div className="min-h-screen bg-white text-green">
       <main className="container grid gap-6 px-6 py-8 md:grid-cols-[1fr_300px]">
         <div className="space-y-6">
-          <h1 className="text-3xl font-bold text-white">Flight Details</h1>
+          <h1 className="text-3xl font-bold text-green-600">Flight Details</h1>
 
           {/* Flight Image */}
           <div className="overflow-hidden rounded-lg shadow-lg">
@@ -163,7 +163,7 @@ export default function FlightDetailsPage() {
 
         {/* Checkout Sidebar */}
         <div className="space-y-4">
-          <Card className="p-6 bg-white text-gray-900 rounded-xl shadow-lg">
+          <Card className="p-6 bg-white text-gray-900 rounded-xl shadow-lg h-full">
             <h2 className="mb-4 font-semibold text-lg">Booking</h2>
             <p className="text-lg font-semibold text-gray-900">Price: ${flight.base_price.toFixed(2)}</p>
             <p className="text-gray-600">Seats Available: {flight.available_seats}</p>
