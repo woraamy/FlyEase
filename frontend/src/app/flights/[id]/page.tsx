@@ -12,7 +12,7 @@ import { Card } from "@/components/ui/card";
 import { flightAPI } from "./action";
 
 interface Flight {
-  id: string;
+  id: number;
   flight_number: string;
   departure_airport: { code: string; name: string };
   arrival_airport: { code: string; name: string };
@@ -28,19 +28,29 @@ interface Flight {
 }
 
 export default function FlightDetailsPage() {
-  const { id: flightId } = useParams<{ id: string }>();
+  const { id: flightId } = useParams<{ id: string }>(); 
   const [flight, setFlight] = useState<Flight | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!flightId) {
+      setError("Flight ID is missing.");
+      setLoading(false);
+      return;
+    }
+
     async function fetchFlight() {
       try {
         console.log(`Fetching flight with ID: ${flightId}`);
-        
-        const res = await flightAPI.getFlightById(flightId);
 
-        // Check if the response is valid JSON
+        
+        const res = await flightAPI.getFlightById(Number(flightId));
+
+        if (!res.ok) {
+          throw new Error(`API Error: ${res.status} ${res.statusText}`);
+        }
+
         const contentType = res.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
           throw new Error("Invalid JSON response. The API might be returning an error page.");
@@ -61,7 +71,7 @@ export default function FlightDetailsPage() {
     }
 
     fetchFlight();
-  }, [flightId]);
+  }, [flightId]); 
 
   if (loading) {
     return (
