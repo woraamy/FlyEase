@@ -7,9 +7,15 @@ import {
   Plane, Clock, Wifi, Tv, UtensilsCrossed, Star, LoaderCircle 
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { flightAPI } from "./action";
+import { Apple } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 
 interface Flight {
   id: number;
@@ -90,89 +96,160 @@ export default function FlightDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-green">
-      <main className="container grid gap-6 px-6 py-8 md:grid-cols-[1fr_300px]">
-        <div className="space-y-6">
-          <h1 className="text-3xl font-bold text-green-600">Flight Details</h1>
-
-          {/* Flight Image */}
-          <div className="overflow-hidden rounded-lg shadow-lg">
-            <img src={flight.featured_image} alt="Flight" className="w-full h-64 object-cover" />
+    <div className="flex px-6 py-4">
+    {/* Left */}
+    <div className="flex-[3] items-center justify-center p-6">
+      {/* Header */}
+      <div className="flex flex-col space-y-4">
+        <p className="text-3xl font-semibold text-center">Flight Booking Details</p>
+        {/* Container for cards and button */}
+        <div className="flex justify-between items-center space-x-4">
+          {/* Cards */}
+          <div className="grid grid-cols-4 gap-4 w-full">
+            {[
+              { name: "Alaska Airlines", icon: Apple },
+              { name: "Delta Airlines", icon: Apple },
+              { name: "United Airlines", icon: Apple },
+              { name: "American Airlines", icon: Apple },
+            ].map((_, index) => (
+              <div key={index} className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
+                <Apple />
+                <span className="flex flex-col">
+                  <p className="text-xs">Airline</p>
+                  <p className="text-sm">Alaska Airline</p>
+                </span>
+              </div>
+            ))}
           </div>
 
-          {/* Flight Info Card */}
-          <Card className="bg-white text-gray-900 p-6 rounded-xl shadow-lg">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                    <Plane className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-lg">Flight {flight.flight_number}</div>
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                      {flight.rating} Rating
-                    </div>
-                  </div>
-                </div>
-
-                {/* Flight Time Details */}
-                <div className="grid gap-2">
-                  <div className="flex items-center gap-8">
-                    <div>
-                      <div className="font-semibold">{flight.departure_airport.code}</div>
-                      <div className="text-sm text-gray-500">{format(new Date(flight.departure_time), "h:mm a")}</div>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-500">
-                      <Clock className="h-4 w-4" />
-                      {format(new Date(flight.arrival_time), "h:mm a")}
-                    </div>
-                    <div>
-                      <div className="font-semibold">{flight.arrival_airport.code}</div>
-                      <div className="text-sm text-gray-500">{format(new Date(flight.arrival_time), "h:mm a")}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Flight Amenities */}
-                <div className="flex gap-4">
-                  {flight.has_wifi && (
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
-                      <Wifi className="h-4 w-4 text-green-600" />
-                      WiFi
-                    </div>
-                  )}
-                  {flight.has_entertainment && (
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
-                      <Tv className="h-4 w-4 text-green-600" />
-                      Entertainment
-                    </div>
-                  )}
-                  {flight.has_meals && (
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
-                      <UtensilsCrossed className="h-4 w-4 text-green-600" />
-                      Meals
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </Card>
+          {/* Button */}
+          <Button className="bg-green-500 text-white font-semibold px-4 py-5 h-full rounded-xl hover:bg-green-600">
+            Process to Payment
+          </Button>
         </div>
-
-        {/* Checkout Sidebar */}
-        <div className="space-y-4">
-          <Card className="p-6 bg-white text-gray-900 rounded-xl shadow-lg h-full">
-            <h2 className="mb-4 font-semibold text-lg">Booking</h2>
-            <p className="text-lg font-semibold text-gray-900">Price: ${flight.base_price.toFixed(2)}</p>
-            <p className="text-gray-600">Seats Available: {flight.available_seats}</p>
-            <Button className="w-full bg-green-600 text-white hover:bg-green-700 mt-4" size="lg">
-              Book Now
-            </Button>
-          </Card>
+      </div>
+      <Separator className="m-4" />
+      {/* Passenger Detail */}
+      <div className="flex flex-col">
+        <p className="text-2xl font-semibold pb-6">Passenger Detail</p>
+        <div className="flex items-center space-x-3">
+          <Avatar className="h-[100px] w-[100px]">
+            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+          <span className="w-full">
+            <p className="text-sm">Full Name</p>
+            <div className="text-gray-400 bg-gray-200 p-2 rounded-2xl">e.g. Elara Kinsley</div>
+          </span>
         </div>
-      </main>
+      </div>
+      <Separator className="m-4" />
+      {/* Additonal Services */}
+      <div className="pb-3 space-y-4">
+        <p className="text-xl font-semibold">Additional Services</p>
+        {/* Services List */}
+        <div className="flex justify-between">
+          <span>
+            <p className="font-bold">Seat Preference</p>
+            <p>Select your preferred seat</p>
+          </span>
+          <Switch id="something" />
+        </div>
+        <div className="flex justify-between">
+          <span>
+            <p className="font-bold">Seat Preference</p>
+            <p>Select your preferred seat</p>
+          </span>
+          <Switch id="something" />
+        </div>
+        <div className="flex justify-between">
+          <span>
+            <p className="font-bold">Seat Preference</p>
+            <p>Select your preferred seat</p>
+          </span>
+          <Switch id="something" />
+        </div>
+        <div className="flex justify-between">
+          <span>
+            <p className="font-bold">Seat Preference</p>
+            <p>Select your preferred seat</p>
+          </span>
+          <Switch id="something" />
+        </div>
+      </div>
+      <Separator className="m-8" />
+      {/* Passenger Information */}
+      <div>
+        <p className="text-xl font-semibold pb-4">Passenger Information</p>
+        <div className="grid grid-cols-2 gap-4">
+          <span className="space-y-2">
+            <p className="font-semibold">Age</p>
+            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+          </span>
+          <span className="space-y-2">
+            <p className="font-semibold">Age</p>
+            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+          </span>
+          <span className="space-y-2">
+            <p className="font-semibold">Age</p>
+            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+          </span>
+          <span className="space-y-2">
+            <p className="font-semibold">Age</p>
+            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+          </span>
+          <span className="space-y-2">
+            <p className="font-semibold">Age</p>
+            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+          </span>
+          <span className="space-y-2">
+            <p className="font-semibold">Age</p>
+            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+          </span>
+        </div>
+        <Separator className="m-8" />
+      </div>
+      {/* Buttons */}
+      <div className="flex space-x-4">
+        <Button>Save Details</Button>
+        <Button>Cancle</Button>
+      </div>
     </div>
-  );
+    {/* Right */}
+    <div className="flex-[1] justify-center p-5">
+      <Card>
+        <CardHeader>
+          <CardTitle>Checkout</CardTitle>
+        </CardHeader>
+        <CardContent className="pb-4">
+          <span className="flex justify-between">
+            <p className="text-gray-500">Subtotal</p>
+            <p>100$</p>
+          </span>
+          <span className="flex justify-between">
+            <p className="text-gray-500">Shipping</p>
+            <p>100$</p>
+          </span>
+          <span className="flex justify-between">
+            <p className="text-gray-500">Tax</p>
+            <p>100$</p>
+          </span>
+          <span className="flex justify-between">
+            <p className="text-gray-500">Total</p>
+            <p className="font-bold">100$</p>
+          </span>
+          <Button className="w-full rounded-xl mt-3">Place order</Button>
+        </CardContent>
+        <Separator className="m-4" />
+        <CardFooter className="flex justify-between pt-2">
+          <span className="flex flex-col space-y-2">
+            <Label htmlFor="email">Promo code</Label>
+            <Input type="email" id="email" placeholder="Enter code" />
+          </span>
+          <Button>Apply</Button>
+        </CardFooter>
+      </Card>
+    </div>
+  </div>
+);
 }
