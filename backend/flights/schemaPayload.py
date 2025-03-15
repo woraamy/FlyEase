@@ -4,6 +4,7 @@ from ninja import Schema
 from pydantic import Field
 
 class AirportSchema(Schema):
+    id: int
     code: str
     name: str
     city: str

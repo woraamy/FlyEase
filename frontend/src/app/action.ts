@@ -1,6 +1,5 @@
 // app/action.ts
 import { SearchParams } from '@/types/searchtype';
-
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000/api' ;
 
 export async function searchFlights(params: SearchParams) {

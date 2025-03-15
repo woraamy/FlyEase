@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from typing import List, Optional
 from ninja import NinjaAPI
 from .models import Flight
@@ -6,6 +7,13 @@ from .schemaPayload import FlightSchema, FlightClassDetailSchema, TravelClassSch
 from datetime import datetime
 
 api = NinjaAPI()
+
+# Get a single flight by ID (for flight details page)
+@api.get("/flights/{flight_id}", response=FlightSchema)
+def get_flight_details(request, flight_id: int):
+    flight = get_object_or_404(Flight, id=flight_id)
+    return flight
+
 
 @api.get("/flights/", response=List[FlightSchema])
 def list_available_flights(request):

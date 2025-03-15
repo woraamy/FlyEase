@@ -1,13 +1,30 @@
+"use client";
+
 import { Star, Wifi, Utensils, Music } from "lucide-react";
 import { Flight } from "@/types/searchtype";
+import { useRouter } from "next/navigation";
 
 export interface FlightCardProps {
   flight: Flight;  // Update the props interface to include flight
 }
 
 const FlightCard = ({ flight }: FlightCardProps) => {
+  console.log(flight)
+  const router = useRouter()
+
+  const handleClick = () => {
+    if (!flight.id) {
+      console.error("Flight ID is missing:", flight);
+      return; // Prevent navigation if flight.id is undefined
+    }
+    router.push(`/flights/${flight.id}`);
+  };
+
   return (
-    <div className="bg-[#EAF0EC] text-black rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 p-6 flex flex-col gap-6 w-full">
+    <div 
+      className="bg-[#EAF0EC] text-black rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 p-6 flex flex-col gap-6 w-full"
+      onClick={handleClick} // Make the card clickable 
+    >
       <div className="flex items-start gap-6 justify-between w-full">
         <div className="flex gap-6">
           <img 
