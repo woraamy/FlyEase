@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
 import { 
-  Plane, Clock, Wifi, Tv, UtensilsCrossed, Star, LoaderCircle, PlaneTakeoff, PlaneLanding, CalendarArrowUp, CalendarArrowDown
+  Plane, Clock, Wifi, Tv, UtensilsCrossed, Star, LoaderCircle, PlaneTakeoff, PlaneLanding, CalendarArrowUp, CalendarArrowDown, ChevronDown
 } from "lucide-react";
 
 import { flightAPI } from "./action";
@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { FaChevronDown } from "react-icons/fa";
 
 interface Flight {
   id: number;
@@ -38,6 +39,10 @@ export default function FlightDetailsPage() {
   const [flight, setFlight] = useState<Flight | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [seatExpanded, setSeatExpanded] = useState(false);
+  const [mealExpanded, setMealExpanded] = useState(false);
+  const [serviceExpanded, setServiceExpanded] = useState(false);
+  const [baggageExpanded, setBaggageExpanded] = useState(false);
 
   useEffect(() => {
     if (!flightId) {
@@ -102,6 +107,8 @@ export default function FlightDetailsPage() {
       {/* Header */}
       <div className="flex flex-col space-y-4">
         <p className="text-3xl font-semibold text-center">Flight Details</p>
+        <h1 className="text-xl text-center">from {flight.departure_airport.name} to {flight.arrival_airport.name}</h1>
+        <p className="text-sm flex items-center"><Star className="text-yellow-500 mr-1" /> Ratings {flight.rating} / 5</p>
         {/* Container for cards and button */}
         <img
             src={flight.featured_image}
@@ -157,52 +164,49 @@ export default function FlightDetailsPage() {
         </div>
       </div>
       <Separator className="m-4" />
-      {/* Passenger Detail */}
+      {/* Service on Flight */}
+      {/* Services on Flight */}
       <div className="flex flex-col">
-        <p className="text-2xl font-semibold pb-6">Passenger Detail</p>
-        <div className="flex items-center space-x-3">
-          <Avatar className="h-[100px] w-[100px]">
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <span className="w-full">
-            <p className="text-sm">Full Name</p>
-            <div className="text-gray-400 bg-gray-200 p-2 rounded-2xl">e.g. Elara Kinsley</div>
-          </span>
-        </div>
-      </div>
+            <p className="text-2xl font-semibold pb-6">Services on Flight</p>
+            <div className="grid grid-cols-3 gap-4">
+              {flight.has_wifi && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl"><Wifi className="text-green-700" /><span>In-Flight WiFi</span></div>}
+              {flight.has_entertainment && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl"><Tv className="text-green-700" /><span>In-Flight Entertainment</span></div>}
+              {flight.has_meals && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl">< UtensilsCrossed className="text-green-700" /><span>Complimentary Meal</span></div>}
+            </div>
+          </div>
       <Separator className="m-4" />
       {/* Additonal Services */}
       <div className="pb-3 space-y-4">
         <p className="text-xl font-semibold">Additional Services</p>
         {/* Services List */}
+        {/* <ChevronDown className={`cursor-pointer transition-transform ${expanded ? "rotate-180" : ""}`} onClick={() => setExpanded(!expanded)} /> */}
         <div className="flex justify-between">
           <span>
             <p className="font-bold">Seat Preference</p>
             <p>Select your preferred seat</p>
           </span>
-          <Switch id="something" />
+          <ChevronDown id="seat preference" className={`cursor-pointer transition-transform ${seatExpanded ? "rotate-180" : ""}`} onClick={() => setSeatExpanded(!seatExpanded)} />
         </div>
         <div className="flex justify-between">
           <span>
-            <p className="font-bold">Seat Preference</p>
-            <p>Select your preferred seat</p>
+            <p className="font-bold">Meal Preference</p>
+            <p>Choose your Meal</p>
           </span>
-          <Switch id="something" />
+          <ChevronDown id="meal preference" className={`cursor-pointer transition-transform ${mealExpanded ? "rotate-180" : ""}`} onClick={() => setMealExpanded(!mealExpanded)} />
         </div>
         <div className="flex justify-between">
           <span>
-            <p className="font-bold">Seat Preference</p>
-            <p>Select your preferred seat</p>
+            <p className="font-bold">Extra Bagage</p>
+            <p>Add extra baggage</p>
           </span>
-          <Switch id="something" />
+          <ChevronDown id="seat preference" className={`cursor-pointer transition-transform ${baggageExpanded ? "rotate-180" : ""}`} onClick={() => setBaggageExpanded(!baggageExpanded)} />
         </div>
         <div className="flex justify-between">
           <span>
-            <p className="font-bold">Seat Preference</p>
-            <p>Select your preferred seat</p>
+            <p className="font-bold">Special Assistance</p>
+            <p>Request Assistance</p>
           </span>
-          <Switch id="something" />
+          <ChevronDown id="seat preference" className={`cursor-pointer transition-transform ${serviceExpanded ? "rotate-180" : ""}`} onClick={() => setServiceExpanded(!serviceExpanded)} />
         </div>
       </div>
       <Separator className="m-8" />
@@ -211,28 +215,40 @@ export default function FlightDetailsPage() {
         <p className="text-xl font-semibold pb-4">Passenger Information</p>
         <div className="grid grid-cols-2 gap-4">
           <span className="space-y-2">
-            <p className="font-semibold">Age</p>
-            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+            <p className="font-semibold">First Name</p>
+            <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl" type="firstName" placeholder="e.g. John" />
+          </span>
+          <span className="space-y-2">
+            <p className="font-semibold">Last Name</p>
+            <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl" type="lastName" placeholder="e.g. Doe" />
           </span>
           <span className="space-y-2">
             <p className="font-semibold">Age</p>
-            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+            <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl" type="age" placeholder="e.g. 29" />
           </span>
           <span className="space-y-2">
-            <p className="font-semibold">Age</p>
-            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+            <p className="font-semibold">Gender</p>
+            <select className="text-gray-600 bg-[#E9F1ED] rounded-xl p-2 w-full">
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="prefer_not_to_say">Prefer Not To Say</option>
+            </select>
           </span>
           <span className="space-y-2">
-            <p className="font-semibold">Age</p>
-            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+            <p className="font-semibold">Contact Number</p>
+            <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl" type="contactNumber" placeholder="e.g. +12345678" />
           </span>
           <span className="space-y-2">
-            <p className="font-semibold">Age</p>
-            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+            <p className="font-semibold">Email</p>
+            <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl" type="email" placeholder="e.g. johndoe@gmail.com" />
           </span>
           <span className="space-y-2">
-            <p className="font-semibold">Age</p>
-            <Input className="text-gray-600 bg-gray-200 rounded-xl" type="email" placeholder="Email" />
+            <p className="font-semibold">Passport Number</p>
+            <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl" type="passportNumber" placeholder="e.g. X12345678" />
+          </span>
+          <span className="space-y-2">
+            <p className="font-semibold">Nationality</p>
+            <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl" type="nationality" placeholder="e.g. American" />
           </span>
         </div>
         <Separator className="m-8" />
