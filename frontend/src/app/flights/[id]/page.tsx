@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
 import { 
-  Plane, Clock, Wifi, Tv, UtensilsCrossed, Star, LoaderCircle 
+  Plane, Clock, Wifi, Tv, UtensilsCrossed, Star, LoaderCircle, PlaneTakeoff, PlaneLanding, CalendarArrowUp, CalendarArrowDown
 } from "lucide-react";
 
 import { flightAPI } from "./action";
@@ -101,31 +101,59 @@ export default function FlightDetailsPage() {
     <div className="flex-[3] items-center justify-center p-6">
       {/* Header */}
       <div className="flex flex-col space-y-4">
-        <p className="text-3xl font-semibold text-center">Flight Booking Details</p>
+        <p className="text-3xl font-semibold text-center">Flight Details</p>
         {/* Container for cards and button */}
+        <img
+            src={flight.featured_image}
+            alt="Beach"
+            className="w-full h-96 object-cover mt-6 rounded-lg"
+          />
         <div className="flex justify-between items-center space-x-4">
           {/* Cards */}
-          <div className="grid grid-cols-4 gap-4 w-full">
-            {[
+          <div className="grid grid-cols-5 gap-4 w-full">
+            {/* {[
               { name: "Alaska Airlines", icon: Apple },
-              { name: "Delta Airlines", icon: Apple },
+              { name: "Delta Airlines", icon: Plane },
               { name: "United Airlines", icon: Apple },
               { name: "American Airlines", icon: Apple },
-            ].map((_, index) => (
-              <div key={index} className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
-                <Apple />
+            ].map((_, index) => ( */}
+              <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
+                <Plane />
                 <span className="flex flex-col">
-                  <p className="text-xs">Airline</p>
-                  <p className="text-sm">Alaska Airline</p>
+                  <p className="text-xs">Flight Number</p>
+                  <p className="text-sm">{flight.flight_number}</p>
                 </span>
               </div>
-            ))}
+              <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
+                <CalendarArrowUp />
+                <span className="flex flex-col">
+                  <p className="text-xs">Departure Time</p>
+                  <p className="text-sm">{format(new Date(flight.departure_time), "EE, MMMM d, yyyy h:mm a")}</p>
+                </span>
+              </div>
+              <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
+                <CalendarArrowDown />
+                <span className="flex flex-col">
+                  <p className="text-xs">Arrival Time</p>
+                  <p className="text-sm">{format(new Date(flight.arrival_time), "EE, MMMM d, yyyy h:mm a")}</p>
+                </span>
+              </div>
+              <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
+                <PlaneTakeoff />
+                <span className="flex flex-col">
+                  <p className="text-xs">Departure Airport</p>
+                  <p className="text-sm">{flight.departure_airport.name}</p>
+                </span>
+              </div>
+              <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
+                <PlaneLanding />
+                <span className="flex flex-col">
+                  <p className="text-xs">Arrival Airport</p>
+                  <p className="text-sm">{flight.arrival_airport.name}</p>
+                </span>
+              </div>
+            {/* ))} */}
           </div>
-
-          {/* Button */}
-          <Button className="bg-green-500 text-white font-semibold px-4 py-5 h-full rounded-xl hover:bg-green-600">
-            Process to Payment
-          </Button>
         </div>
       </div>
       <Separator className="m-4" />
