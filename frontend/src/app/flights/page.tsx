@@ -1,6 +1,6 @@
 // app/flights/page.tsx
 import { Suspense } from 'react';
-import { flightAPI } from '@/app/action';
+import { getFlights } from '@/app/action';
 import FlightList from '@/components/FlightList';
 import SearchForm from '@/components/SearchForm';
 import Loading from '@/components/Loading';
@@ -8,7 +8,7 @@ import Loading from '@/components/Loading';
 export default async function Flights() {
   let initialFlights = [];
   try {
-    initialFlights = await flightAPI.getFlights();
+    initialFlights = await getFlights();
   } catch (error) {
     console.error('Error loading flights:', error);
   }
