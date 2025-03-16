@@ -1,0 +1,11 @@
+services:
+  # ...keep existing 'backend' service
+
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432  # enables connecting locally via psql
+    environment:
+      POSTGRES_DB: flightDB
+      POSTGRES_USER: dev  # Set your username
+      POSTGRES_PASSWORD: password  # Set your password
