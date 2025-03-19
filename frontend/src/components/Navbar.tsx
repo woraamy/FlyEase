@@ -22,8 +22,8 @@ export default function Navbar() {
       </div>
       <div className="flex space-x-4">
         <SignedOut>
-          <SignInButton />
-          <SignUpButton />
+          <Link href="/signup" className="hover:text-green-700">Sign Up</Link>
+          <Link href="/login" className="hover:text-green-700">Sign In</Link>
         </SignedOut>
         <SignedIn>
           <UserButton />
