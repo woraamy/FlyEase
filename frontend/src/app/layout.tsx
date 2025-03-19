@@ -3,8 +3,11 @@ import { ReactNode } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Plus_Jakarta_Sans } from 'next/font/google'
-import { Providers } from '@/components/Providers';
+import { Providers } from '@/components/Providers'; // react query
 import "./globals.css";
+import {
+  ClerkProvider
+} from '@clerk/nextjs'
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
@@ -23,10 +26,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={plusJakartaSans.className}>
       <body className={`bg-gray-50 min-h-screen flex flex-col`}>
+        <ClerkProvider>
         <Providers>
         <Navbar />
         <main className="flex-grow">{children}</main>
         </Providers>
+        </ClerkProvider>
         <Footer />
       </body>
     </html>
