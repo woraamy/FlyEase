@@ -26,7 +26,7 @@ export default function Navbar() {
           <Link href="/login" className="hover:text-green-700">Sign In</Link>
         </SignedOut>
         <SignedIn>
-          <UserButton />
+          <UserButton userProfileUrl="/profile"/>
         </SignedIn>
       </div>
     </nav>
