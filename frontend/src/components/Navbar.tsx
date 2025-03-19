@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaSearch, FaUser } from "react-icons/fa";
+import { SignedIn, SignInButton, SignedOut, SignUpButton, UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -20,8 +21,13 @@ export default function Navbar() {
         <Link href="/chat-bot" className={pathname === "/chat-bot" ? "text-green-700 font-semibold" : "hover:text-green-700"}>Chat Bot</Link>
       </div>
       <div className="flex space-x-4">
-        <FaSearch className="text-gray-600 cursor-pointer hover:text-green-700" />
-        <FaUser className="text-gray-600 cursor-pointer hover:text-green-700" />
+        <SignedOut>
+          <SignInButton />
+          <SignUpButton />
+        </SignedOut>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
       </div>
     </nav>
   );

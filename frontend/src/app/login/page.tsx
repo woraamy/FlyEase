@@ -72,7 +72,7 @@ export default function SignupPage() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <Button className="w-full">Create Account</Button>
+          <Button className="w-full">Log in to Your Account</Button>
           <p className="text-sm text-center text-gray-600">
             Doesn't have an account?{" "}
             <Link href="/signup" className="text-blue-600 hover:underline">
