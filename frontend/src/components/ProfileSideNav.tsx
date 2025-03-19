@@ -4,7 +4,7 @@ import { BsFileBarGraphFill } from "react-icons/bs";
 import { MdWorkHistory } from "react-icons/md";
 import { RiInformation2Fill } from "react-icons/ri";
 import { usePathname } from 'next/navigation';
-import { IoIosSettings } from "react-icons/io";
+import { FolderKanban, Plane, UserPen } from 'lucide-react';
 
 export default function ProfileSidenav() {
     const pathname = usePathname();
@@ -17,15 +17,15 @@ export default function ProfileSidenav() {
             <div className="relative ml-[20%] mt-20 w-[70%] ">
                 <span className="p-3">MENU</span>
                 <div className={`flex p-3 mt-2 ${investpage}`}>
-                    < BsFileBarGraphFill />
+                    < UserPen />
                     <Link href={`/profile`} className="ml-2">Profile</Link>
                 </div>
                 <div className={`flex mt-2 p-3 ${historypage}`}>
-                    < MdWorkHistory />
+                    < Plane />
                     <Link href={`/profile/flights`} className="ml-2">My Flights</Link>
                 </div>
                 <div className={`flex mt-2 p-3 ${informationpage}`}>
-                    < RiInformation2Fill />
+                    < FolderKanban />
                     <Link href={`/profile/travel-plans`} className="ml-2">My Travel Plans</Link>
                 </div>
             </div>
