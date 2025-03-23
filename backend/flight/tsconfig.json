@@ -1,0 +1,12 @@
+{
+   "compilerOptions": {
+      "lib": ["es6"],
+      "target": "ES2022",
+      "module": "NodeNext",
+      "moduleResolution": "NodeNext",
+      "outDir": "./build",
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "sourceMap": true
+   }
+}
