@@ -80,8 +80,6 @@ export default function FlightDetailsPage() {
     async function fetchFlight() {
       try {
         console.log(`Fetching flight with ID: ${flightId}`);
-
-        
         const res = await flightAPI.getFlightById(Number(flightId));
 
         if (!res.ok) {

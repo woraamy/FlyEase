@@ -1,5 +1,0 @@
-django-ninja
-django 
-django-cors-headers
-Django-environ
-psycopg2-binary

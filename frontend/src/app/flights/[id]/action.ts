@@ -1,14 +1,10 @@
-const API_BASE_URL = process.env.API_BASE_URL
-
+// const API_BASE_URL = process.env.API_BASE_URL; // || 'http://localhost:3000/flights/[id]' ;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// console.log(API_BASE_URL);
 export const flightAPI = {
     getFlightById: async (id: number) => {
-      console.log(typeof id)
-      console.log("fetching ja")
-      const res = await fetch(`http://localhost:8000/api/flights/${id}`);
-      // const data = await res.json()
-      console.log("fetch laew")
-      console.log(res)
+      const url = `${API_BASE_URL}/${id}`;
+      const res = await fetch(url);
       return res;
     },
   };
-  

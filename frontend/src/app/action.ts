@@ -1,7 +1,7 @@
 "use server"
 import { auth } from "@clerk/nextjs/server";
 import { SearchParams } from '@/types/searchtype';
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000/api' ;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // export async function searchFlights(params: SearchParams) {
 //   try {
@@ -86,7 +86,7 @@ export async function searchFlights(params: SearchParams) {
 
 export async function getFlights() {
   try {
-    const response = await fetch(`${API_BASE_URL}/flights/`);
+    const response = await fetch(`${API_BASE_URL}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
