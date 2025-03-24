@@ -4,6 +4,7 @@ import { getFlights } from '@/app/action';
 import FlightList from '@/components/FlightList';
 import SearchForm from '@/components/SearchForm';
 import Loading from '@/components/Loading';
+import RecommendedFlights from '@/components/RecommendedFlights';
 
 
 
@@ -31,6 +32,7 @@ export default async function Home() {
         </section>
         <div className="max-w-7xl mx-auto px-6">
           <section className="py-16">
+            <RecommendedFlights />
             <h2 className="text-3xl font-semibold text-gray-900 mb-8">
               Available Flights
             </h2>

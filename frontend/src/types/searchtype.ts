@@ -7,7 +7,7 @@ export interface SearchParams {
   }
 
 export interface Airport {
-    id: number;
+    id: number | string;
     code: string;
     name: string;
     city: string;
@@ -16,7 +16,7 @@ export interface Airport {
 }
   
 export interface Flight {
-    id: number;
+    id: number | string;
     flight_number: string;
     departure_airport: Airport;
     arrival_airport: Airport;
