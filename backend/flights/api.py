@@ -1,10 +1,13 @@
+from django.http import HttpRequest
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from typing import List, Optional
 from ninja import NinjaAPI
-from .models import Flight
-from .schemaPayload import FlightSchema, FlightClassDetailSchema, TravelClassSchema
+from .models import Flight, Airport
+from .schemaPayload import FlightSchema, FlightClassDetailSchema, TravelClassSchema, AirportSchema, FlightRecommendationSchema, RecommendedDestinationSchema, RecommendationRequestSchema
 from datetime import datetime
+import requests
+
 
 api = NinjaAPI()
 
@@ -110,3 +113,54 @@ def search_flights(
         results.append(flight_data)
 
     return results
+
+
+@api.get("/airports/", response=List[AirportSchema])
+def list_airports(request):
+    return Airport.objects.all()
+
+@api.get("/Allflights", response=List[FlightRecommendationSchema])
+def get_flights(request: HttpRequest):
+    """Get all flights"""
+    return Flight.objects.all()
+
+@api.get("/flights/airport/{code}", response=List[FlightSchema])
+def get_flights_by_airport_code(request: HttpRequest, code: str):
+    """Get flights arriving at or departing from a specific airport"""
+    try:
+        airport = Airport.objects.get(code=code)
+        flights = Flight.objects.filter(
+            arrival_airport_id=airport.id
+        ) | Flight.objects.filter(
+            departure_airport_id=airport.id
+        )
+        return flights
+    except Airport.DoesNotExist:
+        return []
+    
+@api.post("/recommend", response=List[RecommendedDestinationSchema])
+def get_recommendations(request: HttpRequest, data: RecommendationRequestSchema):
+    """Proxy to the existing recommendation service"""
+    try:
+        # Forward the request to the existing service
+        response = requests.post(
+            "http://localhost:5000/recommend/new_user",
+            json= {
+                "wants_extra_baggage": data.wants_extra_baggage,
+                "wants_preferred_seat": data.wants_preferred_seat,
+                "wants_in_flight_meals": data.wants_in_flight_meals,
+                "num_passengers": data.num_passengers,
+                "length_of_stay": data.length_of_stay
+            }
+        )
+
+        # Check if the request was successful
+        response.raise_for_status()
+
+        # Return the recommendations
+        return response.json()
+    except requests.RequestException as e:
+        # Log the error
+        print(f"Error connecting to recommendation service: {e}")
+        # Return empty list or handle the error as needed
+        return []

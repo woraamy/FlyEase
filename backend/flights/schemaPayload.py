@@ -1,7 +1,8 @@
 from typing import List, Optional
 from datetime import datetime
-from ninja import Schema
+from ninja import Schema, ModelSchema
 from pydantic import Field
+from .models import Airport
 
 class AirportSchema(Schema):
     id: int
@@ -48,3 +49,42 @@ class FlightSchema(Schema):
     class Config:
         from_attributes = True
         extra = "ignore"
+
+
+
+# class AirportSchema(Schema):
+#     id: str
+#     code: str
+#     name: str
+#     city: str
+#     country: str
+#     image: str
+
+class FlightRecommendationSchema(Schema):
+    id: str
+    flight_number: str
+    departure_time: datetime
+    arrival_time: datetime
+    base_price: str
+    available_seats: int
+    rating: float
+    featured_image: str
+    has_wifi: bool
+    has_entertainment: bool
+    has_meals: bool
+    arrival_airport_id: str
+    departure_airport_id: str
+
+class RecommendationRequestSchema(Schema):
+    wants_extra_baggage: int
+    wants_preferred_seat: int
+    wants_in_flight_meals: int
+    num_passengers: int
+    length_of_stay: int
+
+class RecommendedDestinationSchema(Schema):
+    avg_rating: float
+    booking_count: int
+    destination: str
+    popularity_score: float
+    score: float

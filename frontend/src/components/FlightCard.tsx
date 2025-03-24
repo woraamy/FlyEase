@@ -28,14 +28,14 @@ const FlightCard = ({ flight }: FlightCardProps) => {
       <div className="flex items-start gap-6 justify-between w-full">
         <div className="flex gap-6">
           <img 
-            src={flight.featured_image || flight.image} 
-            alt={`${flight.departure_airport.city} to ${flight.arrival_airport.city}`} 
-            className="w-32 h-32 object-cover rounded-lg" 
+          src={flight.featured_image || flight.image} 
+          alt={`${flight.departure_airport?.city || 'Departure'} to ${flight.arrival_airport?.city || 'Arrival'}`} 
+          className="w-32 h-32 object-cover rounded-lg" 
           />
           <div className="flex flex-col items-start">
-            <h3 className="text-black font-semibold mb-2">
-              {flight.departure_airport.city} to {flight.arrival_airport.city}
-            </h3>
+          <h3 className="text-black font-semibold mb-2">
+            {flight.departure_airport?.city || 'Departure'} to {flight.arrival_airport?.city || 'Arrival'}
+          </h3>
             <p className="text-sm text-gray-600 mb-2">Flight: {flight.flight_number}</p>
             <div className="flex mb-3">
               {[...Array(5)].map((_, i) => (
