@@ -28,7 +28,6 @@ export function TravelPlanCard({ title, from, to, author, description, imageUrl,
           <CardContent className="bg-[#e8f0e8] p-6">
             <div className="mb-2 flex items-start justify-between">
               <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
-              <div className="text-sm text-gray-600">Written By: {author}</div>
             </div>
             <p className="mb-3 text-sm text-gray-600">From {from} to {to}</p>
             <p className="text-gray-700">{description}</p>
