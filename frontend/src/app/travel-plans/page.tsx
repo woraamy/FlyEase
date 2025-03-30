@@ -35,7 +35,7 @@ export default function TravelPlansPage() {
               author={plan.user_id}
               description={plan.introduction}
               imageUrl={plan.header_img}
-              href="/"
+              href={`/travel-plans/${plan.id}`}
             />
           ))}
         </div>
@@ -43,4 +43,3 @@ export default function TravelPlansPage() {
     </main>
   )
 }
-

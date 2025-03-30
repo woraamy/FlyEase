@@ -22,11 +22,7 @@ export default function ProfileSidenav() {
                 </div>
                 <div className={`flex mt-2 p-3 ${historypage}`}>
                     < Plane />
-                    <Link href={`/profile/flights`} className="ml-2">My Flights</Link>
-                </div>
-                <div className={`flex mt-2 p-3 ${informationpage}`}>
-                    < FolderKanban />
-                    <Link href={`/profile/travel-plans`} className="ml-2">My Travel Plans</Link>
+                    <Link href={`/profile/my-flights`} className="ml-2">My Flights</Link>
                 </div>
             </div>
         </div>

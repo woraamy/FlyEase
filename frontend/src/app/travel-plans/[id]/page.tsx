@@ -33,7 +33,7 @@ export default function TravelPlanDetailPage({ params }: { params: { id: string 
               {/* Header Image */}
               <div className="relative h-[300px] w-full">
                 <Image
-                  src="/images/kyoto-travel-plan.jpeg"
+                  src={travelPlan.header_img}
                   alt={travelPlan.header_topic}
                   fill
                   className="object-cover"
@@ -56,10 +56,6 @@ export default function TravelPlanDetailPage({ params }: { params: { id: string 
                   <div className="flex items-center gap-1">
                     <CalendarDays className="h-4 w-4 text-emerald-600" />
                     <span>{new Date(travelPlan.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <User className="h-4 w-4 text-emerald-600" />
-                    <span>User ID: {travelPlan.user_id}</span>
                   </div>
                 </div>
 
