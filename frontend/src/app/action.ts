@@ -180,8 +180,8 @@ export async function getFlightsByAirportCode(code: string) {
     // Based on the logs, it seems flights already have departure_airport and arrival_airport objects
     // Filter flights that arrive at or depart from this airport based on the airport code
     const filteredFlights = allFlights.filter((flight: any) => {
-      const departureMatch = flight.departure_airport && flight.departure_airport.code === code;
-      const arrivalMatch = flight.arrival_airport && flight.arrival_airport.code === code;
+      const departureMatch = flight.departure_airport.code === code;
+      const arrivalMatch = flight.arrival_airport.code === code;
       return departureMatch || arrivalMatch;
     });
     

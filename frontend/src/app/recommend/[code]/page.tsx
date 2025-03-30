@@ -6,6 +6,7 @@ interface RecommendPageProps {
   };
 }
 
-export default function RecommendPage({ params }: RecommendPageProps) {
-  return <AirportFlightsClient code={params.code} />;
+export default async function RecommendPage({ params }: RecommendPageProps) {
+  const { code } = await params;
+  return <AirportFlightsClient code={code} />;
 }
