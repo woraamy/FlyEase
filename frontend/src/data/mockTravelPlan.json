@@ -25,12 +25,12 @@
         "arrival_city": "Zermatt",
         "departure_country": "USA",
         "arrival_country": "Switzerland",
-        "header_img": "/images/switzerland-travel-plan.webp",
+        "header_img": "https://images.unsplash.com/photo-1570161766218-f8488ebb8078?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         "introduction": "Switzerland is a dream destination for winter lovers, and Zermatt is the perfect spot for an unforgettable snowy adventure. From skiing down the Matterhorn to enjoying Swiss hot chocolate by a cozy fireplace, Zermatt offers something for everyone.",
         "paragraphs": {
-            "Skiing at the Matterhorn": "The Matterhorn is one of the most iconic mountains in the world, and skiing in its shadow is an experience like no other. Zermatt offers world-class ski slopes suitable for all levels, from beginners to advanced skiers. The breathtaking Alpine scenery makes every descent down the slopes an unforgettable moment.",
-            "Exploring the Glacier Paradise": "The Klein Matterhorn Glacier Paradise is the highest cable car station in Europe, offering visitors a chance to experience the wonders of a year-round glacier. At over 3,800 meters, you can walk through the ice palace, admire ice sculptures, and enjoy a panoramic view of the surrounding snow-capped peaks.",
-            "Indulging in Swiss Cuisine": "After a long day of outdoor activities, nothing beats indulging in Swiss delicacies. Zermatt is home to many restaurants serving traditional fondue, raclette, and rösti. Pairing these dishes with a glass of local Swiss wine makes for a perfect evening in the Alps."
+            "https://plus.unsplash.com/premium_photo-1672146835758-8232f3df9fb7?q=80&w=3280&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D": "The Matterhorn is one of the most iconic mountains in the world, and skiing in its shadow is an experience like no other. Zermatt offers world-class ski slopes suitable for all levels, from beginners to advanced skiers. The breathtaking Alpine scenery makes every descent down the slopes an unforgettable moment.",
+            "https://images.unsplash.com/photo-1492119884860-63772f175a02?q=80&w=3305&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D": "The Klein Matterhorn Glacier Paradise is the highest cable car station in Europe, offering visitors a chance to experience the wonders of a year-round glacier. At over 3,800 meters, you can walk through the ice palace, admire ice sculptures, and enjoy a panoramic view of the surrounding snow-capped peaks.",
+            "https://images.unsplash.com/photo-1507039102241-5ec61d624406?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D": "After a long day of outdoor activities, nothing beats indulging in Swiss delicacies. Zermatt is home to many restaurants serving traditional fondue, raclette, and rösti. Pairing these dishes with a glass of local Swiss wine makes for a perfect evening in the Alps."
         }
     },
     {
@@ -42,16 +42,16 @@
         "arrival_city": "Nairobi",
         "departure_country": "UK",
         "arrival_country": "Kenya",
-        "header_img": "/images/kenya-travel-plan.jpeg",
+        "header_img": "https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8a2VueWF8ZW58MHx8MHx8fDA%3D",
         "introduction": "Kenya is home to some of the most breathtaking wildlife experiences in the world. From witnessing the Great Migration in the Maasai Mara to exploring the vast savannah landscapes, a safari in Kenya is a bucket-list adventure.",
         "paragraphs": {
-            "The Great Migration in the Maasai Mara": "The Great Migration is one of the most spectacular wildlife events in the world, where millions of wildebeest, zebras, and gazelles traverse the Maasai Mara in search of greener pastures. Seeing these animals cross the crocodile-infested Mara River is a thrilling sight that captures the raw beauty of nature.",
-            "Meeting the Maasai People": "Beyond the wildlife, Kenya is rich in cultural heritage. The Maasai people, known for their vibrant red attire and traditional dances, welcome visitors to learn about their way of life. Spending time in a Maasai village provides a deeper appreciation for their customs, traditions, and resilience.",
-            "Sunset Game Drives": "One of the best ways to experience the African savannah is through a sunset game drive. As the sun sets over the horizon, the golden light illuminates the landscape, creating the perfect backdrop for spotting lions, elephants, and giraffes. It’s a moment of serenity and awe that stays with travelers forever."
+            "https://images.unsplash.com/photo-1519659528534-7fd733a832a0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8a2VueWF8ZW58MHx8MHx8fDA%3D": "The Great Migration is one of the most spectacular wildlife events in the world, where millions of wildebeest, zebras, and gazelles traverse the Maasai Mara in search of greener pastures. Seeing these animals cross the crocodile-infested Mara River is a thrilling sight that captures the raw beauty of nature.",
+            "https://images.unsplash.com/photo-1624307844603-5a603dd96176?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjN8fGtlbnlhfGVufDB8fDB8fHww": "Beyond the wildlife, Kenya is rich in cultural heritage. The Maasai people, known for their vibrant red attire and traditional dances, welcome visitors to learn about their way of life. Spending time in a Maasai village provides a deeper appreciation for their customs, traditions, and resilience.",
+            "https://images.unsplash.com/photo-1534476478164-b15fec4f091c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDd8fGtlbnlhfGVufDB8fDB8fHww": "One of the best ways to experience the African savannah is through a sunset game drive. As the sun sets over the horizon, the golden light illuminates the landscape, creating the perfect backdrop for spotting lions, elephants, and giraffes. It’s a moment of serenity and awe that stays with travelers forever."
         }
     },
     {
-        "id": 4, 
+        "id": 4,
         "user_id": 104,
         "createdAt": "2025-03-26T12:00:00Z",
         "header_topic": "Island Hopping in the Philippines",
@@ -59,12 +59,12 @@
         "arrival_city": "Palawan",
         "departure_country": "Australia",
         "arrival_country": "Philippines",
-        "header_img": "/images/phillipplines-travel-plan.avif",
+        "header_img": "https://images.unsplash.com/photo-1531761535209-180857e963b9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGhpbGlwcGluZXN8ZW58MHx8MHx8fDA%3D",
         "introduction": "The Philippines is home to over 7,000 islands, each with its own unique charm. Palawan, often dubbed the ‘Last Frontier,’ boasts crystal-clear waters, limestone cliffs, and hidden lagoons waiting to be explored.",
         "paragraphs": {
-            "Exploring the Underground River": "The Puerto Princesa Underground River is one of the New Seven Wonders of Nature. This subterranean river flows through a limestone cave system, creating an otherworldly experience as you paddle through its dark, mystical waters while bats fly overhead.",
-            "Snorkeling in El Nido": "El Nido is a paradise for snorkeling enthusiasts, with its vibrant coral reefs and abundant marine life. Swimming alongside sea turtles and colorful fish in the turquoise waters of the Bacuit Archipelago is a truly magical experience.",
-            "Sunset at Nacpan Beach": "For those looking to unwind, Nacpan Beach offers an untouched paradise with golden sands and breathtaking sunsets. Relaxing here with a fresh coconut in hand while the sky turns shades of orange and pink is the perfect way to end a day of adventure."
+            "https://images.unsplash.com/photo-1549714301-24ca408b5446?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fHBoaWxpcHBpbmVzfGVufDB8fDB8fHww": "The Puerto Princesa Underground River is one of the New Seven Wonders of Nature. This subterranean river flows through a limestone cave system, creating an otherworldly experience as you paddle through its dark, mystical waters while bats fly overhead.",
+            "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cGhpbGlwcGluZXN8ZW58MHx8MHx8fDA%3D": "El Nido is a paradise for snorkeling enthusiasts, with its vibrant coral reefs and abundant marine life. Swimming alongside sea turtles and colorful fish in the turquoise waters of the Bacuit Archipelago is a truly magical experience.",
+            "https://plus.unsplash.com/premium_photo-1707028749325-1c3f48c15cee?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhpbGlwcGluZXN8ZW58MHx8MHx8fDA%3D": "For those looking to unwind, Nacpan Beach offers an untouched paradise with golden sands and breathtaking sunsets. Relaxing here with a fresh coconut in hand while the sky turns shades of orange and pink is the perfect way to end a day of adventure."
         }
     },
     {
@@ -79,9 +79,77 @@
         "header_img": "/images/morocco-travel-plan.jpeg",
         "introduction": "Marrakech is a city that awakens the senses, from its vibrant souks to its aromatic spices. A journey through Morocco’s cultural hub offers a rich tapestry of history, art, and culinary delights.",
         "paragraphs": {
-            "Wandering Through the Medina": "The Medina of Marrakech is a UNESCO World Heritage Site filled with winding alleyways, colorful markets, and historic riads. Getting lost here is part of the charm, as every corner reveals a new treasure—from handcrafted lanterns to aromatic spice stalls.",
-            "Visiting the Majorelle Garden": "Designed by French painter Jacques Majorelle and later restored by Yves Saint Laurent, the Majorelle Garden is a serene oasis in the bustling city. The vivid blue walls, exotic plants, and tranquil fountains create a peaceful retreat from the lively streets of Marrakech.",
-            "A Night at Jemaa el-Fnaa": "As the sun sets, Jemaa el-Fnaa square comes alive with street performers, snake charmers, and sizzling food stalls. Sampling local delicacies like tagine and pastilla while soaking in the lively atmosphere is a quintessential Marrakech experience."
+            "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW9yb2Njb3xlbnwwfHwwfHx8MA%3D%3D": "The Medina of Marrakech is a UNESCO World Heritage Site filled with winding alleyways, colorful markets, and historic riads. Getting lost here is part of the charm, as every corner reveals a new treasure—from handcrafted lanterns to aromatic spice stalls.",
+            "https://images.unsplash.com/photo-1569383746724-6f1b882b8f46?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8bW9yb2Njb3xlbnwwfHwwfHx8MA%3D%3D": "Designed by French painter Jacques Majorelle and later restored by Yves Saint Laurent, the Majorelle Garden is a serene oasis in the bustling city. The vivid blue walls, exotic plants, and tranquil fountains create a peaceful retreat from the lively streets of Marrakech.",
+            "https://images.unsplash.com/photo-1528657249085-c569d3c869e4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fG1vcm9jY298ZW58MHx8MHx8fDA%3D": "As the sun sets, Jemaa el-Fnaa square comes alive with street performers, snake charmers, and sizzling food stalls. Sampling local delicacies like tagine and pastilla while soaking in the lively atmosphere is a quintessential Marrakech experience."
         }
-    }
+    },
+    {
+        "id": 6,
+            "user_id": 106,
+            "createdAt": "2025-03-24T11:00:00Z",
+            "header_topic": "Exploring the Ancient Wonders of Rome",
+            "departure_city": "Los Angeles",
+            "arrival_city": "Rome",
+            "departure_country": "USA",
+            "arrival_country": "Italy",
+            "header_img": "https://images.unsplash.com/photo-1555992828-35627f3b373f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjd8fHJvbWV8ZW58MHx8MHx8fDA%3D",
+            "introduction": "Rome, the Eternal City, offers a journey through time with its rich history and iconic landmarks. From ancient ruins to Renaissance art, every corner tells a story.",
+            "paragraphs": {
+                "https://images.unsplash.com/photo-1555992828-ca4dbe41d294?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cm9tZXxlbnwwfHwwfHx8MA%3D%3D": "The Colosseum stands as a testament to Rome's gladiatorial past. Walking through its arches, you can almost hear the echoes of ancient cheers.",
+                "https://images.unsplash.com/photo-1596627116790-af6f46dddbda?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fHJvbWV8ZW58MHx8MHx8fDA%3D": "Toss a coin into the Trevi Fountain to ensure your return to Rome. This Baroque masterpiece is a symbol of hope and romance.",
+                "https://images.unsplash.com/photo-1590502640308-160a1fda0d52?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzh8fHJvbWV8ZW58MHx8MHx8fDA%3D": "The Pantheon, with its massive dome and oculus, showcases the architectural prowess of ancient Romans and remains a place of wonder."
+            }
+        },
+        {
+            "id": 7,
+            "user_id": 107,
+            "createdAt": "2025-03-23T14:20:00Z",
+            "header_topic": "Discovering the Magic of Paris",
+            "departure_city": "Chicago",
+            "arrival_city": "Paris",
+            "departure_country": "USA",
+            "arrival_country": "France",
+            "header_img": "https://images.unsplash.com/photo-1471623432079-b009d30b6729?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHBhcmlzfGVufDB8fDB8fHww",
+            "introduction": "Paris, the City of Light, captivates visitors with its art, fashion, and gastronomy. Every street and monument tells a story of romance and revolution.",
+            "paragraphs": {
+                "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cGFyaXN8ZW58MHx8MHx8fDA%3D": "The Eiffel Tower offers panoramic views of Paris. Ascend its levels to witness the city's beauty unfold beneath you.",
+                "https://unsplash.com/photos/bridge-during-night-time-R5scocnOOdM": "Home to thousands of artworks, including the Mona Lisa, the Louvre Museum is a treasure trove for art enthusiasts.",
+                "https://images.unsplash.com/photo-1574870310056-79c4b3c7d449?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bm90cmUlMjBkYW1lfGVufDB8fDB8fHww": "Notre-Dame Cathedral, with its Gothic architecture and storied past, stands as a symbol of Parisian resilience and artistry."
+            }
+        },
+        {
+            "id": 8,
+            "user_id": 108,
+            "createdAt": "2025-03-22T09:45:00Z",
+            "header_topic": "Adventures in the Australian Outback",
+            "departure_city": "Dallas",
+            "arrival_city": "Alice Springs",
+            "departure_country": "USA",
+            "arrival_country": "Australia",
+            "header_img": "https://images.unsplash.com/photo-1647180393768-ab67ce3aec05?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGFsaWNlJTIwc3ByaW5nc3xlbnwwfHwwfHx8MA%3D%3D",
+            "introduction": "The Australian Outback offers vast landscapes, unique wildlife, and rich indigenous culture. It's a land of adventure and discovery.",
+            "paragraphs": {
+                "https://images.unsplash.com/photo-1612626870288-e2aa5938c042?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YWxpY2UlMjBzcHJpbmdzfGVufDB8fDB8fHww": "Uluru, also known as Ayers Rock, is a sacred site and natural wonder. Witness its changing colors at sunrise and sunset.",
+                "https://images.unsplash.com/photo-1520089674281-cb1da5b4b3e3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGFsaWNlJTIwc3ByaW5nc3xlbnwwfHwwfHx8MA%3D%3D": "Kings Canyon offers rugged cliffs and lush valleys. Hiking its rim provides breathtaking views of the surrounding landscape.",
+                "https://images.unsplash.com/photo-1597663956167-ea682db611d7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fGFsaWNlJTIwc3ByaW5nc3xlbnwwfHwwfHx8MA%3D%3D": "Explore Katherine Gorge by boat or canoe, navigating through towering sandstone cliffs and serene waters."
+            }
+        },
+        {
+            "id": 9,
+            "user_id": 109,
+            "createdAt": "2025-03-21T16:10:00Z",
+            "header_topic": "Cultural Journey through Istanbul",
+            "departure_city": "Miami",
+            "arrival_city": "Istanbul",
+            "departure_country": "USA",
+            "arrival_country": "Turkey",
+            "header_img": "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aXN0YW5idWx8ZW58MHx8MHx8fDA%3D",
+            "introduction": "Istanbul, where East meets West, offers a blend of cultures, cuisines, and histories. It's a city that bridges continents and eras.",
+            "paragraphs": {
+                "https://images.unsplash.com/photo-1623621534850-d325a1980c7e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8aGFnaWElMjBzb3BoaWF8ZW58MHx8MHx8fDA%3D": "Hagia Sophia, with its massive dome and intricate mosaics, has stood as a church, mosque, and now a museum, reflecting Istanbul's diverse history.",
+                "https://plus.unsplash.com/premium_photo-1661962550248-59cf249e078b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Ymx1ZSUyMG1vc3F1ZXxlbnwwfHwwfHx8MA%3D%3D": "The Blue Mosque enchants visitors with its six minarets and blue Iznik tiles adorning its interior.",
+                "https://images.unsplash.com/photo-1579792389177-ae25b2c86d4b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Z3JhbmQlMjBiYXphYXJ8ZW58MHx8MHx8fDA%3D": "The Grand Bazaar is a labyrinth of shops offering spices, textiles, and jewelry. It's a shopper's paradise and a cultural experience."
+            }
+        }
 ]
