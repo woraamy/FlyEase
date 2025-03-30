@@ -132,61 +132,23 @@ export async function getRecommendedDestinations(preferences: RecommendationRequ
   }
 }
 
-export async function getFlightsByAirportCode(code: string) {
-  try {
-    console.log(`Fetching flights for airport code: ${code}`);
-    const response = await axios.get(`${API_BASE_URL}/airport/${code}`);
-    
-    if (!response.data) {
-      console.log(`No flights found for airport ${code} from API`);
-      return [];
-    }
-    
-    console.log(`Retrieved ${Array.isArray(response.data) ? response.data.length : 0} flights from API`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching flights for airport ${code}:`, error);
-    
-    // Fallback: If the endpoint doesn't exist, we'll fetch all flights and filter client-side
-    console.log("Attempting fallback: fetching all flights and filtering client-side");
-    const allFlights = await getFlights();
-    const airports = await getAirports();
-    
-    if (!allFlights || !airports) {
-      console.error("Fallback failed: could not fetch flights or airports");
-      return [];
-    }
-    
-    // Find airport by code
-    const airport = airports.find((airport: Airport) => airport.code === code);
-    
-    if (!airport) {
-      console.error(`Airport with code ${code} not found`);
-      return [];
-    }
-    
-    console.log(`Found airport with code ${code}:`, airport);
-    
-    // Check the structure of the first flight
-    if (!allFlights.length) {
-      console.log("No flights available");
-      return [];
-    }
-    
-    const firstFlight = allFlights[0];
-    console.log("First flight structure:", Object.keys(firstFlight));
-    
-    // Based on the logs, it seems flights already have departure_airport and arrival_airport objects
-    // Filter flights that arrive at or depart from this airport based on the airport code
-    const filteredFlights = allFlights.filter((flight: any) => {
-      const departureMatch = flight.departure_airport && flight.departure_airport.code === code;
-      const arrivalMatch = flight.arrival_airport && flight.arrival_airport.code === code;
-      return departureMatch || arrivalMatch;
-    });
-    
-    console.log(`Filtered ${filteredFlights.length} flights for airport ${code}`);
-    return filteredFlights;
+export async function getFlightsByAirportCode(airportCode: string): Promise<Flight[]> {
+  // Normalize the airport code to uppercase
+  const normalizedCode = airportCode.toUpperCase();
+
+  // Replace with your actual API endpoint
+  const response = await fetch(`${API_BASE_URL}/by-airport/${normalizedCode}`, {
+    cache: 'no-store',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch flights for airport ${normalizedCode}: ${response.status}`);
   }
+
+  return response.json();
 }
 
 export async function matchRecommendationsWithAirports(

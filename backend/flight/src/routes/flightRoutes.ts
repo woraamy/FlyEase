@@ -88,104 +88,80 @@ interface RecommendationRequest {
 
 router.post('/recommend', async (req, res) => {
     try {
-        const requestData: RecommendationRequest = {
-            wants_extra_baggage: req.body.wants_extra_baggage,
-            wants_preferred_seat: req.body.wants_preferred_seat,
-            wants_in_flight_meals: req.body.wants_in_flight_meals,
-            num_passengers: req.body.num_passengers,
-            length_of_stay: req.body.length_of_stay
+        // Format the request data according to what the Python service expects
+        const requestData = {
+            user_preferences: {
+                wants_extra_baggage: req.body.wants_extra_baggage,
+                wants_preferred_seat: req.body.wants_preferred_seat,
+                wants_in_flight_meals: req.body.wants_in_flight_meals,
+                num_passengers: req.body.num_passengers,
+                length_of_stay: req.body.length_of_stay
+            },
+            season: req.body.season || 'Summer',
+            trip_type: req.body.trip_type || 'Regular Vacation',
+            origin: req.body.origin || null,
+            top_k: req.body.top_k  || 10
         };
 
+        // console.log('Sending recommendation request:', JSON.stringify(requestData));
+
         const response = await axios.post(
-            'http://localhost:5000/recommend/new_user',
-            requestData
+            'http://localhost:5001/recommend/new_user',
+            requestData,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
         );
 
         res.json(response.data);
     } catch (error) {
         console.error('Error connecting to recommendation service:', error);
-        res.json([]);
-    }
-});
-
-router.get('/airport/:code', async (req: Request, res: Response) => {
-    try {
-        const airportRepository = AppDataSource.getRepository(Airport);
-        const flightRepository = AppDataSource.getRepository(Flight);
-
-        // Find the airport
-        const airport = await airportRepository.findOne({
-            where: { code: req.params.code.toUpperCase() }
+        // Return a more informative error response
+        res.status(500).json({ 
+            error: 'Failed to get recommendations',
+            details: error.response ? error.response.data : error.message
         });
-
-        if (!airport) {
-            return res.json([]);
-        }
-
-        // Get current date for filtering future flights
-        const currentDate = new Date();
-
-        // Find flights using QueryBuilder with relations and conditions
-        const flights = await flightRepository
-            .createQueryBuilder('flight')
-            .leftJoinAndSelect('flight.departure_airport', 'departure_airport')
-            .leftJoinAndSelect('flight.arrival_airport', 'arrival_airport')
-            .leftJoinAndSelect('flight.travel_classes', 'travel_classes')
-            .leftJoinAndSelect('flight.class_details', 'class_details')
-            .where([
-                { departure_airport: airport },
-                { arrival_airport: airport }
-            ])
-            .andWhere('flight.departure_time >= :currentDate', { currentDate })
-            .andWhere('flight.available_seats > :minSeats', { minSeats: 0 })
-            .orderBy('flight.departure_time', 'ASC')
-            .getMany();
-
-        // Transform the response to include only necessary data
-        const transformedFlights = flights.map(flight => ({
-            id: flight.id,
-            flight_number: flight.flight_number,
-            departure_airport: {
-                code: flight.departure_airport.code,
-                city: flight.departure_airport.city,
-                country: flight.departure_airport.country
-            },
-            arrival_airport: {
-                code: flight.arrival_airport.code,
-                city: flight.arrival_airport.city,
-                country: flight.arrival_airport.country
-            },
-            departure_time: flight.departure_time,
-            arrival_time: flight.arrival_time,
-            base_price: flight.base_price,
-            available_seats: flight.available_seats,
-            rating: flight.rating,
-            featured_image: flight.featured_image,
-            amenities: {
-                wifi: flight.has_wifi,
-                entertainment: flight.has_entertainment,
-                meals: flight.has_meals
-            },
-            travel_classes: flight.travel_classes.map(tc => ({
-                id: tc.id,
-                name: tc.name,
-                details: flight.class_details
-                    .filter(cd => cd.travel_class.id === tc.id)
-                    .map(cd => ({
-                        price: cd.base_price,
-                        available_seats: cd.available_seats
-                    }))
-            }))
-        }));
-
-        res.json(transformedFlights);
-    } catch (error) {
-        console.error('Error fetching flights:', error);
-        res.json([]);
     }
 });
 
 // Additional useful endpoints
+router.get('/by-airport/:code', async (req: Request, res: Response) => {
+    try {
+        const { code } = req.params;
+        const upperCode = code.toUpperCase(); // Convert to uppercase immediately
+
+        if (!code || upperCode.length !== 3) {
+            return res.status(400).json({ 
+                error: 'Bad request',
+                message: 'Invalid airport code format. Code must be 3 characters.'
+            });
+        }
+
+        const flights = await flightRepo.createQueryBuilder('flight')
+            .leftJoinAndSelect('flight.departure_airport', 'departure_airport')
+            .leftJoinAndSelect('flight.arrival_airport', 'arrival_airport')
+            .leftJoinAndSelect('flight.travel_classes', 'travel_classes')
+            .leftJoinAndSelect('flight.class_details', 'class_details')
+            .where('UPPER(departure_airport.code) = :code OR UPPER(arrival_airport.code) = :code', { code: upperCode })
+            .getMany();
+
+        if (flights.length === 0) {
+            return res.status(404).json({
+                message: `No flights found for airport code ${upperCode}`
+            });
+        }
+
+        return res.json(flights);
+    } catch (error) {
+        console.error('Error fetching flights by airport code:', error);
+        return res.status(500).json({ 
+            error: 'Internal server error',
+            message: 'An error occurred while fetching flights'
+        });
+    }
+});
 
 router.get('/search-detailed', async (req: Request, res: Response) => {
     try {
@@ -242,7 +218,5 @@ router.get('/search-detailed', async (req: Request, res: Response) => {
         res.json([]);
     }
 });
-
-
 
 export default router;
