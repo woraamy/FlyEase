@@ -5,6 +5,7 @@ import { CalendarDays, MapPin, User } from "lucide-react"
 import { FlightRecCard } from "@/components/FightRecCard"
 import mockFlights from "@/data/mockFlights.json"
 import mockTravelPlans from "@/data/mockTravelPlan.json"
+import { travelPlanAPI } from "./action"
 
 // Mock data for a single travel plan
 const getTravelPlan = (id: string) => {
@@ -13,9 +14,9 @@ const getTravelPlan = (id: string) => {
   return plan
 }
 
-export default function TravelPlanDetailPage({ params }: { params: { id: string } }) {
-  const travelPlan = getTravelPlan(params.id)
-
+export default async function TravelPlanDetailPage({ params }: { params: { id: string } }) {
+  const plan = await travelPlanAPI.getTravelPlanById(params.id)
+  const travelPlan = await plan.json()
   if (!travelPlan) {
     notFound()
   }
@@ -73,7 +74,7 @@ export default function TravelPlanDetailPage({ params }: { params: { id: string 
                           className="object-cover"
                         />
                       </div>
-                      <p className="text-base leading-relaxed text-gray-700 md:text-lg">{text}</p>
+                      <p className="text-base leading-relaxed text-gray-700 md:text-lg">{String(text)}</p>
                     </div>
                   ))}
                 </div>
