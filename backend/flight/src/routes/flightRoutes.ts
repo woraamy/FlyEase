@@ -88,27 +88,80 @@ interface RecommendationRequest {
 
 router.post('/recommend', async (req, res) => {
     try {
-        const requestData: RecommendationRequest = {
-            wants_extra_baggage: req.body.wants_extra_baggage,
-            wants_preferred_seat: req.body.wants_preferred_seat,
-            wants_in_flight_meals: req.body.wants_in_flight_meals,
-            num_passengers: req.body.num_passengers,
-            length_of_stay: req.body.length_of_stay
+        // Format the request data according to what the Python service expects
+        const requestData = {
+            user_preferences: {
+                wants_extra_baggage: req.body.wants_extra_baggage,
+                wants_preferred_seat: req.body.wants_preferred_seat,
+                wants_in_flight_meals: req.body.wants_in_flight_meals,
+                num_passengers: req.body.num_passengers,
+                length_of_stay: req.body.length_of_stay
+            },
+            season: req.body.season || 'Summer',
+            trip_type: req.body.trip_type || 'Regular Vacation',
+            origin: req.body.origin || null,
+            top_k: req.body.top_k  || 10
         };
 
+        // console.log('Sending recommendation request:', JSON.stringify(requestData));
+
         const response = await axios.post(
-            'http://localhost:5000/recommend/new_user',
-            requestData
+            'http://localhost:5001/recommend/new_user',
+            requestData,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
         );
 
         res.json(response.data);
     } catch (error) {
         console.error('Error connecting to recommendation service:', error);
-        res.json([]);
+        // Return a more informative error response
+        res.status(500).json({ 
+            error: 'Failed to get recommendations',
+            details: error.response ? error.response.data : error.message
+        });
     }
 });
 
 // Additional useful endpoints
+router.get('/by-airport/:code', async (req: Request, res: Response) => {
+    try {
+        const { code } = req.params;
+        const upperCode = code.toUpperCase(); // Convert to uppercase immediately
+
+        if (!code || upperCode.length !== 3) {
+            return res.status(400).json({ 
+                error: 'Bad request',
+                message: 'Invalid airport code format. Code must be 3 characters.'
+            });
+        }
+
+        const flights = await flightRepo.createQueryBuilder('flight')
+            .leftJoinAndSelect('flight.departure_airport', 'departure_airport')
+            .leftJoinAndSelect('flight.arrival_airport', 'arrival_airport')
+            .leftJoinAndSelect('flight.travel_classes', 'travel_classes')
+            .leftJoinAndSelect('flight.class_details', 'class_details')
+            .where('UPPER(departure_airport.code) = :code OR UPPER(arrival_airport.code) = :code', { code: upperCode })
+            .getMany();
+
+        if (flights.length === 0) {
+            return res.status(404).json({
+                message: `No flights found for airport code ${upperCode}`
+            });
+        }
+
+        return res.json(flights);
+    } catch (error) {
+        console.error('Error fetching flights by airport code:', error);
+        return res.status(500).json({ 
+            error: 'Internal server error',
+            message: 'An error occurred while fetching flights'
+        });
+    }
+});
 
 router.get('/search-detailed', async (req: Request, res: Response) => {
     try {
@@ -165,7 +218,5 @@ router.get('/search-detailed', async (req: Request, res: Response) => {
         res.json([]);
     }
 });
-
-
 
 export default router;

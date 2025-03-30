@@ -24,13 +24,15 @@ export default function AirportFlightsClient({ code }: AirportFlightsClientProps
     async function fetchData() {
       if (!code) return;
       
+      const normalizedCode = code.toUpperCase();
+
       try {
         setLoading(true);
         
         // Fetch airports and flights in parallel
         const [airportsData, flightsData] = await Promise.all([
           getAirports(),
-          getFlightsByAirportCode(code)
+          getFlightsByAirportCode(normalizedCode)
         ]);
         
         console.log("Airports data:", airportsData);
@@ -43,7 +45,7 @@ export default function AirportFlightsClient({ code }: AirportFlightsClientProps
         }
         
         // Find the current airport
-        const currentAirport = airportsData.find(a => a.code === code);
+        const currentAirport = airportsData.find(a => a.code.toUpperCase() === normalizedCode);
         if (!currentAirport) {
           setError(`Airport with code ${code} not found`);
           setLoading(false);
