@@ -1,9 +1,11 @@
 # recommendation_service.py
 from flask import Flask, request, jsonify
 from recommendation_api import RecommendationAPI
+from flask_cors import CORS
 
 app = Flask(__name__)
 recommender = RecommendationAPI()
+CORS(app)
 
 @app.route('/recommend/new_user', methods=['POST'])
 def recommend_new_user():

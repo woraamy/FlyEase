@@ -9,7 +9,6 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const API_BASE_URL_AIRPORTS = process.env.NEXT_PUBLIC_API_BASE_URL_AIRPORTS;
 
 const API_BASE_URL_TRAVEL_PLANS = process.env.NEXT_PUBLIC_API_BASE_URL_TRAVEL_PLANS;
-
 // export async function searchFlights(params: SearchParams) {
 //   try {
 //     // Filter the params to remove any null or empty values
