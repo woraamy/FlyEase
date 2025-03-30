@@ -8,6 +8,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const API_BASE_URL_AIRPORTS = process.env.NEXT_PUBLIC_API_BASE_URL_AIRPORTS;
 
+const API_BASE_URL_TRAVEL_PLANS = process.env.NEXT_PUBLIC_API_BASE_URL_TRAVEL_PLANS;
+
 // export async function searchFlights(params: SearchParams) {
 //   try {
 //     // Filter the params to remove any null or empty values
@@ -199,4 +201,22 @@ export async function matchRecommendationsWithAirports(
       airportDetails: airport || null
     };
   }).filter(rec => rec.airportDetails !== null);
+
+}
+
+
+export async function getTravelPlans() {
+  try {
+    const response = await fetch(`${API_BASE_URL_TRAVEL_PLANS}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+
+  } catch (error) {
+    console.error('Error loading flight:', error);
+    return null;
+  }
 }

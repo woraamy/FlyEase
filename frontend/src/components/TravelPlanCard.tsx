@@ -6,13 +6,12 @@ interface TravelPlanCardProps {
   title: string
   from: string
   to: string
-  author: number
   description: string
   imageUrl: string
   href: string
 }
 
-export function TravelPlanCard({ title, from, to, author, description, imageUrl, href }: TravelPlanCardProps) {
+export function TravelPlanCard({ title, from, to, description, imageUrl, href }: TravelPlanCardProps) {
     return (
       <Link href={href} className="block transition-all hover:shadow-lg">
         <Card className="overflow-hidden rounded-lg shadow-md" style={{ background: "linear-gradient(90deg, rgba(161,191,159,1) 0%, rgba(219,239,218,1) 57%, rgba(222,242,221,1) 100%)" }}>
