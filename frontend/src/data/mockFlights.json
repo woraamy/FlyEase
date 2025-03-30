@@ -1,0 +1,33 @@
+[
+    {
+      "from": "San Francisco",
+      "to": "Japan",
+      "departureTime": "12:30",
+      "arrivalTime": "15:00",
+      "departureAirport": "San Francisco Airport",
+      "arrivalAirport": "Kansai Airport",
+      "price": "800",
+      "airline": "Japan Airlines"
+    },
+    {
+      "from": "San Francisco",
+      "to": "Japan",
+      "departureTime": "10:15",
+      "arrivalTime": "13:40",
+      "departureAirport": "San Francisco Airport",
+      "arrivalAirport": "Kansai Airport",
+      "price": "805",
+      "airline": "ANA"
+    },
+    {
+      "from": "San Francisco",
+      "to": "Japan",
+      "departureTime": "19:30",
+      "arrivalTime": "22:00",
+      "departureAirport": "San Francisco Airport",
+      "arrivalAirport": "Kansai Airport",
+      "price": "825",
+      "airline": "United Airlines"
+    }
+  ]
+  

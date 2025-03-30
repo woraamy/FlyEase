@@ -17,7 +17,7 @@ export default function Navbar() {
       <div className="flex space-x-6 text-gray-600 font-medium">
         <Link href="/" className={pathname === "/" ? "text-green-700 font-semibold" : "hover:text-green-700"}>Home</Link>
         <Link href="/flights" className={pathname === "/flights" ? "text-green-700 font-semibold" : "hover:text-green-700"}>Flights</Link>
-        <Link href="/travel-plan" className={pathname === "/travel-plan" ? "text-green-700 font-semibold" : "hover:text-green-700"}>Travel Plan</Link>
+        <Link href="/travel-plans" className={pathname === "/travel-plans" ? "text-green-700 font-semibold" : "hover:text-green-700"}>Travel Plan</Link>
         <Link href="/chat-bot" className={pathname === "/chat-bot" ? "text-green-700 font-semibold" : "hover:text-green-700"}>Chat Bot</Link>
       </div>
       <div className="flex space-x-4">
