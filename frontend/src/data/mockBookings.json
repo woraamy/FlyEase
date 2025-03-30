@@ -1,0 +1,73 @@
+[
+    {
+      "name": "John Doe",
+      "departureTime": "2025-04-10 08:30",
+      "arrivalTime": "2025-04-10 12:45",
+      "departureCity": "New York",
+      "departureCountry": "USA",
+      "departureAirport": "JFK",
+      "arrivalCity": "London",
+      "arrivalCountry": "UK",
+      "arrivalAirport": "Heathrow",
+      "seatNumber": "12A",
+      "qrCodeUrl": "/images/qrcode-bookings.png",
+      "status": "checked-in"
+    },
+    {
+      "name": "Jane Smith",
+      "departureTime": "2025-05-15 14:00",
+      "arrivalTime": "2025-05-15 18:20",
+      "departureCity": "Paris",
+      "departureCountry": "France",
+      "departureAirport": "CDG",
+      "arrivalCity": "Rome",
+      "arrivalCountry": "Italy",
+      "arrivalAirport": "FCO",
+      "seatNumber": "22B",
+      "qrCodeUrl": "/images/qrcode-bookings.png",
+      "status": "waiting for check-in"
+    },
+    {
+      "name": "Alice Johnson",
+      "departureTime": "2025-06-20 10:15",
+      "arrivalTime": "2025-06-20 14:30",
+      "departureCity": "Tokyo",
+      "departureCountry": "Japan",
+      "departureAirport": "NRT",
+      "arrivalCity": "Sydney",
+      "arrivalCountry": "Australia",
+      "arrivalAirport": "SYD",
+      "seatNumber": "5C",
+      "qrCodeUrl": "/images/qrcode-bookings.png",
+      "status": "checked-in"
+    },
+    {
+      "name": "Robert Brown",
+      "departureTime": "2025-07-10 07:45",
+      "arrivalTime": "2025-07-10 11:55",
+      "departureCity": "Dubai",
+      "departureCountry": "UAE",
+      "departureAirport": "DXB",
+      "arrivalCity": "Singapore",
+      "arrivalCountry": "Singapore",
+      "arrivalAirport": "SIN",
+      "seatNumber": "18D",
+      "qrCodeUrl": "/images/qrcode-bookings.png",
+      "status": "waiting for check-in"
+    },
+    {
+      "name": "Emily Wilson",
+      "departureTime": "2025-08-05 22:10",
+      "arrivalTime": "2025-08-06 06:20",
+      "departureCity": "Los Angeles",
+      "departureCountry": "USA",
+      "departureAirport": "LAX",
+      "arrivalCity": "Hong Kong",
+      "arrivalCountry": "China",
+      "arrivalAirport": "HKG",
+      "seatNumber": "9E",
+      "qrCodeUrl": "/images/qrcode-bookings.png",
+      "status": "checked-in"
+    }
+  ]
+  

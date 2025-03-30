@@ -15,7 +15,7 @@ const Profile = () => {
   console.log(user)
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto pt-6">
       <div className="flex">
         <div className="mx-4">
           <Image
@@ -64,13 +64,6 @@ const Profile = () => {
                 </tbody>
               </table>
             </div>
-          </div>
-          <div className="flex justify-center">
-            <Link href={'/additional'}>
-              <button className="mt-4 bg-purple-600 px-4 py-2 font-bold text-white transition-all hover:bg-purple-800">
-                Update Additional Information
-              </button>
-            </Link>
           </div>
         </div>
       </div>
