@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "chatbot"
+version = "0.1.0"
+description = ""
+authors = ["Chaiyawut Thengket <santa081831@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+langchain-community = "^0.3.20"
+langchain-huggingface = "^0.1.2"
+langchain-text-splitters = "^0.3.7"
+langchain-openai = "^0.3.11"
+langchain-core = "^0.3.49"
+langgraph = "^0.3.21"
+requests = "^2.32.3"
+typing-extensions = "^4.13.0"
+pgvector = "^0.4.0"
+psycopg2-binary = "^2.9.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
