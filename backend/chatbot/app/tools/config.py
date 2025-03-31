@@ -1,4 +1,7 @@
+from dotenv import load_dotenv
 import os
+# Load environment variables
+load_dotenv()
 
 # Configuration
 CONNECTION_POSTGRES = os.getenv("CONNECTION_POSTGRES")

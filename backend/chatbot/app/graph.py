@@ -24,5 +24,5 @@ graph.add_edge("retrieve_context", "search_web")
 graph.add_edge("search_web", "generate_response")
 graph.add_edge("generate_response", END)
 
-app = graph.compile()
+graph_app = graph.compile()
 

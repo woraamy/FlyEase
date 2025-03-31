@@ -2,10 +2,13 @@ import datetime
 import uuid
 from typing import Dict, Any, List
 
-from langchain_community.vectorstores.pgvector import PGVector
+# Use the older PGVector implementation
+from langchain.vectorstores.pgvector import PGVector
 from langchain_huggingface import HuggingFaceEmbeddings
 
-from app.tools.config import CONNECTION_POSTGRES, COLLECTION_NAME
+# Constants
+COLLECTION_NAME = "flights"
+CONNECTION_STRING = "postgresql+psycopg2://postgres:test@localhost:6543/vector_db"
 
 def store_query_in_vector_db(query: str, response: str = None, metadata: Dict[str, Any] = None):
     """Store user query and response in vector database with metadata"""
@@ -20,27 +23,22 @@ def store_query_in_vector_db(query: str, response: str = None, metadata: Dict[st
 
     text_to_embed = response if response and metadata.get("is_response") else query
 
-    document_data = {
-        "uuid": item_id,
-        "query": query,
-        "document": response if response else "",
-        "cmetadata": metadata,
-        "custom_id": metadata.get("session_id", item_id)
-    }
-
     try:
+        # Use the older PGVector implementation
         vector_store = PGVector(
-            connection_string=CONNECTION_POSTGRES,
+            connection_string=CONNECTION_STRING,
             collection_name=COLLECTION_NAME,
-            embedding_function=embeddings
+            embedding_function=embeddings  # Use embedding_function for older version
         )
 
+        # Add texts with metadata
         vector_store.add_texts(
             texts=[text_to_embed],
-            metadatas=[document_data],
+            metadatas=[metadata],
             ids=[item_id]
         )
 
+        print(f"Successfully stored in vector DB with ID: {item_id}")
         return item_id
     except Exception as e:
         print(f"Error storing in vector DB: {e}")
@@ -50,10 +48,12 @@ def retrieve_similar_contexts(query: str, top_k: int = 3):
     """Retrieve similar contexts from vector database"""
     try:
         embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
+        # Use the older PGVector implementation
         vector_store = PGVector(
-            connection_string=CONNECTION_POSTGRES,
+            connection_string=CONNECTION_STRING,
             collection_name=COLLECTION_NAME,
-            embedding_function=embeddings
+            embedding_function=embeddings  # Use embedding_function for older version
         )
 
         results = vector_store.similarity_search_with_score(query, k=top_k)
