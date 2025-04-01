@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import EmbeddedCheckoutForm from "@/components/EmbeddedCheckoutForm";
 
 interface Flight {
   id: number;
@@ -315,6 +316,7 @@ export default function FlightDetailsPage() {
             <p className="text-gray-500">Total</p>
             <p className="font-bold">100$</p>
           </span>
+          <EmbeddedCheckoutForm price={120} name="Flight Booking" />
           <Button className="w-full rounded-xl mt-3">Place order</Button>
         </CardContent>
         <Separator className="m-4" />
