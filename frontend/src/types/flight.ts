@@ -63,3 +63,24 @@
     popularity_score: number;
     score: number;
   }
+
+
+  export interface PaginationResponse {
+    data: Flight[];
+    pagination: {
+      total: number;
+      page: number;
+      pageSize: number;
+      totalPages: number;
+    };
+  }
+  
+  export interface FlightListProps {
+    initialFlights: Flight[];
+    pagination?: {
+      total: number;
+      page: number;
+      pageSize: number;
+      totalPages: number;
+    };
+  }

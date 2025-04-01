@@ -21,6 +21,55 @@ router.get("/", async (req, res) => {
     res.json(flights);
 });
 
+// router.get("/", async (req, res) => {
+//     try {
+//         // Validate and parse query parameters
+//         const page = Math.max(1, parseInt(req.query.page as string) || 2);
+//         const pageSize = Math.min(5, Math.max(1, parseInt(req.query.pageSize as string) || 5));
+        
+//         // Calculate skip for pagination
+//         const skip = (page - 1) * pageSize;
+        
+//         // Get total count for pagination metadata
+//         const totalFlights = await flightRepo.count({
+//             where: { available_seats: MoreThan(0) }
+//         });
+        
+//         // Calculate total pages
+//         const totalPages = Math.ceil(totalFlights / pageSize);
+        
+//         // If requested page exceeds total pages, adjust to last page
+//         const adjustedPage = page > totalPages && totalPages > 0 ? totalPages : page;
+//         const adjustedSkip = (adjustedPage - 1) * pageSize;
+        
+//         // Get paginated flights
+//         const flights = await flightRepo.find({
+//             where: { available_seats: MoreThan(0) },
+//             relations: ["departure_airport", "arrival_airport", "class_details", "travel_classes"],
+//             skip: adjustedSkip,
+//             take: pageSize,
+//             order: { departure_time: "ASC" }
+//         });
+        
+//         // Return paginated response with metadata
+//         res.json({
+//             data: flights,
+//             pagination: {
+//                 total: totalFlights,
+//                 page: adjustedPage,
+//                 pageSize: pageSize,
+//                 totalPages: totalPages
+//             }
+//         });
+//     } catch (error) {
+//         console.error("Error fetching flights:", error);
+//         res.status(500).json({ 
+//             error: "Failed to fetch flights", 
+//             message: error instanceof Error ? error.message : "Unknown error"
+//         });
+//     }
+// });
+
 // ✅ Search Flights
 router.get("/search", async (req, res) => {
     const { departure_airport_city, arrival_airport_city, departure_date, arrival_date, travel_class_name } = req.query;
@@ -196,6 +245,8 @@ router.get('/by-airport/:code', async (req: Request, res: Response) => {
         });
     }
 });
+
+
 
 router.get('/search-detailed', async (req: Request, res: Response) => {
     try {
