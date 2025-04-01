@@ -7,7 +7,7 @@ export class Airport {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ unique: true, length: 3 })
+    @Column({ unique: true, length: 4 })
     code: string;
 
     @Column({ length: 100 })
