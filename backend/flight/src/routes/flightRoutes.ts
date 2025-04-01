@@ -215,7 +215,8 @@ router.get('/by-airport/:code', async (req: Request, res: Response) => {
         const { code } = req.params;
         const upperCode = code.toUpperCase(); // Convert to uppercase immediately
 
-        if (!code || upperCode.length !== 3) {
+        // if (!code || upperCode.length !== 3 || ) {
+        if (!code || (upperCode.length !== 3 && upperCode.length !== 4)) {
             return res.status(400).json({ 
                 error: 'Bad request',
                 message: 'Invalid airport code format. Code must be 3 characters.'
