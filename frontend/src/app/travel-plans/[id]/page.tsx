@@ -15,7 +15,8 @@ const getTravelPlan = (id: string) => {
 }
 
 export default async function TravelPlanDetailPage({ params }: { params: { id: string } }) {
-  const plan = await travelPlanAPI.getTravelPlanById(params.id)
+  const id = params.id
+  const plan = await travelPlanAPI.getTravelPlanById(id)
   const travelPlan = await plan.json()
   if (!travelPlan) {
     notFound()
