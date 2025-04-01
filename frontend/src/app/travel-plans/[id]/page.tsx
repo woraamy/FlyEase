@@ -1,11 +1,30 @@
 import Image from "next/image"
 import { notFound } from "next/navigation"
-import { CalendarDays, MapPin, User } from "lucide-react"
+import { CalendarDays, MapPin } from "lucide-react"
 
 import { FlightRecCard } from "@/components/FightRecCard"
 import mockFlights from "@/data/mockFlights.json"
 import mockTravelPlans from "@/data/mockTravelPlan.json"
 import { travelPlanAPI } from "./action"
+import { getFlightByArrCity } from "@/app/action"
+import Link from "next/link"
+
+interface Flight {
+  id: number;
+  flight_number: string;
+  departure_airport: { code: string; name: string; city: string };
+  arrival_airport: { code: string; name: string; city: string};
+  departure_time: string;
+  arrival_time: string;
+  base_price: string;
+  available_seats: number;
+  rating: number;
+  featured_image: string;
+  has_wifi: boolean;
+  has_entertainment: boolean;
+  has_meals: boolean;
+}
+
 
 // Mock data for a single travel plan
 const getTravelPlan = (id: string) => {
@@ -21,9 +40,12 @@ export default async function TravelPlanDetailPage({ params }: { params: Promise
   if (!travelPlan) {
     notFound()
   }
+  // Fetch flights data based on the travel plan's arrival city
+  const flights = await getFlightByArrCity(travelPlan.arrival_city);
 
   // Convert paragraphs object to array for easier mapping
   const paragraphEntries = Object.entries(travelPlan.paragraphs)
+
 
   return (
     <main className="min-h-screen bg-gradient-to-r from-[rgba(161,191,159,1)] via-[rgba(219,239,218,1)] to-[rgba(222,242,221,1)]">
@@ -88,19 +110,25 @@ export default async function TravelPlanDetailPage({ params }: { params: Promise
             <div className="sticky top-8 rounded-xl bg-white p-6 shadow-xl">
               <h2 className="mb-6 text-xl font-bold text-gray-900">Recommended Flights</h2>
               <div className="space-y-4">
-                {mockFlights.map((flight, index) => (
-                  <FlightRecCard
-                    key={index}
-                    from={flight.from}
-                    to={flight.to}
-                    departureTime={flight.departureTime}
-                    arrivalTime={flight.arrivalTime}
-                    departureAirport={flight.departureAirport}
-                    arrivalAirport={flight.arrivalAirport}
-                    price={flight.price}
-                    airline={flight.airline}
-                  />
-                ))}
+                {flights && flights.length > 0 ? (
+                  flights.map((flight: Flight) => (
+                    <Link href={`/flights/${flight.id}`} key={flight.id}>
+                      <div className="my-3">
+                        <FlightRecCard
+                          from={flight.departure_airport.city}
+                          to={flight.arrival_airport.city}
+                          departureTime={flight.departure_time}
+                          arrivalTime={flight.arrival_time}
+                          departureAirport={flight.departure_airport.code}
+                          arrivalAirport={flight.arrival_airport.code}
+                          price={flight.base_price}
+                        />
+                        </div>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No flights available for this destination.</p>
+                )}
               </div>
             </div>
           </div>
@@ -109,4 +137,3 @@ export default async function TravelPlanDetailPage({ params }: { params: Promise
     </main>
   )
 }
-
