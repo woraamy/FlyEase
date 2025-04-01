@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -8,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUser } from "@clerk/nextjs";
 
 interface ChatHistoryProps {
   history: Array<{query: string, response: string}>;
@@ -15,6 +18,7 @@ interface ChatHistoryProps {
 
 export default function ChatHistory({ history }: ChatHistoryProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { user, isLoaded } = useUser();
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -34,14 +38,21 @@ export default function ChatHistory({ history }: ChatHistoryProps) {
                   {/* User message */}
                   <div className="flex items-start gap-4">
                     <Avatar className="h-10 w-10 border-2 border-primary/10 shadow-sm">
-                      <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground font-medium">U</AvatarFallback>
+                      {isLoaded && user ? (
+                        <AvatarImage src={user.imageUrl} alt={user.fullName || "User"} className="object-cover" />
+                      ) : null}
+                      <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground font-medium">
+                        {isLoaded && user ? (user.firstName?.[0] || "U") : "U"}
+                      </AvatarFallback>
                     </Avatar>
-                    <div className="rounded-xl bg-muted/50 p-4 text-sm max-w-[80%] relative shadow-sm border border-muted/30">
+                    <CardContent className="rounded-xl bg-muted/50 p-4 text-sm max-w-[80%] relative shadow-sm border border-muted/30">
                       <div className="font-medium text-foreground/90">
                         {item.query}
                       </div>
-                      {/* <Badge variant="outline" className="absolute -top-2 -left-1 text-xs bg-background">You</Badge> */}
-                    </div>
+                      <Badge variant="secondary" className="absolute -top-5 -left-1 text-xs bg-background">
+                        {isLoaded && user ? (user.fullName || "You") : "You"}
+                      </Badge>
+                    </CardContent>
                   </div>
                   
                   {/* AI response */}

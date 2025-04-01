@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { SearchParams } from '@/types/searchtype';
 import { Airport, Recommendation, RecommendationRequest, Flight, RecommendedDestination} from '@/types/flight';
 import { ApiResponse } from '@/types/chatbot';
+import { PaginationResponse } from '@/types/flight';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -310,3 +311,35 @@ export const fetchQuery = async (query: string, sessionId: string | undefined) =
     throw new Error('Error: Could not process your request');
   }
 };
+
+
+// import { PaginationResponse } from "@/types/flight";
+
+// export async function fetchFlights(page: number, pageSize: number = 5): Promise<PaginationResponse> {
+//   try {
+//     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/?page=${page}&pageSize=${pageSize}`, {
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       cache: 'no-store',
+//     });
+    
+//     if (!response.ok) {
+//       throw new Error(`API error with status: ${response.status}`);
+//     }
+    
+//     const data: PaginationResponse = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.error("Error fetching flights:", error);
+//     // Return default empty state that matches the expected type
+//     return {
+//       data: [],
+//       pagination: {
+//         page: page,
+//         total: 0,
+//         pageSize: pageSize
+//       }
+//     };
+//   }
+// }

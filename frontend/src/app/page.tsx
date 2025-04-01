@@ -33,12 +33,12 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <section className="py-16">
             <RecommendedFlights />
-            <h2 className="text-3xl font-semibold text-gray-900 mb-8">
+            {/* <h2 className="text-3xl font-semibold text-gray-900 mb-8">
               Available Flights
             </h2>
             <Suspense fallback={<Loading />}>
               <FlightList initialFlights={initialFlights} />
-            </Suspense>
+            </Suspense> */}
           </section>
         </div>
       </main>
