@@ -1,73 +1,15 @@
 "use client";
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { getRecommendedDestinations, getAirports, matchRecommendationsWithAirports } from '@/app/action';
-import { Airport } from '@/types/flight';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { RenderRow } from "@/components/RenderRow"; 
+import { Recommendation } from '@/types/recommendation';
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import Link from 'next/link';
-
-interface Recommendation {
-  airportDetails: Airport | null;
-  avg_rating: number;
-  booking_count: number;
-  destination: string;
-  popularity_score: number;
-  score: number;
-}
-
-// Enhanced AirportCard using shadcn/ui components
-function EnhancedAirportCard({ 
-  code, 
-  name, 
-  city, 
-  country, 
-  image, 
-  score 
-}: { 
-  code: string;
-  name: string;
-  city: string;
-  country: string;
-  image?: string;
-  score: number;
-}) {
-  return (
-    <Card className="w-full overflow-hidden transition-all duration-300 hover:shadow-lg">
-      <div className="relative h-36 w-full overflow-hidden">
-        <img
-          src={image || "/images/default-airport.jpg"}
-          alt={name}
-          className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
-        />
-        <Badge className="absolute right-2 top-2 bg-blue-600">
-          Score: {score.toFixed(1)}
-        </Badge>
-      </div>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">{name}</CardTitle>
-      </CardHeader>
-      <CardContent className="pb-2">
-        <p className="text-sm text-muted-foreground">{city}, {country}</p>
-      </CardContent>
-      <CardFooter>
-        <Button asChild variant="outline" className="w-full">
-          <Link href={`/recommend/${code}`}>
-            Explore Flights
-          </Link>
-        </Button>
-      </CardFooter>
-    </Card>
-  );
-}
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function Home() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const scrollContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     async function fetchData() {
@@ -105,101 +47,57 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const scroll = (direction: 'left' | 'right', index: number) => {
-    const container = scrollContainerRefs.current[index];
-    if (container) {
-      // Width of card (272px) + gap (now 24px)
-      const scrollAmount = 296;
-      
-      if (direction === 'left') {
-        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      } else {
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    }
-  };
-
   // Group recommendations by categories
   const topRated = [...recommendations].sort((a, b) => b.avg_rating - a.avg_rating);
   const mostPopular = [...recommendations].sort((a, b) => b.booking_count - a.booking_count);
   const recommended = [...recommendations].sort((a, b) => b.score - a.score);
 
-  if (loading) return (
-    <div className="flex h-64 items-center justify-center">
-      <div className="space-y-4">
-        <Skeleton className="h-12 w-64" />
-        <div className="flex space-x-4">
-          <Skeleton className="h-32 w-32" />
-          <Skeleton className="h-32 w-32" />
-          <Skeleton className="h-32 w-32" />
+  if (loading) {
+    return (
+      <div className="space-y-10">
+        <div>
+          <Skeleton className="h-10 w-2/3 mb-6" />
+          <div className="space-y-10">
+            {[...Array(3)].map((_, sectionIndex) => (
+              <div key={sectionIndex} className="space-y-6">
+                <Skeleton className="h-8 w-64 mb-4" />
+                <div className="flex space-x-6 overflow-x-auto pb-4">
+                  {[...Array(4)].map((_, cardIndex) => (
+                    <Card key={cardIndex} className="w-64 flex-shrink-0">
+                      <CardContent className="p-0">
+                        <Skeleton className="h-40 w-full rounded-t-lg" />
+                        <div className="p-4 space-y-2">
+                          <Skeleton className="h-4 w-full" />
+                          <Skeleton className="h-4 w-2/3" />
+                          <div className="flex justify-between items-center mt-4">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-6 w-16 rounded-full" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
   
   if (error) return (
-    <div className="mx-auto my-8 max-w-md rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
-      <p className="font-medium">Error: {error}</p>
-    </div>
-  );
-
-  const renderRow = (title: string, items: Recommendation[], index: number) => (
-    <div className="mb-12">
-      <h2 className="mb-4 text-2xl font-bold">{title}</h2>
-      <div className="group relative">
-        <Button
-          variant="secondary"
-          size="icon"
-          onClick={() => scroll('left', index)}
-          className="absolute left-0 top-1/2 z-10 -translate-y-1/2 opacity-0 shadow-md transition-opacity group-hover:opacity-100"
-          aria-label="Scroll left"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
-        
-        <div 
-          ref={(el) => { scrollContainerRefs.current[index] = el; }} 
-          className="scrollbar-hide flex space-x-6 overflow-x-auto pb-4 scroll-smooth"
-        >
-          {items.map((rec, itemIndex) => (
-            rec.airportDetails && (
-              <div 
-                key={`${rec.airportDetails.code}-${itemIndex}`} 
-                className="w-[272px] flex-none" 
-              >
-                <EnhancedAirportCard
-                  code={rec.airportDetails.code}
-                  name={rec.airportDetails.name}
-                  city={rec.airportDetails.city}
-                  country={rec.airportDetails.country}
-                  image={rec.airportDetails.image}
-                  score={rec.score}
-                />
-              </div>
-            )
-          ))}
-        </div>
-        
-        <Button
-          variant="secondary"
-          size="icon"
-          onClick={() => scroll('right', index)}
-          className="absolute right-0 top-1/2 z-10 -translate-y-1/2 opacity-0 shadow-md transition-opacity group-hover:opacity-100"
-          aria-label="Scroll right"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </Button>
-      </div>
+    <div className="p-6 text-center">
+      <div className="text-red-500 text-lg">Error: {error}</div>
     </div>
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-10 text-3xl font-bold">Discover Your Next Destination</h1>
-      
-      {renderRow("Recommended For You", recommended, 0)}
-      {renderRow("Most Popular Destinations", mostPopular, 1)}
-      {renderRow("Highest Rated Destinations", topRated, 2)}
+    <div>
+      {/* <h1 className="text-3xl font-bold mb-8">Discover Your Next Destination</h1> */}
+      <RenderRow title="Recommended For You" items={recommended} index={0} />
+      <RenderRow title="Most Popular Destinations" items={mostPopular} index={1} />
+      <RenderRow title="Highest Rated Destinations" items={topRated} index={2} />
     </div>
   );
 }
