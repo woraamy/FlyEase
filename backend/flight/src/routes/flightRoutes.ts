@@ -83,35 +83,33 @@ router.get("/:flightId", async (req, res) => {
 // ✅ Get Flights by Arrival City
 router.get("/travel-rec/:arrivalCity", async (req: Request, res: Response) => {
     console.log("route hit")
-    
     try {
-        const { arrivalCity } = req.params;
-        console.log(arrivalCity)
-        if (!arrivalCity) {
-            res.status(400).json({ error: "Arrival city is required" });
-        }
-        
-        const flights = await flightRepo
-            .createQueryBuilder("flight")
-            .leftJoinAndSelect("flight.departure_airport", "departure_airport")
-            .leftJoinAndSelect("flight.arrival_airport", "arrival_airport")
-            .leftJoinAndSelect("flight.class_details", "class_details")
-            .leftJoinAndSelect("flight.travel_classes", "travel_classes")
-            .where("LOWER(arrival_airport.city) = LOWER(:arrival_city)", { arrival_city: arrivalCity })
-            .getMany();
-
-        console.log("Flights found:", flights); // Debug log
-        console.log("hello world ")
-        if (!flights.length) {
-            res.status(404).json({ message: "No flights found for the given arrival city" });
-        }
-
-        res.json(flights);
+      const { arrivalCity } = req.params;
+      console.log(arrivalCity)
+      if (!arrivalCity) {
+        return res.status(400).json({ error: "Arrival city is required" });
+      }
+      
+      const flights = await flightRepo
+        .createQueryBuilder("flight")
+        .leftJoinAndSelect("flight.departure_airport", "departure_airport")
+        .leftJoinAndSelect("flight.arrival_airport", "arrival_airport")
+        .leftJoinAndSelect("flight.class_details", "class_details")
+        .leftJoinAndSelect("flight.travel_classes", "travel_classes")
+        .where("LOWER(arrival_airport.city) = LOWER(:arrival_city)", { arrival_city: arrivalCity })
+        .getMany();
+      
+      console.log("Flights found:", flights); // Debug log
+      console.log("hello world ")
+      
+      // Return empty array if no flights found (instead of 404 error)
+      return res.json(flights);
+      
     } catch (error) {
-        console.error('Error occurred:', error);  // Log full error
-        res.status(500).json({ error: "Something went wrong", details: error });  // Add 'details' for debugging
+      console.error('Error occurred:', error); // Log full error
+      return res.status(500).json({ error: "Something went wrong", details: error }); // Add 'details' for debugging
     }
-});
+  });
 
 
 interface RecommendationRequest {
