@@ -35,3 +35,20 @@ export interface Message {
     onSendMessage: (message: string) => Promise<void>;
     disabled: boolean;
   }
+
+  // types/index.ts
+export interface QueryResponse {
+    response: string;
+    session_id: string;
+    similar_contexts?: Array<{
+      content: string;
+      metadata: Record<string, any>;
+      similarity_score: number;
+    }>;
+    search_results?: Array<{
+      title: string;
+      url: string;
+      content?: string;
+      score?: number;
+    }>;
+  }

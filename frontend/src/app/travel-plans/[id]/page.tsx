@@ -33,8 +33,8 @@ const getTravelPlan = (id: string) => {
   return plan
 }
 
-export default async function TravelPlanDetailPage({ params }: { params: { id: string } }) {
-  const { id } = await Promise.resolve(params)
+export default async function TravelPlanDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const plan = await travelPlanAPI.getTravelPlanById(id)
   const travelPlan = await plan.json()
   if (!travelPlan) {
