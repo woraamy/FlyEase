@@ -185,6 +185,20 @@ export async function getTravelPlans() {
   }
 }
 
+
+export async function getFlightByArrCity(arrivalCity: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/travel-rec/${arrivalCity}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error loading flights by arrival city:', error);
+    return null;
+  }
+}
+
 // export async function sendMessage(message: string, sessionId: string | null): Promise<ApiResponse> {
 //   try {
 //     // Use the correct endpoint structure for LangGraph
