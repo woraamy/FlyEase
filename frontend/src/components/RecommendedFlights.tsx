@@ -4,6 +4,7 @@ import { getRecommendedDestinations, getAirports, matchRecommendationsWithAirpor
 import AirportCard from '../components/AirportCard';
 import { Airport } from '@/types/flight';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import SyncLoader from "react-spinners/SyncLoader";
 
 interface Recommendation {
   airportDetails: Airport | null;
@@ -75,7 +76,12 @@ export default function Home() {
   const mostPopular = [...recommendations].sort((a, b) => b.booking_count - a.booking_count);
   const recommended = [...recommendations].sort((a, b) => b.score - a.score);
 
-  if (loading) return <div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <SyncLoader color="#3B82F6" size={15} margin={2} />
+    </div>
+  );
+  
   if (error) return <div className="bg-red-100 text-red-700 p-4 rounded">Error: {error}</div>;
 
   const renderRow = (title: string, items: Recommendation[], index: number) => (

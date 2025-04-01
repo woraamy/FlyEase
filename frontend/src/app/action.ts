@@ -230,44 +230,44 @@ export async function getTravelPlans() {
 //   }
 // }
 
-export async function sendMessage(query: string, messages: any[] = [], sessionId?: string) {
-  try {
-    const response = await fetch(`${API_BASE_URL_CHAT_BOT}/api/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query,
-        messages,
-        session_id: sessionId  // Include session ID if available
-      }),
-    });
+// export async function sendMessage(query: string, messages: any[] = [], sessionId?: string) {
+//   try {
+//     const response = await fetch(`${API_BASE_URL_CHAT_BOT}/api/chat`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         query,
+//         messages,
+//         session_id: sessionId  // Include session ID if available
+//       }),
+//     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `API error: ${response.status}`);
-    }
+//     if (!response.ok) {
+//       const errorData = await response.json();
+//       throw new Error(errorData.error || `API error: ${response.status}`);
+//     }
 
-    const data = await response.json();
+//     const data = await response.json();
     
-    // Ensure we have a response even if the backend fails
-    if (!data.response) {
-      data.response = "Sorry, I couldn't process your request at this time.";
-    }
+//     // Ensure we have a response even if the backend fails
+//     if (!data.response) {
+//       data.response = "Sorry, I couldn't process your request at this time.";
+//     }
     
-    return data;
-  } catch (error) {
-    console.error('Error sending message:', error);
-    // Return a fallback response object instead of throwing
-    return {
-      response: "Sorry, I couldn't connect to the backend service. Please check if the server is running.",
-      context: [],
-      search_results: [],
-      session_id: sessionId
-    };
-  }
-}
+//     return data;
+//   } catch (error) {
+//     console.error('Error sending message:', error);
+//     // Return a fallback response object instead of throwing
+//     return {
+//       response: "Sorry, I couldn't connect to the backend service. Please check if the server is running.",
+//       context: [],
+//       search_results: [],
+//       session_id: sessionId
+//     };
+//   }
+// }
 
 export async function checkApiHealth() {
   try {
@@ -278,3 +278,21 @@ export async function checkApiHealth() {
     return false;
   }
 }
+
+
+export const fetchQuery = async (query: string, sessionId: string | undefined) => {
+  try {
+    const response = await fetch('http://localhost:8000/api/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, session_id: sessionId || undefined })
+    });
+
+    if (!response.ok) throw new Error('Network response was not ok');
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error:', error);
+    throw new Error('Error: Could not process your request');
+  }
+};
