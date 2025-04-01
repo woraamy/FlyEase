@@ -2,6 +2,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { SearchParams } from '@/types/searchtype';
 import { Airport, Recommendation, RecommendationRequest, Flight, RecommendedDestination} from '@/types/flight';
+import { ApiResponse } from '@/types/chatbot';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -9,6 +10,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const API_BASE_URL_AIRPORTS = process.env.NEXT_PUBLIC_API_BASE_URL_AIRPORTS;
 
 const API_BASE_URL_TRAVEL_PLANS = process.env.NEXT_PUBLIC_API_BASE_URL_TRAVEL_PLANS;
+
+const API_BASE_URL_CHAT_BOT = process.env.NEXT_PUBLIC_API_BASE_URL_CHAT_BOT;
 // export async function searchFlights(params: SearchParams) {
 //   try {
 //     // Filter the params to remove any null or empty values
@@ -195,3 +198,115 @@ export async function getFlightByArrCity(arrivalCity: string) {
     return null;
   }
 }
+
+// export async function sendMessage(message: string, sessionId: string | null): Promise<ApiResponse> {
+//   try {
+//     // Use the correct endpoint structure for LangGraph
+//     // For a new conversation without a thread ID
+//     const endpoint = sessionId 
+//       ? `http://127.0.0.1:2024/threads/${sessionId}/runs` 
+//       : 'http://127.0.0.1:2024/runs';
+    
+//     const response = await fetch(endpoint, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         assistant_id: 'graph', // This should match the ID in your langgraph.json
+//         input: {
+//           query: message
+//         },
+//         stream_mode: 'updates'
+//       }),
+//     });
+    
+//     if (!response.ok) {
+//       console.log(`Backend server responded with status: ${response.status}`);
+//       throw new Error(`Failed to fetch from backend: ${response.status}`);
+//     }
+    
+//     const data = await response.json();
+    
+//     return {
+//       message: data.output?.response || data.output?.answer || "No response received",
+//       sessionId: data.thread_id || sessionId || '',
+//       contexts: data.output?.similar_contexts || [],
+//       searchResults: data.output?.search_results || []
+//     };
+//   } catch (error) {
+//     console.error('Error in chat action:', error);
+//     return {
+//       message: 'Sorry, I encountered an error processing your request. Please check if the backend server is running.',
+//       sessionId: sessionId || '',
+//       error: error instanceof Error ? error.message : 'Unknown error'
+//     };
+//   }
+// }
+
+// export async function sendMessage(query: string, messages: any[] = [], sessionId?: string) {
+//   try {
+//     const response = await fetch(`${API_BASE_URL_CHAT_BOT}/api/chat`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         query,
+//         messages,
+//         session_id: sessionId  // Include session ID if available
+//       }),
+//     });
+
+//     if (!response.ok) {
+//       const errorData = await response.json();
+//       throw new Error(errorData.error || `API error: ${response.status}`);
+//     }
+
+//     const data = await response.json();
+    
+//     // Ensure we have a response even if the backend fails
+//     if (!data.response) {
+//       data.response = "Sorry, I couldn't process your request at this time.";
+//     }
+    
+//     return data;
+//   } catch (error) {
+//     console.error('Error sending message:', error);
+//     // Return a fallback response object instead of throwing
+//     return {
+//       response: "Sorry, I couldn't connect to the backend service. Please check if the server is running.",
+//       context: [],
+//       search_results: [],
+//       session_id: sessionId
+//     };
+//   }
+// }
+
+export async function checkApiHealth() {
+  try {
+    const response = await fetch(`${API_BASE_URL_CHAT_BOT}/api/health`);
+    return response.ok;
+  } catch (error) {
+    console.error('API health check failed:', error);
+    return false;
+  }
+}
+
+
+export const fetchQuery = async (query: string, sessionId: string | undefined) => {
+  try {
+    const response = await fetch('http://localhost:8000/api/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, session_id: sessionId || undefined })
+    });
+
+    if (!response.ok) throw new Error('Network response was not ok');
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error:', error);
+    throw new Error('Error: Could not process your request');
+  }
+};
