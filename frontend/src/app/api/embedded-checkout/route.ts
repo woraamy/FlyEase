@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
         // Create a new product in Stripe
         const { id } = await stripe.prices.create({
-            unit_amount: price,
+            unit_amount: Math.round(price * 100),
             currency: 'usd',
             product_data: {
                 name: 'name',

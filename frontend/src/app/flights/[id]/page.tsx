@@ -338,8 +338,9 @@ export default function FlightDetailsPage() {
             
             {isSignedIn ? (
               <>
+                
                 <EmbeddedCheckoutForm price={(updatedPrice ?? flight?.base_price ?? 0) * 1.1} name="Flight Booking" />
-                <Button className="w-full rounded-xl mt-3">Place order</Button>
+                {/* <Button className="w-full rounded-xl mt-3">Place order</Button> */}
               </>
             ) : (
               <div className="mt-4 text-center flex flex-col items-center gap-3">
