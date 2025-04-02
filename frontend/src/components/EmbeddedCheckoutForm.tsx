@@ -5,6 +5,7 @@ import {
   EmbeddedCheckout,
 } from "@stripe/react-stripe-js";
 import { useCallback, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 interface EmbeddedCheckoutProps {
   price: Number;
@@ -45,9 +46,9 @@ export default function EmbeddedCheckoutForm({ price, name }: EmbeddedCheckoutPr
 
   return (
     <div id="checkout" className="my-4">
-      <button className="btn" onClick={handleCheckoutClick}>
+      <Button className="w-full rounded-xl mt-3" onClick={handleCheckoutClick}>
         Stripe Checkout
-      </button>
+      </Button>
       <dialog ref={modalRef} className="modal">
       <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
       <h3 className="font-bold text-lg">Embedded Checkout</h3>

@@ -212,7 +212,7 @@ const handleBaggageSelection = (baggage: { name: string; price: number }): void 
                 }`}
                 onClick={() => onServiceChange && onServiceChange(service)}
               >
-                <p className="text-sm">{service}</p>
+                <p className="text-sm text-center">{service}</p>
               </div>
             ))}
           </div>
