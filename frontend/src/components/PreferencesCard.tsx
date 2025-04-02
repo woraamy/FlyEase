@@ -24,16 +24,33 @@ const seatOptions = [
 ];
 
 const mealOptions = ["Standard Meal", "Vegetarian Meal", "Halal Meal", "Gluten-Free Meal", "Seafood Meal"];
-const baggageOptions = ["No Extra Baggage", "Extra 10kg", "Extra 20kg", "Extra 30kg"];
+// const baggageOptions = ["No Extra Baggage", "Extra 10kg", "Extra 20kg", "Extra 30kg"];
+const baggageOptions = [
+    { 
+        name: "NO Extra Baggage", 
+        price: 0
+    },
+    { 
+        name: "Extra 10kg", 
+        price: 30
+    },
+    { 
+        name: "Extra 20kg", 
+        price: 55
+    },
+    { 
+        name: "Extra 30kg", 
+        price: 75
+    }
+];
 const serviceOptions = ["No Assistance", "Wheelchair Assistance", "Priority Boarding", "Visual/Hearing Assistance", "Pets on Board"];
 
-type MealOption = "Standard Meal" | "Vegetarian Meal" | "Halal Meal" | "Gluten-Free Meal" | "Seafood Meal";
 
 
 interface FlightPreferencesProps {
   onSeatChange?: (seat: { name: string; multiplier: number }) => void;
-  onMealChange: (meal: MealOption) => void;
-  onBaggageChange?: (baggage: string) => void;
+  onMealChange: (meal: string) => void;
+  onBaggageChange?: (baggage: { name: string; price: number }) => void;
   onServiceChange?: (service: string) => void;
   selectedSeat?: string;
   selectedMeal?: string;
@@ -59,6 +76,12 @@ export default function FlightPreferences({
 const handleSeatSelection = (seat: { name: string; multiplier: number }): void => {
     if (onSeatChange) {
         onSeatChange(seat);
+    }
+};
+
+const handleBaggageSelection = (baggage: { name: string; price: number }): void => {
+    if (onBaggageChange) {
+        onBaggageChange(baggage);
     }
 };
 
@@ -93,7 +116,7 @@ const handleSeatSelection = (seat: { name: string; multiplier: number }): void =
               <div
                 key={seat.name}
                 className={`flex flex-col items-center space-y-2 border-[1px] rounded-xl p-4 cursor-pointer transition-all ${
-                  selectedSeat === seat.name ? "border-blue-500 bg-blue-100 shadow-md" : "border-gray-300"
+                  selectedSeat === seat.name ? "border-[#31B372] bg-[#E9F1ED] shadow-md" : "border-gray-300"
                 }`}
                 onClick={() => handleSeatSelection(seat)}
               >
@@ -124,7 +147,7 @@ const handleSeatSelection = (seat: { name: string; multiplier: number }): void =
               <div
                 key={meal}
                 className={`flex items-center justify-center border-[1px] rounded-xl p-3 cursor-pointer transition-all ${
-                  selectedMeal === meal ? "border-blue-500 bg-blue-100 shadow-md" : "border-gray-300"
+                  selectedMeal === meal ? "border-[#31B372] bg-[#E9F1ED] shadow-md" : "border-gray-300"
                 }`}
                 onClick={() => onMealChange && onMealChange(meal)}
               >
@@ -152,13 +175,14 @@ const handleSeatSelection = (seat: { name: string; multiplier: number }): void =
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full mt-3">
             {baggageOptions.map((baggage) => (
               <div
-                key={baggage}
-                className={`flex items-center justify-center border-[1px] rounded-xl p-3 cursor-pointer transition-all ${
-                  selectedBaggage === baggage ? "border-blue-500 bg-blue-100 shadow-md" : "border-gray-300"
+                key={baggage.name}
+                className={`flex flex-col items-center space-y-2 border-[1px] rounded-xl p-4 cursor-pointer transition-all ${
+                  selectedBaggage === baggage.name ? "border-[#31B372] bg-[#E9F1ED] shadow-md" : "border-gray-300"
                 }`}
-                onClick={() => onBaggageChange && onBaggageChange(baggage)}
+                onClick={() => handleBaggageSelection(baggage)}
               >
-                <p className="text-sm">{baggage}</p>
+                <p className="text-sm font-semibold">{baggage.name}</p>
+                <p className="text-xs">additional ${baggage.price}</p>
               </div>
             ))}
           </div>
@@ -179,12 +203,12 @@ const handleSeatSelection = (seat: { name: string; multiplier: number }): void =
         </div>
 
         {serviceExpanded && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full mt-3">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 w-full mt-3">
             {serviceOptions.map((service) => (
               <div
                 key={service}
                 className={`flex items-center justify-center border-[1px] rounded-xl p-3 cursor-pointer transition-all ${
-                  selectedService === service ? "border-blue-500 bg-blue-100 shadow-md" : "border-gray-300"
+                  selectedService === service ? "border-[#31B372] bg-[#E9F1ED] shadow-md" : "border-gray-300"
                 }`}
                 onClick={() => onServiceChange && onServiceChange(service)}
               >

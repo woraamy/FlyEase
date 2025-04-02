@@ -48,7 +48,6 @@ const passengerSchema = z.object({
   nationality: z.string().min(3, "Nationality must be valid"),
 });
 
-const baggageOptions = {"No Extra Baggage": 0, "Extra 10kg": 30, "Extra 20kg": 55, "Extra 30kg": 75};
 
 type PassengerFormData = z.infer<typeof passengerSchema>;
 
@@ -62,7 +61,7 @@ export default function FlightDetailsPage() {
   const [selectedMeal, setSelectedMeal] = useState("Standard Meal");
   const [selectedBaggage, setSelectedBaggage] = useState("No Extra Baggage");
   const [selectedService, setSelectedService] = useState("No Assistance");
-  const [updatedPrice, setUpdatedPrice] = useState(0);
+  const [updatedPrice, setUpdatedPrice] = useState(flight?.base_price);
 
   const handleSeatSelection = (seat: { name: string; multiplier: number }) => {
     setSelectedSeat(seat.name);
@@ -76,50 +75,19 @@ export default function FlightDetailsPage() {
     price: number;
   }
 
-  const handleBaggageSelection = (baggageOption: keyof typeof baggageOptions) => {
-    setSelectedBaggage(baggageOption);
+  const handleBaggageSelection = (baggage: { name: string; price: number }) => {
+    setSelectedBaggage(baggage.name);
     if (flight) {
-      // Update the price based on the selected baggage option
-      const baggagePrice: number = baggageOptions[baggageOption] || 0;
-      // Recalculate the price with the current seat multiplier
-      const seatMultiplier: number = getSeatMultiplier(selectedSeat);
-      setUpdatedPrice(flight.base_price * seatMultiplier + baggagePrice);
+      setUpdatedPrice((updatedPrice ?? 0) + baggage.price);
     }
   };
-  
-  // Helper function to get the seat multiplier
-  const getSeatMultiplier = (seatName: string): number => {
-    interface SeatMap {
-      [key: string]: number;
-    }
 
-    const seatMap: SeatMap = {
-      "First Class": 2,
-      "Business Class": 1.75,
-      "Premium Economy Class": 1.5,
-      "Economy Class": 1
-    };
-    return seatMap[seatName] || 1;
+  const handleMealSelection = (meal: string) => {
+    setSelectedMeal(meal);
   };
 
-  interface MealOption {
-    name: string;
-    price: number;
-  }
-
-  const handleMealSelection = (meal: MealOption) => {
-    setSelectedMeal(meal.name);
-    // If you need to add price changes for meals, you can handle it here
-  };
-
-  interface ServiceOption {
-    name: string;
-    price?: number;
-  }
-
-  const handleServiceSelection = (service: ServiceOption) => {
-    setSelectedService(service.name);
-    // If you need to add price changes for services, you can handle it here
+  const handleServiceSelection = (service: string) => {
+    setSelectedService(service);
   };
 
   const {
@@ -343,17 +311,17 @@ export default function FlightDetailsPage() {
             </span>
             <span className="flex justify-between">
               <p className="text-gray-500">Additional Services</p>
-              <p>${updatedPrice - flight.base_price > 0 ? (updatedPrice - flight.base_price).toFixed(2) : '0.00'}</p>
+              <p>${(updatedPrice ?? flight?.base_price ?? 0) - flight.base_price > 0 ? ((updatedPrice ?? flight?.base_price ?? 0) - flight.base_price).toFixed(2) : '0.00'}</p>
             </span>
             <span className="flex justify-between">
               <p className="text-gray-500">Tax</p>
-              <p>${(updatedPrice * 0.1).toFixed(2)}</p>
+              <p>${((updatedPrice ?? flight?.base_price ?? 0) * 0.1).toFixed(2)}</p>
             </span>
             <span className="flex justify-between">
               <p className="text-gray-500">Total</p>
-              <p className="font-bold">${(updatedPrice * 1.1).toFixed(2)}</p>
+              <p className="font-bold">${((updatedPrice ?? flight?.base_price ?? 0) * 1.1).toFixed(2)}</p>
             </span>
-            <EmbeddedCheckoutForm price={updatedPrice * 1.1} name="Flight Booking" />
+            <EmbeddedCheckoutForm price={(updatedPrice ?? flight?.base_price ?? 0) * 1.1} name="Flight Booking" />
             <Button className="w-full rounded-xl mt-3">Place order</Button>
           </CardContent>
           <Separator className="m-4" />
