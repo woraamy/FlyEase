@@ -59,14 +59,14 @@ export default function FlightDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const { isSignedIn } = useAuth(); // Use Clerk's authentication hook
 
-  const [selectedSeat, setSelectedSeat] = useState("Economy Class");
+  const [selectedSeat, setSelectedSeat] = useState<"First Class" | "Business Class" | "Premium Economy Class" | "Economy Class">("Economy Class");
   const [selectedMeal, setSelectedMeal] = useState("Standard Meal");
   const [selectedBaggage, setSelectedBaggage] = useState("No Extra Baggage");
   const [selectedService, setSelectedService] = useState("No Assistance");
   const [updatedPrice, setUpdatedPrice] = useState(flight?.base_price);
 
   const handleSeatSelection = (seat: { name: string; multiplier: number }) => {
-    setSelectedSeat(seat.name);
+    setSelectedSeat(seat.name as "First Class" | "Business Class" | "Premium Economy Class" | "Economy Class");
     if (flight) {
       setUpdatedPrice(flight.base_price * seat.multiplier);
     }
@@ -75,9 +75,26 @@ export default function FlightDetailsPage() {
   const handleBaggageSelection = (baggage: { name: string; price: number }) => {
     setSelectedBaggage(baggage.name);
     if (flight) {
-      setUpdatedPrice((updatedPrice ?? 0) + baggage.price);
+      // Recalculate the price with the current seat multiplier
+      const seatMultiplier = getSeatMultiplier(selectedSeat);
+      setUpdatedPrice(flight.base_price * seatMultiplier + baggage.price);
     }
   };
+
+  
+  
+  // Helper function to get the seat multiplier
+  const getSeatMultiplier = (seatName: "First Class" | "Business Class" | "Premium Economy Class" | "Economy Class") => {
+      const seatMap = {
+        "First Class": 2,
+        "Business Class": 1.75,
+        "Premium Economy Class": 1.5,
+        "Economy Class": 1
+      };
+      
+      return seatMap[seatName] || 1;
+    };
+
 
   const handleMealSelection = (meal: string) => {
     setSelectedMeal(meal);
