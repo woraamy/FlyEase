@@ -9,6 +9,7 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth, SignInButton } from "@clerk/nextjs"; // Import Clerk auth hooks
 
 import { flightAPI } from "./action";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import EmbeddedCheckoutForm from "@/components/EmbeddedCheckoutForm";
-import Preferences from "@/components/PreferencesCard"; // Import the new component
+import Preferences from "@/components/PreferencesCard";
 
 interface Flight {
   id: number;
@@ -56,6 +57,7 @@ export default function FlightDetailsPage() {
   const [flight, setFlight] = useState<Flight | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { isSignedIn } = useAuth(); // Use Clerk's authentication hook
 
   const [selectedSeat, setSelectedSeat] = useState("Economy Class");
   const [selectedMeal, setSelectedMeal] = useState("Standard Meal");
@@ -69,11 +71,6 @@ export default function FlightDetailsPage() {
       setUpdatedPrice(flight.base_price * seat.multiplier);
     }
   };
-
-  interface BaggageOption {
-    name: string;
-    price: number;
-  }
 
   const handleBaggageSelection = (baggage: { name: string; price: number }) => {
     setSelectedBaggage(baggage.name);
@@ -321,17 +318,34 @@ export default function FlightDetailsPage() {
               <p className="text-gray-500">Total</p>
               <p className="font-bold">${((updatedPrice ?? flight?.base_price ?? 0) * 1.1).toFixed(2)}</p>
             </span>
-            <EmbeddedCheckoutForm price={(updatedPrice ?? flight?.base_price ?? 0) * 1.1} name="Flight Booking" />
-            <Button className="w-full rounded-xl mt-3">Place order</Button>
+            
+            {isSignedIn ? (
+              <>
+                <EmbeddedCheckoutForm price={(updatedPrice ?? flight?.base_price ?? 0) * 1.1} name="Flight Booking" />
+                <Button className="w-full rounded-xl mt-3">Place order</Button>
+              </>
+            ) : (
+              <div className="mt-4 text-center flex flex-col items-center gap-3">
+                <p className="text-red-500 mb-2">Please sign in to continue with checkout</p>
+                <SignInButton mode="modal">
+                  <Button className="w-full rounded-xl">Sign In to Checkout</Button>
+                </SignInButton>
+              </div>
+            )}
           </CardContent>
-          <Separator className="m-4" />
-          <CardFooter className="flex justify-between pt-2">
-            <span className="flex flex-col space-y-2">
-              <Label htmlFor="email">Promo code</Label>
-              <Input type="email" id="email" placeholder="Enter code" />
-            </span>
-            <Button>Apply</Button>
-          </CardFooter>
+          
+          {isSignedIn && (
+            <>
+              <Separator className="m-4" />
+              <CardFooter className="flex justify-between pt-2">
+                <span className="flex flex-col space-y-2">
+                  <Label htmlFor="email">Promo code</Label>
+                  <Input type="email" id="email" placeholder="Enter code" />
+                </span>
+                <Button>Apply</Button>
+              </CardFooter>
+            </>
+          )}
         </Card>
       </div>
     </div>
