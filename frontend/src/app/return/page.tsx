@@ -9,7 +9,7 @@ export default async function CheckoutReturn({ searchParams }: { searchParams: {
     const { session_id } = await searchParams;
     const session = await getSession(session_id);
 
-    console.log(session);
+    // console.log(session);
 
     if (session?.status === "open") {
         return <p>Payment did not work.</p>;

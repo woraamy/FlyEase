@@ -1,5 +1,12 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
 
+//enum for booking status
+export enum BookingStatus {
+    PENDING = "PENDING",
+    CONFIRMED = "CONFIRMED"
+}
+
+
 @Entity()
 export class Booking {
     @PrimaryGeneratedColumn()
@@ -11,17 +18,20 @@ export class Booking {
     @Column({ length: 5 })
     seat_number: string;
 
-    @Column()
+    @Column({ nullable: true })
     passenger_id: number; // No FK to Passenger (Microservice-friendly)
 
-    @Column({ length: 6, unique: true })
+    @Column({ length: 6, unique: true , nullable: true})
     booking_code: string;
 
-    @Column({ length: 255})
+    @Column({ length: 255, nullable: true })
     clerkId: string;
+
+    @Column({ type: "enum", enum: BookingStatus, default: BookingStatus.PENDING })
+    status : BookingStatus;
 
     @CreateDateColumn({ type: "timestamp" })
     created_at: Date;
 
-    
+
 }

@@ -1,5 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
+// enum for gender
+
+export enum GenderStatus {
+    Male = "M",
+    Female = "F",
+    NotSay = "O"
+}
+
 @Entity('passenger')
 export class Passenger {
     @PrimaryGeneratedColumn()
@@ -22,4 +30,13 @@ export class Passenger {
 
     @Column({ type: 'varchar', length: 15 })
     phone: string;
+
+    @Column({ type: 'varchar', length: 255 })
+    nationality: string;
+
+    @Column({ type: 'int', length: 3 })
+    age: number;
+
+    @Column({ type: 'enum',  enum: GenderStatus, default: GenderStatus.NotSay })
+    Gender: GenderStatus;
 }

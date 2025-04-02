@@ -27,72 +27,38 @@ export async function POST(request: Request) {
     }
     
     switch (event.type) {
-
             // reserved spot status confirmed
         case 'payment_intent.succeeded':
-            const paymentIntent = event.data.object;
-            console.log(`PaymentIntent was successful!`);
+            const paymentIntent = event.data.object.metadata;
+
             // Handle successful payment intent here
-            await fetch(`${bookingURL}/booking`, {
+            await fetch(`${bookingURL}/booking/success`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    payment_intent: paymentIntent,
-                }),
+                body: JSON.stringify({paymentIntent}),
             })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    console.log('Error please contact support response:', response);
                 }
-                console.log('Payment intent processed successfully');
-            }
-            )
-
-            break;
-        
-            // release reserved spot
-        case 'payment_intent.payment_failed':
-            const paymentFailed = event.data.object;
-            await fetch(`${bookingURL}/payment-failed`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    payment_intent: paymentFailed,
-                }),
-            })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                console.log('Payment intent failed successfully');
+                console.log('Payment intent succeeded successfully');
             }
             )
             break;
 
-            // reserved spot
-        case 'payment_intent.created':
-            const paymentCreated = event.data.object;
-            await fetch(`${bookingURL}/payment-created`, {
+        case 'checkout.session.expired':
+            const session = event.data.object.metadata;;
+            // delete reserved spot
+            console.log(`Session expired!`);
+            await fetch(`${bookingURL}/booking/decline`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    payment_intent: paymentCreated,
-                }),
+                body: JSON.stringify({session}),
             })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                console.log('Payment intent created successfully');
-            }
-            )
-            break;
         default:
             break;
     }
