@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
 import { 
-  Plane, Wifi, Tv, UtensilsCrossed, Star, LoaderCircle, PlaneTakeoff, PlaneLanding, CalendarArrowUp, CalendarArrowDown, ChevronDown
+  Plane, Wifi, Tv, UtensilsCrossed, Star, LoaderCircle, PlaneTakeoff, PlaneLanding, CalendarArrowUp, CalendarArrowDown
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth, SignInButton } from "@clerk/nextjs"; // Import Clerk auth hooks
 
 import { flightAPI } from "./action";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import EmbeddedCheckoutForm from "@/components/EmbeddedCheckoutForm";
+import Preferences from "@/components/PreferencesCard";
 
 interface Flight {
   id: number;
@@ -47,6 +49,7 @@ const passengerSchema = z.object({
   nationality: z.string().min(3, "Nationality must be valid"),
 });
 
+
 type PassengerFormData = z.infer<typeof passengerSchema>;
 
 export default function FlightDetailsPage() {
@@ -54,10 +57,52 @@ export default function FlightDetailsPage() {
   const [flight, setFlight] = useState<Flight | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [seatExpanded, setSeatExpanded] = useState(false);
-  const [mealExpanded, setMealExpanded] = useState(false);
-  const [serviceExpanded, setServiceExpanded] = useState(false);
-  const [baggageExpanded, setBaggageExpanded] = useState(false);
+  const { isSignedIn } = useAuth(); // Use Clerk's authentication hook
+
+  const [selectedSeat, setSelectedSeat] = useState<"First Class" | "Business Class" | "Premium Economy Class" | "Economy Class">("Economy Class");
+  const [selectedMeal, setSelectedMeal] = useState("Standard Meal");
+  const [selectedBaggage, setSelectedBaggage] = useState("No Extra Baggage");
+  const [selectedService, setSelectedService] = useState("No Assistance");
+  const [updatedPrice, setUpdatedPrice] = useState(flight?.base_price);
+
+  const handleSeatSelection = (seat: { name: string; multiplier: number }) => {
+    setSelectedSeat(seat.name as "First Class" | "Business Class" | "Premium Economy Class" | "Economy Class");
+    if (flight) {
+      setUpdatedPrice(flight.base_price * seat.multiplier);
+    }
+  };
+
+  const handleBaggageSelection = (baggage: { name: string; price: number }) => {
+    setSelectedBaggage(baggage.name);
+    if (flight) {
+      // Recalculate the price with the current seat multiplier
+      const seatMultiplier = getSeatMultiplier(selectedSeat);
+      setUpdatedPrice(flight.base_price * seatMultiplier + baggage.price);
+    }
+  };
+
+  
+  
+  // Helper function to get the seat multiplier
+  const getSeatMultiplier = (seatName: "First Class" | "Business Class" | "Premium Economy Class" | "Economy Class") => {
+      const seatMap = {
+        "First Class": 2,
+        "Business Class": 1.75,
+        "Premium Economy Class": 1.5,
+        "Economy Class": 1
+      };
+      
+      return seatMap[seatName] || 1;
+    };
+
+
+  const handleMealSelection = (meal: string) => {
+    setSelectedMeal(meal);
+  };
+
+  const handleServiceSelection = (service: string) => {
+    setSelectedService(service);
+  };
 
   const {
     register,
@@ -98,9 +143,14 @@ export default function FlightDetailsPage() {
         }
 
         setFlight(data);
-      } catch (err: any) {
+        setUpdatedPrice(data.base_price); // Initialize price
+      } catch (err) {
         console.error("Error fetching flight:", err);
-        setError(err.message);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred.");
+        }
       } finally {
         setLoading(false);
       }
@@ -127,114 +177,83 @@ export default function FlightDetailsPage() {
 
   return (
     <div className="flex px-6 py-4">
-    {/* Left */}
-    <div className="flex-[3] items-center justify-center p-6">
-      {/* Header */}
-      <div className="flex flex-col space-y-4">
-        <p className="text-3xl font-semibold text-center">Flight Details</p>
-        <h1 className="text-xl text-center">from {flight.departure_airport.city} to {flight.arrival_airport.city}</h1>
-        <p className="text-sm flex items-center"><Star className="text-yellow-500 mr-1" /> Ratings {flight.rating} / 5</p>
-        {/* Container for cards and button */}
-        <img
-            src={flight.featured_image}
-            alt="Beach"
-            className="w-full h-96 object-cover mt-6 rounded-lg"
-          />
-        <div className="flex justify-between items-center space-x-4">
-          {/* Cards */}
-          <div className="grid grid-cols-5 gap-4 w-full">
-            {/* {[
-              { name: "Alaska Airlines", icon: Apple },
-              { name: "Delta Airlines", icon: Plane },
-              { name: "United Airlines", icon: Apple },
-              { name: "American Airlines", icon: Apple },
-            ].map((_, index) => ( */}
-              <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
-                <Plane />
-                <span className="flex flex-col">
-                  <p className="text-xs">Flight Number</p>
-                  <p className="text-sm">{flight.flight_number}</p>
-                </span>
-              </div>
-              <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
-                <CalendarArrowUp />
-                <span className="flex flex-col">
-                  <p className="text-xs">Departure Time</p>
-                  <p className="text-sm">{format(new Date(flight.departure_time), "EE, MMMM d, yyyy h:mm a")}</p>
-                </span>
-              </div>
-              <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
-                <CalendarArrowDown />
-                <span className="flex flex-col">
-                  <p className="text-xs">Arrival Time</p>
-                  <p className="text-sm">{format(new Date(flight.arrival_time), "EE, MMMM d, yyyy h:mm a")}</p>
-                </span>
-              </div>
-              <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
-                <PlaneTakeoff />
-                <span className="flex flex-col">
-                  <p className="text-xs">Departure Airport</p>
-                  <p className="text-sm">{flight.departure_airport.name}</p>
-                </span>
-              </div>
-              <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
-                <PlaneLanding />
-                <span className="flex flex-col">
-                  <p className="text-xs">Arrival Airport</p>
-                  <p className="text-sm">{flight.arrival_airport.name}</p>
-                </span>
-              </div>
-            {/* ))} */}
-          </div>
-        </div>
-      </div>
-      <Separator className="m-4" />
-      {/* Service on Flight */}
-      {/* Services on Flight */}
-      <div className="flex flex-col">
-            <p className="text-2xl font-semibold pb-6">Services on Flight</p>
-            <div className="grid grid-cols-3 gap-4">
-              {flight.has_wifi && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl"><Wifi className="text-green-700" /><span>In-Flight WiFi</span></div>}
-              {flight.has_entertainment && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl"><Tv className="text-green-700" /><span>In-Flight Entertainment</span></div>}
-              {flight.has_meals && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl">< UtensilsCrossed className="text-green-700" /><span>Complimentary Meal</span></div>}
+      {/* Left */}
+      <div className="flex-[3] items-center justify-center p-6">
+        {/* Header */}
+        <div className="flex flex-col space-y-4">
+          <p className="text-3xl font-semibold text-center">Flight Details</p>
+          <h1 className="text-xl text-center">from {flight.departure_airport.city} to {flight.arrival_airport.city}</h1>
+          <p className="text-sm flex items-center"><Star className="text-yellow-500 mr-1" /> Ratings {flight.rating} / 5</p>
+          {/* Container for cards and button */}
+          <img
+              src={flight.featured_image}
+              alt="Beach"
+              className="w-full h-96 object-cover mt-6 rounded-lg"
+            />
+          <div className="flex justify-between items-center space-x-4">
+            {/* Cards */}
+            <div className="grid grid-cols-5 gap-4 w-full">
+                <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
+                  <Plane />
+                  <span className="flex flex-col">
+                    <p className="text-xs">Flight Number</p>
+                    <p className="text-sm">{flight.flight_number}</p>
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
+                  <CalendarArrowUp />
+                  <span className="flex flex-col">
+                    <p className="text-xs">Departure Time</p>
+                    <p className="text-sm">{format(new Date(flight.departure_time), "EE, MMMM d, yyyy h:mm a")}</p>
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
+                  <CalendarArrowDown />
+                  <span className="flex flex-col">
+                    <p className="text-xs">Arrival Time</p>
+                    <p className="text-sm">{format(new Date(flight.arrival_time), "EE, MMMM d, yyyy h:mm a")}</p>
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
+                  <PlaneTakeoff />
+                  <span className="flex flex-col">
+                    <p className="text-xs">Departure Airport</p>
+                    <p className="text-sm">{flight.departure_airport.name}</p>
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
+                  <PlaneLanding />
+                  <span className="flex flex-col">
+                    <p className="text-xs">Arrival Airport</p>
+                    <p className="text-sm">{flight.arrival_airport.name}</p>
+                  </span>
+                </div>
             </div>
           </div>
-      <Separator className="m-4" />
-      {/* Additonal Services */}
-      <div className="pb-3 space-y-4">
-        <p className="text-xl font-semibold">Additional Services</p>
-        {/* Services List */}
-        {/* <ChevronDown className={`cursor-pointer transition-transform ${expanded ? "rotate-180" : ""}`} onClick={() => setExpanded(!expanded)} /> */}
-          <div className="flex justify-between">
-            <span>
-              <p className="font-bold">Seat Preference</p>
-              <p>Select your preferred seat</p>
-            </span>
-            <ChevronDown id="seat preference" className={`cursor-pointer transition-transform ${seatExpanded ? "rotate-180" : ""}`} onClick={() => setSeatExpanded(!seatExpanded)} />
-          </div>
-          <div className="flex justify-between">
-            <span>
-              <p className="font-bold">Meal Preference</p>
-              <p>Choose your Meal</p>
-            </span>
-            <ChevronDown id="meal preference" className={`cursor-pointer transition-transform ${mealExpanded ? "rotate-180" : ""}`} onClick={() => setMealExpanded(!mealExpanded)} />
-          </div>
-          <div className="flex justify-between">
-            <span>
-              <p className="font-bold">Extra Baggage</p>
-              <p>Add extra baggage</p>
-            </span>
-            <ChevronDown id="seat preference" className={`cursor-pointer transition-transform ${baggageExpanded ? "rotate-180" : ""}`} onClick={() => setBaggageExpanded(!baggageExpanded)} />
-          </div>
-          <div className="flex justify-between">
-            <span>
-              <p className="font-bold">Special Assistance</p>
-              <p>Request Assistance</p>
-            </span>
-            <ChevronDown id="seat preference" className={`cursor-pointer transition-transform ${serviceExpanded ? "rotate-180" : ""}`} onClick={() => setServiceExpanded(!serviceExpanded)} />
-          </div>
         </div>
-        <Separator className="m-8" />
+        <Separator className="m-4" />
+        {/* Services on Flight */}
+        <div className="flex flex-col">
+              <p className="text-2xl font-semibold pb-6">Services on Flight</p>
+              <div className="grid grid-cols-3 gap-4">
+                {flight.has_wifi && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl"><Wifi className="text-green-700" /><span>In-Flight WiFi</span></div>}
+                {flight.has_entertainment && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl"><Tv className="text-green-700" /><span>In-Flight Entertainment</span></div>}
+                {flight.has_meals && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl">< UtensilsCrossed className="text-green-700" /><span>Complimentary Meal</span></div>}
+              </div>
+            </div>
+        <Separator className="m-4" />
+        
+        {/* Preferences Component */}
+        <Preferences 
+          onSeatChange={handleSeatSelection}
+          onMealChange={handleMealSelection}
+          onBaggageChange={handleBaggageSelection}
+          onServiceChange={handleServiceSelection}
+          selectedSeat={selectedSeat}
+          selectedMeal={selectedMeal}
+          selectedBaggage={selectedBaggage}
+          selectedService={selectedService}
+        />
 
         {/* Passenger Information */}
         <div>
@@ -292,43 +311,60 @@ export default function FlightDetailsPage() {
           </form>
         <Separator className="m-8" />
       </div>
+      </div>
+      {/* Right */}
+      <div className="flex-[1] justify-center p-5">
+        <Card>
+          <CardHeader>
+            <CardTitle>Checkout</CardTitle>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <span className="flex justify-between">
+              <p className="text-gray-500">Base Price</p>
+              <p>${flight.base_price}</p>
+            </span>
+            <span className="flex justify-between">
+              <p className="text-gray-500">Additional Services</p>
+              <p>${(updatedPrice ?? flight?.base_price ?? 0) - flight.base_price > 0 ? ((updatedPrice ?? flight?.base_price ?? 0) - flight.base_price).toFixed(2) : '0.00'}</p>
+            </span>
+            <span className="flex justify-between">
+              <p className="text-gray-500">Tax</p>
+              <p>${((updatedPrice ?? flight?.base_price ?? 0) * 0.1).toFixed(2)}</p>
+            </span>
+            <span className="flex justify-between">
+              <p className="text-gray-500">Total</p>
+              <p className="font-bold">${((updatedPrice ?? flight?.base_price ?? 0) * 1.1).toFixed(2)}</p>
+            </span>
+            
+            {isSignedIn ? (
+              <>
+                <EmbeddedCheckoutForm price={(updatedPrice ?? flight?.base_price ?? 0) * 1.1} name="Flight Booking" />
+                <Button className="w-full rounded-xl mt-3">Place order</Button>
+              </>
+            ) : (
+              <div className="mt-4 text-center flex flex-col items-center gap-3">
+                <p className="text-red-500 mb-2">Please sign in to continue with checkout</p>
+                <SignInButton mode="modal">
+                  <Button className="w-full rounded-xl">Sign In to Checkout</Button>
+                </SignInButton>
+              </div>
+            )}
+          </CardContent>
+          
+          {isSignedIn && (
+            <>
+              <Separator className="m-4" />
+              <CardFooter className="flex justify-between pt-2">
+                <span className="flex flex-col space-y-2">
+                  <Label htmlFor="email">Promo code</Label>
+                  <Input type="email" id="email" placeholder="Enter code" />
+                </span>
+                <Button>Apply</Button>
+              </CardFooter>
+            </>
+          )}
+        </Card>
+      </div>
     </div>
-    {/* Right */}
-    <div className="flex-[1] justify-center p-5">
-      <Card>
-        <CardHeader>
-          <CardTitle>Checkout</CardTitle>
-        </CardHeader>
-        <CardContent className="pb-4">
-          <span className="flex justify-between">
-            <p className="text-gray-500">Subtotal</p>
-            <p>100$</p>
-          </span>
-          <span className="flex justify-between">
-            <p className="text-gray-500">Shipping</p>
-            <p>100$</p>
-          </span>
-          <span className="flex justify-between">
-            <p className="text-gray-500">Tax</p>
-            <p>100$</p>
-          </span>
-          <span className="flex justify-between">
-            <p className="text-gray-500">Total</p>
-            <p className="font-bold">100$</p>
-          </span>
-          <EmbeddedCheckoutForm price={120} name="Flight Booking" />
-          <Button className="w-full rounded-xl mt-3">Place order</Button>
-        </CardContent>
-        <Separator className="m-4" />
-        <CardFooter className="flex justify-between pt-2">
-          <span className="flex flex-col space-y-2">
-            <Label htmlFor="email">Promo code</Label>
-            <Input type="email" id="email" placeholder="Enter code" />
-          </span>
-          <Button>Apply</Button>
-        </CardFooter>
-      </Card>
-    </div>
-  </div>
-);
+  );
 }
