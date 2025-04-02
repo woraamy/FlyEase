@@ -1,0 +1,25 @@
+{
+   "name": "aircraft",
+   "version": "0.0.1",
+   "description": "Awesome project developed with TypeORM.",
+   "type": "commonjs",
+   "devDependencies": {
+      "@types/node": "^16.11.10",
+      "ts-node": "10.9.1",
+      "ts-node-dev": "^2.0.0",
+      "typescript": "4.5.2"
+   },
+   "dependencies": {
+      "@types/cors": "^2.8.17",
+      "@types/express": "^5.0.1",
+      "cors": "^2.8.5",
+      "express": "^5.1.0",
+      "pg": "^8.4.0",
+      "reflect-metadata": "^0.1.13",
+      "typeorm": "0.3.21"
+   },
+   "scripts": {
+      "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+      "typeorm": "typeorm-ts-node-commonjs"
+   }
+}
