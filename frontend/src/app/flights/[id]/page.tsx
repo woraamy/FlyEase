@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { 
   Plane, Wifi, Tv, UtensilsCrossed, Star, LoaderCircle, PlaneTakeoff, PlaneLanding, CalendarArrowUp, CalendarArrowDown, ChevronDown
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,6 +48,33 @@ const passengerSchema = z.object({
   nationality: z.string().min(3, "Nationality must be valid"),
 });
 
+const seatOptions = [
+  { 
+    name: "First Class", 
+    multiplier: 2
+  },
+  { 
+    name: "Business Class", 
+    multiplier: 1.75
+  },
+  { 
+    name: "Premium Economy Class", 
+    multiplier: 1.5
+  },
+  { 
+    name: "Economy Class", 
+    multiplier: 1
+  },
+];
+
+interface baggageOptions {
+  
+}
+const mealOptions = ["Standard Meal", "Vegetarian Meal", "Halal Meal", "Gluten-Free Meal", "Seafood Meal"];
+const baggageOptions = {"No Extra Baggage": 0, "Extra 10kg": 30, "Extra 20kg": 55, "Extra 30kg": 75};
+const serviceOptions = ["No Assistance", "Wheelchair Assistance", "Priority Boarding", "Visual/Hearing Assistance", "Pets on Board"];
+
+
 type PassengerFormData = z.infer<typeof passengerSchema>;
 
 export default function FlightDetailsPage() {
@@ -56,8 +84,33 @@ export default function FlightDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [seatExpanded, setSeatExpanded] = useState(false);
   const [mealExpanded, setMealExpanded] = useState(false);
-  const [serviceExpanded, setServiceExpanded] = useState(false);
   const [baggageExpanded, setBaggageExpanded] = useState(false);
+  const [serviceExpanded, setServiceExpanded] = useState(false);
+
+  const [selectedSeat, setSelectedSeat] = useState("Economy");
+  const [selectedMeal, setSelectedMeal] = useState("Standard Meal");
+  const [selectedBaggage, setSelectedBaggage] = useState("No Extra Baggage");
+  const [selectedService, setSelectedService] = useState("No Assistance");
+
+  // const seatOptions = [
+  //   { name: "First Class", multiplier: 2 },
+  //   { name: "Business Class", multiplier: 1.75 },
+  //   { name: "Premium Economy", multiplier: 1.5 },
+  //   { name: "Economy", multiplier: 1 },
+  // ];
+
+  const [updatedPrice, setUpdatedPrice] = useState(flight?.base_price || 0);
+
+  const handleSeatSelection = (seat: any) => {
+    setSelectedSeat(seat.name);
+    setUpdatedPrice(flight?.base_price || 0 * seat.multiplier);
+  };
+
+  const handleBaggageSelection = (baggageOption: string) => {
+    setSelectedBaggage(baggageOption);
+    setUpdatedPrice(flight?.base_price || 0 + baggageOptions[baggageOption] || 0);
+  };
+  
 
   const {
     register,
@@ -125,6 +178,9 @@ export default function FlightDetailsPage() {
     );
   }
 
+
+ 
+
   return (
     <div className="flex px-6 py-4">
     {/* Left */}
@@ -143,12 +199,6 @@ export default function FlightDetailsPage() {
         <div className="flex justify-between items-center space-x-4">
           {/* Cards */}
           <div className="grid grid-cols-5 gap-4 w-full">
-            {/* {[
-              { name: "Alaska Airlines", icon: Apple },
-              { name: "Delta Airlines", icon: Plane },
-              { name: "United Airlines", icon: Apple },
-              { name: "American Airlines", icon: Apple },
-            ].map((_, index) => ( */}
               <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
                 <Plane />
                 <span className="flex flex-col">
@@ -189,7 +239,6 @@ export default function FlightDetailsPage() {
         </div>
       </div>
       <Separator className="m-4" />
-      {/* Service on Flight */}
       {/* Services on Flight */}
       <div className="flex flex-col">
             <p className="text-2xl font-semibold pb-6">Services on Flight</p>
@@ -210,30 +259,118 @@ export default function FlightDetailsPage() {
               <p className="font-bold">Seat Preference</p>
               <p>Select your preferred seat</p>
             </span>
-            <ChevronDown id="seat preference" className={`cursor-pointer transition-transform ${seatExpanded ? "rotate-180" : ""}`} onClick={() => setSeatExpanded(!seatExpanded)} />
+            {/* <ChevronDown id="seat preference" className={`cursor-pointer transition-transform ${seatExpanded ? "rotate-180" : ""}`} onClick={() => setSeatExpanded(!seatExpanded)} /> */}
+            <div
+              data-toggle="collapse"
+              aria-expanded={seatExpanded}
+              aria-controls="seatPref"
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => setSeatExpanded(!seatExpanded)}
+            >
+              <ChevronDown
+                id="seat preference"
+                className={`transition-transform ${seatExpanded ? "rotate-180" : ""}`}
+              />
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span>
-              <p className="font-bold">Meal Preference</p>
-              <p>Choose your Meal</p>
-            </span>
-            <ChevronDown id="meal preference" className={`cursor-pointer transition-transform ${mealExpanded ? "rotate-180" : ""}`} onClick={() => setMealExpanded(!mealExpanded)} />
-          </div>
-          <div className="flex justify-between">
-            <span>
-              <p className="font-bold">Extra Baggage</p>
-              <p>Add extra baggage</p>
-            </span>
-            <ChevronDown id="seat preference" className={`cursor-pointer transition-transform ${baggageExpanded ? "rotate-180" : ""}`} onClick={() => setBaggageExpanded(!baggageExpanded)} />
-          </div>
-          <div className="flex justify-between">
-            <span>
-              <p className="font-bold">Special Assistance</p>
-              <p>Request Assistance</p>
-            </span>
-            <ChevronDown id="seat preference" className={`cursor-pointer transition-transform ${serviceExpanded ? "rotate-180" : ""}`} onClick={() => setServiceExpanded(!serviceExpanded)} />
-          </div>
+          {/* Seat Preference Selection in Grid Format */}
+          {seatExpanded && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full mt-3">
+              {seatOptions.map((seat) => (
+                <div
+                  key={seat.name}
+                  className={`flex flex-col items-center space-y-2 border-[1px] rounded-xl p-4 cursor-pointer transition-all ${
+                    selectedSeat === seat.name ? "border-blue-500 bg-blue-100 shadow-md" : "border-gray-300"
+                  }`}
+                  onClick={() => handleSeatSelection(seat)}
+                >
+                  <p className="text-sm font-semibold">{seat.name}</p>
+                  <p className="text-s">{seat.multiplier}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+      {/* Meal Preference */}
+      <div>
+        <div className="flex justify-between cursor-pointer" onClick={() => setMealExpanded(!mealExpanded)}>
+          <span>
+            <p className="font-bold">Meal Preference</p>
+            <p>Choose your meal</p>
+          </span>
+          <ChevronDown className={`transition-transform ${mealExpanded ? "rotate-180" : ""}`} />
         </div>
+
+        {mealExpanded && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full mt-3">
+            {mealOptions.map((meal) => (
+              <div
+                key={meal}
+                className={`flex items-center justify-center border-[1px] rounded-xl p-3 cursor-pointer transition-all ${
+                  selectedMeal === meal ? "border-blue-500 bg-blue-100 shadow-md" : "border-gray-300"
+                }`}
+                onClick={() => setSelectedMeal(meal)}
+              >
+                <p className="text-sm">{meal}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Extra Baggage */}
+      <div>
+        <div className="flex justify-between cursor-pointer" onClick={() => setBaggageExpanded(!baggageExpanded)}>
+          <span>
+            <p className="font-bold">Extra Baggage</p>
+            <p>Add extra baggage</p>
+          </span>
+          <ChevronDown className={`transition-transform ${baggageExpanded ? "rotate-180" : ""}`} />
+        </div>
+
+        {baggageExpanded && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full mt-3">
+            {baggageOptions.map((baggage) => (
+              <div
+                key={baggage}
+                className={`flex items-center justify-center border-[1px] rounded-xl p-3 cursor-pointer transition-all ${
+                  selectedBaggage === baggage ? "border-blue-500 bg-blue-100 shadow-md" : "border-gray-300"
+                }`}
+                onClick={() => setSelectedBaggage(baggage)}
+              >
+                <p className="text-sm">{baggage}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Special Assistance */}
+      <div>
+        <div className="flex justify-between cursor-pointer" onClick={() => setServiceExpanded(!serviceExpanded)}>
+          <span>
+            <p className="font-bold">Special Assistance</p>
+            <p>Request assistance</p>
+          </span>
+          <ChevronDown className={`transition-transform ${serviceExpanded ? "rotate-180" : ""}`} />
+        </div>
+
+        {serviceExpanded && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full mt-3">
+            {serviceOptions.map((service) => (
+              <div
+                key={service}
+                className={`flex items-center justify-center border-[1px] rounded-xl p-3 cursor-pointer transition-all ${
+                  selectedService === service ? "border-blue-500 bg-blue-100 shadow-md" : "border-gray-300"
+                }`}
+                onClick={() => setSelectedService(service)}
+              >
+                <p className="text-sm">{service}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
         <Separator className="m-8" />
 
         {/* Passenger Information */}
