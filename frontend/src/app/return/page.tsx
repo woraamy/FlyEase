@@ -44,27 +44,7 @@ async function getSession(sessionId: string) {
 export default async function CheckoutReturn({ searchParams}: { searchParams: Promise<{ session_id: string }> }) {
   const { session_id } = await searchParams
 
-  if (!session_id) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <XCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
-            <CardTitle>Invalid Session</CardTitle>
-            <CardDescription>No session ID was provided. Please return to the store.</CardDescription>
-          </CardHeader>
-          <CardFooter className="flex justify-center">
-            <Button asChild>
-              <Link href="/">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Return to Store
-              </Link>
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    )
-  }
+    // console.log(session);
 
   const session = await getSession(session_id)
 

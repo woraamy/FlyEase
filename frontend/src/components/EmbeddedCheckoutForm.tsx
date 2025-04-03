@@ -8,15 +8,43 @@ import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface EmbeddedCheckoutProps {
-  price: Number;
-  name: string;
+  price: number;
+  firstName: string;
+  lastName: string;
+  selectedSeat: string;
+  selectedMeal: string;
+  selectedService: string;
+  SelectedBaggage: string;
+  id: number;
+  flight_number: string;
+  age: number;
+  gender: string;
+  contactNumber: string;
+  email: string;
+  passportNumber: string;
+  nationality: string;
 }
 
-export default function EmbeddedCheckoutForm({ price, name }: EmbeddedCheckoutProps) {
+export default function EmbeddedCheckoutForm({
+  price,
+  firstName,
+  lastName,
+  selectedSeat,
+  selectedMeal,
+  selectedService,
+  SelectedBaggage,
+  id,
+  flight_number,
+  age,
+  gender,
+  contactNumber,
+  email,
+  passportNumber,
+  nationality,
+}: EmbeddedCheckoutProps) {
   const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
   );
-
   const [showCheckout, setShowCheckout] = useState(false);
   const modalRef = useRef<HTMLDialogElement>(null);
 
@@ -26,15 +54,55 @@ export default function EmbeddedCheckoutForm({ price, name }: EmbeddedCheckoutPr
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ price, name }),
+      body: JSON.stringify({
+        price,
+        passengerInfo: {
+          firstName,
+          lastName,
+          age,
+          gender,
+          contactNumber,
+          email,
+          passportNumber,
+          nationality,
+        },
+        flightInfo: {
+          id,
+          flight_number,
+          selectedSeat,
+          selectedMeal,
+          selectedService,
+          SelectedBaggage,
+        }
+      }),
     })
       .then((res) => res.json())
       .then((data) => data.client_secret);
-  }, [price, name]);
+  }, [
+    price,
+    firstName,
+    lastName,
+    age,
+    gender,
+    contactNumber,
+    email,
+    passportNumber,
+    nationality,
+    id,
+    flight_number,
+    selectedSeat,
+    selectedMeal,
+    selectedService,
+    SelectedBaggage,
+  ]);
 
   const options = { fetchClientSecret };
 
   const handleCheckoutClick = () => {
+    if (!firstName || !lastName) {
+      alert("Please provide passenger name information before checkout");
+      return;
+    }
     setShowCheckout(true);
     modalRef.current?.showModal();
   };
@@ -46,12 +114,16 @@ export default function EmbeddedCheckoutForm({ price, name }: EmbeddedCheckoutPr
 
   return (
     <div id="checkout" className="my-4">
-      <Button className="w-full rounded-xl mt-3" onClick={handleCheckoutClick}>
-        Stripe Checkout
-      </Button>
+      <button 
+        className="btn w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-xl" 
+        onClick={handleCheckoutClick}
+        disabled={!firstName || !lastName}
+      >
+        {!firstName || !lastName ? "Enter Passenger Details" : "Stripe Checkout"}
+      </button>
       <dialog ref={modalRef} className="modal">
-      <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-      <h3 className="font-bold text-lg">Embedded Checkout</h3>
+        <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <h3 className="font-bold text-lg">Checkout for {firstName} {lastName}</h3>
           <div className="py-4">
             {showCheckout && (
               <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>

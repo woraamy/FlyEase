@@ -1,15 +1,12 @@
 import { Router, Request, Response } from "express";
 import { Flight } from "../entity/Flight";
-import { FlightClassDetail } from "../entity/FlightClassDetail";
 import { AppDataSource } from "../data-source";
 import { MoreThan } from "typeorm";
 import axios from "axios";
-import { Airport } from "../entity/Airport";
 
 
 const router = Router();
 const flightRepo = AppDataSource.getRepository(Flight);
-const flightClassRepo = AppDataSource.getRepository(FlightClassDetail);
 
 // ✅ List Available Flights
 router.get("/", async (req, res) => {
@@ -20,55 +17,6 @@ router.get("/", async (req, res) => {
 
     res.json(flights);
 });
-
-// router.get("/", async (req, res) => {
-//     try {
-//         // Validate and parse query parameters
-//         const page = Math.max(1, parseInt(req.query.page as string) || 2);
-//         const pageSize = Math.min(5, Math.max(1, parseInt(req.query.pageSize as string) || 5));
-        
-//         // Calculate skip for pagination
-//         const skip = (page - 1) * pageSize;
-        
-//         // Get total count for pagination metadata
-//         const totalFlights = await flightRepo.count({
-//             where: { available_seats: MoreThan(0) }
-//         });
-        
-//         // Calculate total pages
-//         const totalPages = Math.ceil(totalFlights / pageSize);
-        
-//         // If requested page exceeds total pages, adjust to last page
-//         const adjustedPage = page > totalPages && totalPages > 0 ? totalPages : page;
-//         const adjustedSkip = (adjustedPage - 1) * pageSize;
-        
-//         // Get paginated flights
-//         const flights = await flightRepo.find({
-//             where: { available_seats: MoreThan(0) },
-//             relations: ["departure_airport", "arrival_airport", "class_details", "travel_classes"],
-//             skip: adjustedSkip,
-//             take: pageSize,
-//             order: { departure_time: "ASC" }
-//         });
-        
-//         // Return paginated response with metadata
-//         res.json({
-//             data: flights,
-//             pagination: {
-//                 total: totalFlights,
-//                 page: adjustedPage,
-//                 pageSize: pageSize,
-//                 totalPages: totalPages
-//             }
-//         });
-//     } catch (error) {
-//         console.error("Error fetching flights:", error);
-//         res.status(500).json({ 
-//             error: "Failed to fetch flights", 
-//             message: error instanceof Error ? error.message : "Unknown error"
-//         });
-//     }
-// });
 
 // ✅ Search Flights
 router.get("/search", async (req, res) => {
@@ -130,13 +78,13 @@ router.get("/:flightId", async (req, res) => {
 
 
 // ✅ Get Flights by Arrival City
-router.get("/travel-rec/:arrivalCity", async (req: Request, res: Response) => {
+router.get("/travel-rec/:arrivalCity", async (req, res) => {
     console.log("route hit")
     try {
       const { arrivalCity } = req.params;
       console.log(arrivalCity)
       if (!arrivalCity) {
-        return res.status(400).json({ error: "Arrival city is required" });
+        res.status(400).json({ error: "Arrival city is required" });
       }
       
       const flights = await flightRepo
@@ -152,11 +100,11 @@ router.get("/travel-rec/:arrivalCity", async (req: Request, res: Response) => {
       console.log("hello world ")
       
       // Return empty array if no flights found (instead of 404 error)
-      return res.json(flights);
+      res.json(flights);
       
     } catch (error) {
       console.error('Error occurred:', error); // Log full error
-      return res.status(500).json({ error: "Something went wrong", details: error }); // Add 'details' for debugging
+      res.status(500).json({ error: "Something went wrong", details: error }); // Add 'details' for debugging
     }
   });
 
@@ -210,14 +158,14 @@ router.post('/recommend', async (req, res) => {
 });
 
 // Additional useful endpoints
-router.get('/by-airport/:code', async (req: Request, res: Response) => {
+router.get('/by-airport/:code', async (req, res) => {
     try {
         const { code } = req.params;
         const upperCode = code.toUpperCase(); // Convert to uppercase immediately
 
         // if (!code || upperCode.length !== 3 || ) {
         if (!code || (upperCode.length !== 3 && upperCode.length !== 4)) {
-            return res.status(400).json({ 
+            res.status(400).json({ 
                 error: 'Bad request',
                 message: 'Invalid airport code format. Code must be 3 characters.'
             });
@@ -232,15 +180,15 @@ router.get('/by-airport/:code', async (req: Request, res: Response) => {
             .getMany();
 
         if (flights.length === 0) {
-            return res.status(404).json({
+            res.status(404).json({
                 message: `No flights found for airport code ${upperCode}`
             });
         }
 
-        return res.json(flights);
+        res.json(flights);
     } catch (error) {
         console.error('Error fetching flights by airport code:', error);
-        return res.status(500).json({ 
+        res.status(500).json({ 
             error: 'Internal server error',
             message: 'An error occurred while fetching flights'
         });

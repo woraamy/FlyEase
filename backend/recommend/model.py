@@ -33,8 +33,13 @@ COL_RATING = "rating"
 COL_TIMESTAMP = "timestamp"
 
 # Load the customer_booking.csv file
+import os
+current_dir = os.path.dirname(__file__)
+
 try:
-    data = pd.read_csv("customer_booking.csv", encoding='latin1')
+    # data = pd.read_csv("customer_booking.csv", encoding='latin1')
+    data = pd.read_csv(os.path.join(current_dir, 'customer_booking.csv'), encoding='latin1')
+
     print("Original data sample:")
     print(data.head())
 except Exception as e:
