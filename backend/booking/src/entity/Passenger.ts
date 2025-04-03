@@ -34,7 +34,7 @@ export class Passenger {
     @Column({ type: 'varchar', length: 255 })
     nationality: string;
 
-    @Column({ type: 'int', length: 3 })
+    @Column({ type: 'int' })
     age: number;
 
     @Column({ type: 'enum',  enum: GenderStatus, default: GenderStatus.NotSay })

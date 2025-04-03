@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 
 
-const bookingURL = process.env.BOOKING_URL;
+const bookingURL = process.env.NEXT_PUBLIC_BOOKING_URL;
 
 export async function POST(request: Request) {
     try {
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
                 metadata: {
                     // define form information here
                     // example
-                    booking_id: booking_id,
+                    // booking_id: booking_id,
                     // id_card: id_card,
                     // passport: passport,
                     // first_name: first_name,
