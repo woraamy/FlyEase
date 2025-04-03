@@ -238,24 +238,36 @@ export default function FlightDetailsPage() {
 
 
   useEffect(() => {
-    async function fetchReservedSeats() {
-      if (!flight || !flight.flight_number) return;
+    if (!flight || !flight.flight_number) {
+        if (!flight) setReservedSeats([]);
+        return;
+    }
 
+    // mock reserved seats
+    const mockReservedSeats: string[] = [
+        "1A", "3F", 
+        "6C", "8B", "10E", 
+        "12A", "15D", "15E", "18F", "21C", "25A", "29B" 
+    ];
+    setReservedSeats(mockReservedSeats);
+    setLoading(false); 
+    console.log("Mock reserved seats set:", mockReservedSeats);
+
+    async function fetchReservedSeats() {
+      setLoading(true);
       try {
-        console.log(`Workspaceing reserved seats for flight: ${flight.flight_number}`);
-        const reservedRes = await fetch(`${BOOKING_URL}/booking/reserved-seats/${flight.flight_number}`);
+        console.log(`Workspaceing reserved seats for flight: ${flight?.flight_number}`);
+        const reservedRes = await fetch(`${BOOKING_URL}/booking/reserved-seats/${flight?.flight_number}`);
 
         if (!reservedRes.ok) {
             throw new Error(`API Error fetching reserved seats: ${reservedRes.status} ${reservedRes.statusText}`);
         }
-
         const contentType = reservedRes.headers.get("content-type");
          if (!contentType || !contentType.includes("application/json")) {
             const errorText = await reservedRes.text();
             console.error("Non-JSON Response (Reserved Seats):", errorText);
             throw new Error(`Invalid API response for reserved seats.`);
         }
-
         const reservedJson = await reservedRes.json();
         if (Array.isArray(reservedJson)) {
              const seats = reservedJson
@@ -266,17 +278,20 @@ export default function FlightDetailsPage() {
         } else {
             console.warn("Unexpected format for reserved seats response:", reservedJson);
              setReservedSeats([]);
+             setError(prev => prev ? `${prev}\nCould not parse reserved seats.` : "Could not parse reserved seats.");
         }
-
       } catch (err) {
           console.error("Error fetching reserved seats:", err);
           setError(prev => prev ? `${prev}\n${err instanceof Error ? err.message : "Failed to fetch reserved seats."}` : (err instanceof Error ? err.message : "Failed to fetch reserved seats."));
           setReservedSeats([]);
+      } finally {
+          setLoading(false); 
       }
     }
-
     fetchReservedSeats();
-  }, [flight]); // Depend on flight object change
+
+  }, [flight]); 
+
 
   // --- Loading/Error/Render Logic ---
   if (loading) {

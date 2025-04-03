@@ -60,7 +60,8 @@ export async function POST(request: Request) {
                 metadata: {
                     booking_id: booking_id,
                     flight_number: flightInfo.flight_number,
-                    selectedSeat: flightInfo.selectedSeat,
+                    selectedSeatClass: flightInfo.selectedSeatClass,
+                    selectedSeatId: flightInfo.selectedSeatClass,
                     selectedMeal: flightInfo.selectedMeal,
                     selectedService: flightInfo.selectedService,
                     selectedBaggage: flightInfo.selectedBaggage,

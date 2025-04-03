@@ -11,7 +11,8 @@ interface EmbeddedCheckoutProps {
   price: number;
   firstName: string;
   lastName: string;
-  selectedSeat: string;
+  selectedSeatClass: string;
+  selectedSeatId: string;
   selectedMeal: string;
   selectedService: string;
   SelectedBaggage: string;
@@ -29,7 +30,8 @@ export default function EmbeddedCheckoutForm({
   price,
   firstName,
   lastName,
-  selectedSeat,
+  selectedSeatClass,
+  selectedSeatId,
   selectedMeal,
   selectedService,
   SelectedBaggage,
@@ -69,7 +71,8 @@ export default function EmbeddedCheckoutForm({
         flightInfo: {
           id,
           flight_number,
-          selectedSeat,
+          selectedSeatClass,
+          selectedSeatId,
           selectedMeal,
           selectedService,
           SelectedBaggage,
@@ -90,7 +93,8 @@ export default function EmbeddedCheckoutForm({
     nationality,
     id,
     flight_number,
-    selectedSeat,
+    selectedSeatClass,
+    selectedSeatId,
     selectedMeal,
     selectedService,
     SelectedBaggage,

@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-// Define seat classes and their colors/rows (can be adjusted or passed as props if dynamic)
 const seatClasses = {
   first: { color: "bg-emerald-500", rows: [1, 2, 3, 4, 5] },
   business: { color: "bg-blue-600", rows: [6, 7, 8, 9, 10] },
@@ -142,7 +141,7 @@ export default function SeatMapPopup({
                   </div>
                 ))}
               </div>
-              <div className="w-8"></div> {/* Aisle */}
+              <div className="w-8"></div> 
               <div className="flex-1 flex">
                 {seats.slice(3).map(seat => (
                   <div key={`top-${seat}`} className="w-8 h-8 m-1 flex items-center justify-center text-xs font-bold">
@@ -152,10 +151,7 @@ export default function SeatMapPopup({
               </div>
             </div>
 
-            {/* Aircraft shape placeholder (optional) */}
-            {/* <div className="relative w-full h-8 flex justify-center mb-2"><div className="absolute w-32 h-8 bg-gray-200 rounded-t-full"></div></div> */}
-
-            {/* Seat grid */}
+        
             <div className="flex flex-col">
               {allRows.map(row => {
                 
@@ -190,8 +186,7 @@ export default function SeatMapPopup({
               })}
             </div>
 
-            {/* Aircraft shape placeholder (optional) */}
-            {/* <div className="relative w-full h-12 flex justify-center mt-2"><div className="absolute w-40 h-12 bg-gray-200 rounded-b-full"></div></div> */}
+            
           </div>
         </div>
 
@@ -209,7 +204,7 @@ export default function SeatMapPopup({
                         Cancel
                     </Button>
                 </DialogClose>
-                <Button type="button" onClick={handleConfirm} disabled={!selectedSeat && !!initialSelectedSeat}> {/* Allow confirm if deselecting */}
+                <Button type="button" onClick={handleConfirm} disabled={!selectedSeat && !!initialSelectedSeat}> 
                     Confirm Selection
                 </Button>
            </div>
