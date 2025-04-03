@@ -15,7 +15,7 @@ export class Flight {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ unique: true, length: 10 })
+    @Column({ type: "varchar", unique: true, length: 10 })
     flight_number: string;
 
     @ManyToOne(() => Airport, (airport) => airport.id, { onDelete: "CASCADE" })
@@ -39,16 +39,16 @@ export class Flight {
     @Column({ type: "float", default: 0 })
     rating: number;
 
-    @Column({ length: 500, nullable: true })
+    @Column({ type: "varchar", length: 500, nullable: true })
     featured_image: string;
 
-    @Column({ default: false })
+    @Column({ type: "boolean", default: false })
     has_wifi: boolean;
 
-    @Column({ default: false })
+    @Column({ type: "boolean", default: false })
     has_entertainment: boolean;
 
-    @Column({ default: false })
+    @Column({ type: "boolean", default: false })
     has_meals: boolean;
 
     @ManyToMany(() => TravelClass)

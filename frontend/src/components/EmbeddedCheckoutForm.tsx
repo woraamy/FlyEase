@@ -8,6 +8,7 @@ import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface EmbeddedCheckoutProps {
+  clerkUserId: string;
   price: number;
   firstName: string;
   lastName: string;
@@ -27,6 +28,7 @@ interface EmbeddedCheckoutProps {
 }
 
 export default function EmbeddedCheckoutForm({
+  clerkUserId,
   price,
   firstName,
   lastName,
@@ -59,6 +61,7 @@ export default function EmbeddedCheckoutForm({
       body: JSON.stringify({
         price,
         passengerInfo: {
+          clerkUserId,
           firstName,
           lastName,
           age,
@@ -82,6 +85,7 @@ export default function EmbeddedCheckoutForm({
       .then((res) => res.json())
       .then((data) => data.client_secret);
   }, [
+    clerkUserId,
     price,
     firstName,
     lastName,

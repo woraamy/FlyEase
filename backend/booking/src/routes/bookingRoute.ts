@@ -88,19 +88,20 @@ router.post('/decline', async (req, res) => {
     }
 );
 
-router.get('/check/:seat/:flight', async (req, res) => {
-    const { seat, flight } = req.params;
-    console.log(seat, flight);
+router.get('/check/:seatId/:flight/:seatClass', async (req, res) => {
+    const { seatId, seatClass, flight } = req.params;
+    console.log(seatId, seatClass, flight);
     const booking = await bookingRepo.findOne({
-        where: { seat_number: seat, flight_number: flight },
+        where: { seat_id: seatId, seat_class: seatClass, flight_number: flight },
     });
 
     if (booking) {
-        res.status(409).json({ message: `Seat ${seat} is already booked` });
+        res.status(409).json({ message: `Seat ${seatId} is already booked` });
     } else {
         try {
             const newPost = await bookingRepo.create({
-                seat_number: seat,
+                seat_id: seatId,
+                seat_class: seatClass,
                 flight_number: flight,
             });
             await bookingRepo.save(newPost);
@@ -118,7 +119,7 @@ router.get('/reserved-seats/:flightId', async (req, res) => {
     // Filter reserved seats for the given flight ID
     const seats = await bookingRepo.find({
         where: { flight_number: flightId },
-        select: ['seat_number'],
+        select: ['seat_id'],
         });
 
     res.status(200).json(seats);

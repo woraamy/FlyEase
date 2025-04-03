@@ -14,7 +14,7 @@ interface BookingCardProps {
     arrivalAirport: string;
     seatNumber: string;
     qrCodeUrl: string;
-    status: "checked-in" | "waiting for check-in";
+    status: "PENDING" | "CONFIRMED";
 }
 
 export function BookingCard({
@@ -38,7 +38,7 @@ export function BookingCard({
           <h3 className="text-xl font-bold text-gray-900">{name}</h3>
           <Badge
             className={
-              status === "checked-in" ? "bg-green-500 text-white" : "bg-yellow-500 text-white"
+              status === "CONFIRMED" ? "bg-green-500 text-white" : "bg-yellow-500 text-white"
             }
           >
             {status}

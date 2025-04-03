@@ -66,7 +66,7 @@ export default function FlightDetailsPage() {
   const [flight, setFlight] = useState<Flight | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, userId } = useAuth();
 
   const [selectedSeatClass, setSelectedSeatClass] = useState<SeatClassDisplayName>("Economy Class");
   const [selectedSeatId, setSelectedSeatId] = useState<string | null>(null);
@@ -243,7 +243,6 @@ export default function FlightDetailsPage() {
         return;
     }
 
-    // mock reserved seats
     const mockReservedSeats: string[] = [
         "1A", "3F", 
         "6C", "8B", "10E", 
@@ -530,6 +529,7 @@ export default function FlightDetailsPage() {
                         </p>
                     )}
                     <EmbeddedCheckoutForm
+                        clerkUserId={userId}
                         price={Math.round(totalPrice * 100)}
                         firstName={passengerData.firstName}
                         lastName={passengerData.lastName}

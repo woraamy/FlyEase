@@ -16,7 +16,10 @@ export class Booking {
     flight_number: string; // No FK to Flight (Microservice-friendly)
 
     @Column({ length: 5 })
-    seat_number: string;
+    seat_id: string;
+
+    @Column({ length: 255 })
+    seat_class: string;
 
     @Column({ nullable: true })
     passenger_id: number; // No FK to Passenger (Microservice-friendly)

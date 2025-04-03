@@ -12,7 +12,7 @@ export default function MyFlightsPage() {
                     <BookingCard
                         key={index}
                         {...booking}
-                        status={booking.status as "checked-in" | "waiting for check-in"}
+                        status={booking.status as "PENDING" | "CONFIRMED"}
                     />
                 ))}
             </div>
