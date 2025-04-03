@@ -27,12 +27,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={plusJakartaSans.className}>
       <body className={`bg-gray-50 min-h-screen flex flex-col`}>
         <ClerkProvider>
-        <Providers>
-        <Navbar />
-        <main className="flex-grow">{children}</main>
-        </Providers>
+          <Providers>
+            <Navbar />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </Providers>
         </ClerkProvider>
-        <Footer />
       </body>
     </html>
   );

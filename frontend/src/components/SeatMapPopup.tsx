@@ -191,13 +191,16 @@ export default function SeatMapPopup({
         </div>
 
         <DialogFooter className="sm:justify-between items-center">
-           <div>
-                {selectedSeat ? (
-                    <p>Selected Seat: <Badge variant="outline" className="text-lg">{selectedSeat}</Badge></p>
-                ) : (
-                    <p className="text-sm text-muted-foreground">No seat selected</p>
-                )}
-            </div>
+        <div>
+            {selectedSeat ? (
+                <div className="flex items-center gap-2">
+                    <span>Selected Seat:</span> 
+                    <Badge variant="outline" className="text-lg">{selectedSeat}</Badge>
+                </div>
+            ) : (
+                <p className="text-sm text-muted-foreground">No seat selected</p>
+            )}
+        </div>
             <div>
                 <DialogClose asChild>
                     <Button type="button" variant="secondary" className="mr-2">
