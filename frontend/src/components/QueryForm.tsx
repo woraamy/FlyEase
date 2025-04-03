@@ -23,9 +23,14 @@ export default function QueryForm({ query, setQuery, handleSubmit, loading }: Qu
           className="pr-10"
         />
       </div>
-      <Button type="submit" size="icon" disabled={loading || !query.trim()}>
+      <Button 
+        type="submit" 
+        size="icon" 
+        disabled={loading || !query.trim()} 
+        aria-label="Send message"
+      >
         {loading ? (
-          <ClockLoader color="#ffffff" size={24} />
+          <ClockLoader color="#568203" size={24} />
         ) : (
           <Send className="h-4 w-4" />
         )}

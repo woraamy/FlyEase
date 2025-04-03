@@ -5,6 +5,7 @@ import {
   EmbeddedCheckout,
 } from "@stripe/react-stripe-js";
 import { useCallback, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 interface EmbeddedCheckoutProps {
   price: number;
