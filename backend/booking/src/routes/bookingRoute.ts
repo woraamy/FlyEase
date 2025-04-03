@@ -20,15 +20,17 @@ router.post('/success', async (req, res): Promise<void> => {
         clerkUserId,
         nationality,
         gender,
-        age
+        age,
+        // Add the extra service metadata
+        selectedMeal,
+        selectedService,
+        selectedBaggage
     } = paymentIntent;
-
 
     if (!booking_id || !passport_number || !first_name || !last_name || !email || !contact_number) {
         res.status(400).json({ message: 'All fields are required' });
         return;
     }
-
 
     try {
         var passenger = await passengerRepo.findOne({
@@ -55,10 +57,14 @@ router.post('/success', async (req, res): Promise<void> => {
         const booking_code = Math.random().toString(36).substr(2, 6).toUpperCase();
 
         bookingRepo.update({ id: booking_id }, {
-            passenger_id: passenger.id,
+            passenger: passenger.id,
             status: BookingStatus.CONFIRMED,
             clerkId: clerkUserId,
             booking_code: booking_code,
+            // Add the extra service data
+            selected_meal: selectedMeal,
+            selected_service: selectedService,
+            selected_baggage: selectedBaggage
         });
 
         res.status(200).json({
@@ -73,7 +79,6 @@ router.post('/success', async (req, res): Promise<void> => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 router.post('/decline', async (req, res) => {
     const { booking_id } = req.body;
 
@@ -100,7 +105,7 @@ router.post('/decline', async (req, res) => {
 
 router.get('/check/:seatId/:flight/:seatClass', async (req, res) => {
     const { seatId, seatClass, flight } = req.params;
-    // console.log(seatId, seatClass, flight);
+    
     const booking = await bookingRepo.findOne({
         where: { seat_id: seatId, seat_class: seatClass, flight_number: flight },
     });
@@ -114,16 +119,19 @@ router.get('/check/:seatId/:flight/:seatClass', async (req, res) => {
                 seat_id: seatId,
                 seat_class: seatClass,
                 flight_number: flight,
+                // The extra service fields will be null initially
+                // They will be updated when payment is successful
             });
             await bookingRepo.save(newPost);
-            res.status(201).json({ booking_id : newPost.id });
+            res.status(201).json({ booking_id: newPost.id });
             return;
         } catch (error) {
-            console.error('Error fetching aircraft layout:', error);
-            res.status(409).json({ message: 'Can not make reservation' });
+            console.error('Error creating booking:', error);
+            res.status(409).json({ message: 'Cannot make reservation' });
             return;
+        }
     }
-}});
+});
 
 // GET method to see reserved seats in a flight
 router.get('/reserved-seats/:flightId', async (req, res) => {

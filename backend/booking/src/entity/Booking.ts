@@ -38,5 +38,12 @@ export class Booking {
     @CreateDateColumn({ type: "timestamp" })
     created_at: Date;
 
+    @Column({ length: 255, nullable: true })
+    selected_meal: string;
 
+    @Column({ length: 255, nullable: true })
+    selected_service: string;
+
+    @Column({ length: 255, nullable: true })
+    selected_baggage: string;
 }
