@@ -36,6 +36,9 @@ interface Flight {
   has_meals: boolean;
 }
 
+const AIRCRAFT_URL = process.env.NEXT_PUBLIC_AIRCRAFT_URL;
+const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL;
+
 const passengerSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
@@ -75,6 +78,9 @@ export default function FlightDetailsPage() {
     passportNumber: "",
     nationality: ""
   });
+
+  const [flightData, setFlightData] = useState<any>(null);
+  const [reservedSeats, setReservedSeats] = useState<string[]>([]);
 
   const handleSeatSelection = (seat: { name: string; multiplier: number }) => {
     setSelectedSeat(seat.name as "First Class" | "Business Class" | "Premium Economy Class" | "Economy Class");
@@ -182,6 +188,23 @@ export default function FlightDetailsPage() {
 
     fetchFlight();
   }, [flightId]); 
+
+  useEffect(() => {
+    async function fetchFlightData() {
+      const flightRes = await fetch(`${AIRCRAFT_URL}/aircraft/layout/${flight?.flight_number}`);
+      const flightJson = await flightRes.json();
+      setFlightData(flightJson[0]); // [{object}]
+    }
+
+    async function fetchReservedSeats() {
+      const reservedRes = await fetch(`${BOOKING_URL}/booking/reserved-seats/${flight?.flight_number}`);
+      const reservedJson = await reservedRes.json();
+      setReservedSeats(reservedJson.map((s: any) => s.seat_number));
+    }
+
+    fetchFlightData();
+    fetchReservedSeats();
+  }, []);
 
   if (loading) {
     return (
@@ -370,7 +393,7 @@ export default function FlightDetailsPage() {
                   )}
                 </div>
                 <EmbeddedCheckoutForm 
-                  price={(updatedPrice ?? flight?.base_price ?? 0) * 1.1}
+                  price={(updatedPrice ?? flight?.base_price ?? 0) * 1.1 * 100}  // *100 for cents unit
                   firstName={passengerData.firstName}
                   lastName={passengerData.lastName}
                   selectedSeat={selectedSeat}
