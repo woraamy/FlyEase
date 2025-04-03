@@ -6,13 +6,13 @@ import { ApiResponse } from '@/types/chatbot';
 import { PaginationResponse } from '@/types/flight';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = "http://flight/flights";
 
-const API_BASE_URL_AIRPORTS = process.env.NEXT_PUBLIC_API_BASE_URL_AIRPORTS;
+const API_BASE_URL_AIRPORTS = "http://flight/airports";
 
-const API_BASE_URL_TRAVEL_PLANS = process.env.NEXT_PUBLIC_API_BASE_URL_TRAVEL_PLANS;
+const API_BASE_URL_TRAVEL_PLANS = "http://travel-plan/travel-plans";
 
-const API_BASE_URL_CHAT_BOT = process.env.NEXT_PUBLIC_API_BASE_URL_CHAT_BOT;
+const API_BASE_URL_CHAT_BOT = "http://chatbot";
 // export async function searchFlights(params: SearchParams) {
 //   try {
 //     // Filter the params to remove any null or empty values

@@ -1,5 +1,5 @@
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL_TRAVEL_PLANS;
+const API_BASE_URL = "http://flight/flights";
 // console.log(API_BASE_URL);
 export const travelPlanAPI = {
     getTravelPlanById: async (id: string) => {

@@ -1,0 +1,14 @@
+# Production Image
+FROM node:alpine
+
+WORKDIR /usr/src/app
+
+# Copy package.json and install only production dependencies
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# Copy source files and build TypeScript
+COPY . .
+
+# Start the application
+CMD ["npm", "start"]

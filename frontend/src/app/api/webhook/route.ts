@@ -1,7 +1,7 @@
 import { stripe } from '@/lib/stripe';
 import { NextResponse } from 'next/server';
 
-const bookingURL = process.env.BOOKING_URL;
+const bookingURL = "http://booking";
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 if (!bookingURL) {

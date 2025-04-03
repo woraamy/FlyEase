@@ -1,0 +1,22 @@
+# Use Python 3.12 base image
+FROM python:3.12-slim
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Install production dependencies
+COPY requirements.txt /app/
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy only necessary files (exclude dev tools and tests)
+COPY . /app/
+
+# Expose the port the app runs on
+EXPOSE 5000
+
+# Set environment variables for Flask in production mode
+ENV FLASK_APP=recommendation_service.py
+
+# Use Gunicorn to serve the app in production
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]

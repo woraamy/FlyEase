@@ -1,0 +1,21 @@
+# Use a specific Node.js version as the base image
+FROM node:alpine
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json (or npm-shrinkwrap.json)
+COPY package*.json ./
+
+# Install dependencies, including production dependencies
+RUN npm ci --omit=dev
+
+# Install ts-node globally in the container (needed for running TS directly)
+RUN npm install -g ts-node typescript
+
+# Copy source files and tsconfig.json into the container
+COPY ./src ./src
+COPY ./tsconfig.json ./tsconfig.json
+
+# Start the application
+CMD ["npm", "start"]

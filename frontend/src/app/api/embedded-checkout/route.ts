@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 
 
-const bookingURL = process.env.NEXT_PUBLIC_BOOKING_URL;
+const bookingURL = "http://booking";
 
 export async function POST(request: Request) {
     try {

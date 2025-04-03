@@ -1,0 +1,51 @@
+#
+# To deploy:
+#
+# kubectl apply -f scripts/deploy.yaml
+#
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers: 
+      - name: frontend
+        image: frontend:1
+        imagePullPolicy: Never
+        env:
+        - name: DATABASE_URL
+          value: $DATABASE_URL
+        - name: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+          value: $NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        - name: STRIPE_SECRET_KEY
+          value: $STRIPE_SECRET_KEY
+        - name: STRIPE_WEBHOOK_SECRET
+          value: $STRIPE_WEBHOOK_SECRET
+        - name: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+          value: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY 
+        - name: CLERK_SECRET_KEY
+          value: $CLERK_SECRET_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: frontend
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
