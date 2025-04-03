@@ -2,7 +2,7 @@ import express from "express";
 import { AppDataSource } from "./data-source"
 import cors from "cors";
 import routeAPI from './routes/index'
-
+import "reflect-metadata";
 // import "dotenv/config";
 
 const app = express();

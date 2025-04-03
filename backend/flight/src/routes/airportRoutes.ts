@@ -9,10 +9,10 @@ router.get('/airports', async (req, res) => {
     try {
         const airportRepository = AppDataSource.getRepository(Airport);
         const airports = await airportRepository.find();
-        res.json(airports);
+        return res.json(airports);
     } catch (error) {
         console.error('Error fetching airports:', error);
-        res.status(500).json({ 
+        return res.status(500).json({ 
             error: 'Internal server error',
             message: 'An error occurred while fetching airports'
         });

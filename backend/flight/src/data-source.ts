@@ -1,14 +1,16 @@
-import "reflect-metadata"
-import { DataSource } from "typeorm"
-import * as path from "path";
-import "dotenv/config";
+import "dotenv/config"; // Add this at the top
+import { DataSource } from "typeorm";
+import { Airport } from "./entity/Airport";
+import { Flight } from "./entity/Flight";
+import { TravelClass } from "./entity/TravelClass";
+import { FlightClassDetail } from "./entity/FlightClassDetail";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
     url: process.env.DATABASE_URL,
     synchronize: true,
     logging: false,
-    entities: [path.join(__dirname, "entity", "**", "*.{ts,js}")],
+    entities: [Airport, Flight, TravelClass, FlightClassDetail],
     migrations: [],
     subscribers: [],
-})
+});
