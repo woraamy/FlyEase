@@ -116,7 +116,7 @@ export default async function CheckoutReturn({ searchParams}: { searchParams: Pr
               </Link>
             </Button>
             <Button asChild>
-              <Link href="/account/orders">
+              <Link href="/profile/my-flights">
                 <Package className="mr-2 h-4 w-4" />
                 View Order
               </Link>

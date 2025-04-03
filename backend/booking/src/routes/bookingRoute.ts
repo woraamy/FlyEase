@@ -1,56 +1,63 @@
 import express from 'express';
 import { AppDataSource } from '../data-source';
 import { Booking, BookingStatus } from '../entity/Booking';
-import { Passenger } from '../entity/Passenger';
+import { GenderStatus, Passenger } from '../entity/Passenger';
 
 
 const router = express.Router();
 const bookingRepo = AppDataSource.getRepository(Booking);
 const passengerRepo = AppDataSource.getRepository(Passenger);
 
-router.post('/success', async (req, res) => {
-    const { booking_id,
-            id_card, passport,
-            first_name,
-            last_name,
-            email,
-            phone,
-            clerkId,
-             } = req.body;
+router.post('/success', async (req, res): Promise<void> => {
+    const { paymentIntent } = req.body;
+    const {
+        booking_id,
+        passport_number,
+        first_name,
+        last_name,
+        email,
+        contact_number,
+        clerkUserId,
+        nationality,
+        gender,
+        age
+    } = paymentIntent;
 
-    if (!booking_id) {
-        res.status(400).json({ message: 'Booking ID is required' });
+
+    if (!booking_id || !passport_number || !first_name || !last_name || !email || !contact_number) {
+        res.status(400).json({ message: 'All fields are required' });
+        return;
     }
 
-    if (!id_card && !passport) {
-        res.status(400).json({ message: 'ID card or passport is required' });
-    }
 
     try {
-        var passenger = await passengerRepo.createQueryBuilder('passenger')
-            .where('passenger.id_card = :id_card', {id_card})
-            .orWhere('passenger.passport = :passport', {passport})
-            .getOne();
-
+        var passenger = await passengerRepo.findOne({
+            where: { passport: passport_number },
+            select: ['id'],
+        })
+        
         if (!passenger) {
             passenger = passengerRepo.create({
                 first_name: first_name,
                 last_name: last_name,
                 email: email,
-                phone: phone,
-                id_card: id_card,
-                passport: passport,
+                phone: contact_number,
+                passport: passport_number,
+                nationality: nationality,
+                age: age,
+                Gender: GenderStatus[gender]
             });
-
             await passengerRepo.save(passenger);
         }
+
+        console.log(passenger);
 
         const booking_code = Math.random().toString(36).substr(2, 6).toUpperCase();
 
         bookingRepo.update({ id: booking_id }, {
             passenger_id: passenger.id,
             status: BookingStatus.CONFIRMED,
-            clerkId: clerkId,
+            clerkId: clerkUserId,
             booking_code: booking_code,
         });
 
@@ -62,7 +69,7 @@ router.post('/success', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error fetching passenger:', error);
+        console.log('Error fetching passenger:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
