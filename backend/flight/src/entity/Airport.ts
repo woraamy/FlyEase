@@ -31,7 +31,7 @@ export class Airport {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: "varchar", length: 4 })
+    @Column({ type: "varchar", length: 4 , unique: true })
     code: string;
 
     @Column({ type: "varchar", length: 100 })
