@@ -39,7 +39,6 @@ interface Flight {
   has_meals: boolean;
 }
 
-// ... (Keep AIRCRAFT_URL, BOOKING_URL, passengerSchema, PassengerFormData, FlightSeatClass, SeatClassDisplayName) ...
 const AIRCRAFT_URL = process.env.NEXT_PUBLIC_AIRCRAFT_URL;
 const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL;
 
@@ -84,6 +83,8 @@ export default function FlightDetailsPage() {
   });
 
   const [reservedSeats, setReservedSeats] = useState<string[]>([]);
+
+  const openSeatMapHandler = () => setIsSeatMapOpen(true);
 
   // Helper to safely get base price as a number
   const getBasePriceAsNumber = (): number => {
@@ -132,7 +133,6 @@ export default function FlightDetailsPage() {
     setSelectedBaggage(baggage.name);
     if (flight) {
       const seatMultiplier = getSeatClassMultiplier(selectedSeatClass);
-      // FIX: Use helper function for base price
       setUpdatedPrice(getBasePriceAsNumber() * seatMultiplier + baggage.price);
     }
   };
@@ -181,7 +181,7 @@ export default function FlightDetailsPage() {
 
     async function fetchFlight() {
       setLoading(true);
-      setError(null); // Clear previous errors
+      setError(null); 
       try {
         console.log(`Workspaceing flight with ID: ${flightId}`);
         const res = await flightAPI.getFlightById(Number(flightId));
@@ -205,13 +205,11 @@ export default function FlightDetailsPage() {
         // Ensure base_price is treated correctly before setting state
          const fetchedFlightData: Flight = {
              ...data,
-             // Ensure base_price is stored, even if it's a string initially
              base_price: data.base_price
          };
          setFlight(fetchedFlightData);
 
-        // Now calculate initial price using the helper function
-        const basePriceNum = parseFloat(String(data.base_price)); // Convert here
+        const basePriceNum = parseFloat(String(data.base_price)); 
         if (isNaN(basePriceNum)) {
             console.error("Fetched base_price is not a valid number:", data.base_price);
             throw new Error("Invalid base price received from API.");
@@ -219,7 +217,7 @@ export default function FlightDetailsPage() {
 
         const initialMultiplier = getSeatClassMultiplier("Economy Class");
         const initialBaggagePrice = getBaggagePrice(selectedBaggage);
-        setUpdatedPrice(basePriceNum * initialMultiplier + initialBaggagePrice); // Use converted number
+        setUpdatedPrice(basePriceNum * initialMultiplier + initialBaggagePrice); 
 
       } catch (err) {
         console.error("Error fetching flight:", err);
@@ -236,10 +234,9 @@ export default function FlightDetailsPage() {
     }
 
     fetchFlight();
-  }, [flightId]); // Keep dependencies minimal
+  }, [flightId]); 
 
 
-  // Fetch reserved seats when flight data is available
   useEffect(() => {
     async function fetchReservedSeats() {
       if (!flight || !flight.flight_number) return;
@@ -269,8 +266,6 @@ export default function FlightDetailsPage() {
         } else {
             console.warn("Unexpected format for reserved seats response:", reservedJson);
              setReservedSeats([]);
-             // Optionally add to the main error state or log differently
-             // setError(prev => prev ? `${prev}\nCould not parse reserved seats.` : "Could not parse reserved seats.");
         }
 
       } catch (err) {
@@ -369,11 +364,17 @@ export default function FlightDetailsPage() {
         {/* Preferences Component & Seat Selection Trigger */}
         <div>
             <Preferences
-              onSeatChange={handleSeatClassChange}
+              // Handler for CLASS selection change
+              onSeatClassChange={handleSeatClassChange}
+              // Handler to open the SEAT MAP
+              onOpenSeatMap={openSeatMapHandler} // The function you created: () => setIsSeatMapOpen(true)
+              // Other handlers
               onMealChange={handleMealSelection}
               onBaggageChange={handleBaggageSelection}
               onServiceChange={handleServiceSelection}
-              selectedSeat={selectedSeatClass}
+              // Selected states
+              selectedSeatClass={selectedSeatClass} // Pass the CLASS name
+              selectedSeatId={selectedSeatId}     // Pass the specific SEAT ID
               selectedMeal={selectedMeal}
               selectedBaggage={selectedBaggage}
               selectedService={selectedService}
@@ -409,22 +410,22 @@ export default function FlightDetailsPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <div>
               <Label htmlFor="firstName">First Name</Label>
-              <Input id="firstName" className="bg-gray-50" {...register("firstName")} placeholder="e.g. John" />
+              <Input id="firstName" className="text-gray-600 bg-[#E9F1ED]" {...register("firstName")} placeholder="e.g. John" />
               {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>}
             </div>
             <div>
               <Label htmlFor="lastName">Last Name</Label>
-              <Input id="lastName" className="bg-gray-50" {...register("lastName")} placeholder="e.g. Doe" />
+              <Input id="lastName" className="text-gray-600 bg-[#E9F1ED]" {...register("lastName")} placeholder="e.g. Doe" />
               {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>}
             </div>
             <div>
               <Label htmlFor="age">Age</Label>
-              <Input id="age" className="bg-gray-50" type="number" {...register("age", { valueAsNumber: true })} placeholder="e.g. 29" />
+              <Input id="age" className="text-gray-600 bg-[#E9F1ED]" type="number" {...register("age", { valueAsNumber: true })} placeholder="e.g. 29" />
               {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age.message}</p>}
             </div>
             <div>
               <Label htmlFor="gender">Gender</Label>
-              <select id="gender" {...register("gender")} className="text-gray-600 bg-gray-50 rounded-md p-2 w-full border h-[40px]"> {/* Consistent height */}
+              <select id="gender" {...register("gender")} className="text-gray-600 bg-[#E9F1ED] rounded-md p-2 w-full border h-[40px]"> {/* Consistent height */}
                 <option value="male">Male</option>
                 <option value="female">Female</option>
                 <option value="prefer_not_to_say">Prefer Not To Say</option>
@@ -433,22 +434,22 @@ export default function FlightDetailsPage() {
             </div>
             <div>
               <Label htmlFor="contactNumber">Contact Number</Label>
-              <Input id="contactNumber" className="bg-gray-50" {...register("contactNumber")} placeholder="e.g. +123456789" />
+              <Input id="contactNumber" className="text-gray-600 bg-[#E9F1ED]" {...register("contactNumber")} placeholder="e.g. +123456789" />
               {errors.contactNumber && <p className="text-red-500 text-xs mt-1">{errors.contactNumber.message}</p>}
             </div>
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" className="bg-gray-50" {...register("email")} type="email" placeholder="e.g. johndoe@gmail.com" />
+              <Input id="email" className="text-gray-600 bg-[#E9F1ED]" {...register("email")} type="email" placeholder="e.g. johndoe@gmail.com" />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
             <div>
               <Label htmlFor="passportNumber">Passport Number</Label>
-              <Input id="passportNumber" className="bg-gray-50" {...register("passportNumber")} placeholder="e.g. X12345678" />
+              <Input id="passportNumber" className="text-gray-600 bg-[#E9F1ED]" {...register("passportNumber")} placeholder="e.g. X12345678" />
               {errors.passportNumber && <p className="text-red-500 text-xs mt-1">{errors.passportNumber.message}</p>}
             </div>
             <div>
               <Label htmlFor="nationality">Nationality</Label>
-              <Input id="nationality" className="bg-gray-50" {...register("nationality")} placeholder="e.g. American" />
+              <Input id="nationality" className="text-gray-600 bg-[#E9F1ED]" {...register("nationality")} placeholder="e.g. American" />
               {errors.nationality && <p className="text-red-500 text-xs mt-1">{errors.nationality.message}</p>}
             </div>
             <div className="col-span-1 md:col-span-2 mt-4 flex space-x-4">
@@ -474,12 +475,10 @@ export default function FlightDetailsPage() {
              {/* --- Price Breakdown --- */}
               <div className="flex justify-between">
                   <span className="text-gray-600">Base Price:</span>
-                  {/* FIX: Use helper function and .toFixed() */}
                   <span>${basePriceNumber.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                   <span className="text-gray-600">Seat Class ({selectedSeatClass}):</span>
-                  {/* FIX: Use helper function for calculations and .toFixed() */}
                   <span>+${(basePriceNumber * getSeatClassMultiplier(selectedSeatClass) - basePriceNumber).toFixed(2)}</span>
               </div>
              {selectedSeatId && (
@@ -552,14 +551,14 @@ export default function FlightDetailsPage() {
       </div>
 
       {/* Render Seat Map Popup */}
-      {/* <SeatMapPopup
+      <SeatMapPopup
         isOpen={isSeatMapOpen}
         onClose={() => setIsSeatMapOpen(false)}
         onSeatSelect={handleSeatIdSelect}
         reservedSeats={reservedSeats}
         initialSelectedSeat={selectedSeatId}
         flightClass={mapDisplayNameToInternalClass(selectedSeatClass)}
-      /> */}
+      />
 
     </div>
   );

@@ -20,15 +20,15 @@ const seatClasses = {
   economy: { color: "bg-blue-500", rows: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30] }
 };
 const seats = ["A", "B", "C", "D", "E", "F"];
-const exitRows = [16, 27]; // Define exit rows
+const exitRows = [16, 27]; 
 
 interface SeatMapPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  onSeatSelect: (seatId: string | null) => void; // Allow null if deselecting
+  onSeatSelect: (seatId: string | null) => void; 
   reservedSeats: string[];
   initialSelectedSeat: string | null;
-  flightClass: 'first' | 'business' | 'economy'; // Receive selected class from parent
+  flightClass: 'first' | 'business' | 'economy'; 
 }
 
 export default function SeatMapPopup({
@@ -39,61 +39,56 @@ export default function SeatMapPopup({
   initialSelectedSeat,
   flightClass
 }: SeatMapPopupProps) {
-  // Internal state for the currently selected seat within the popup
   const [selectedSeat, setSelectedSeat] = useState<string | null>(initialSelectedSeat);
 
-  // Update internal state if the initial prop changes while the dialog is open
   useEffect(() => {
     setSelectedSeat(initialSelectedSeat);
   }, [initialSelectedSeat, isOpen]);
 
   const toggleSeat = (seatId: string) => {
-    if (reservedSeats.includes(seatId)) return; // Cannot select reserved seats
+    if (reservedSeats.includes(seatId)) return; 
 
-    // If the clicked seat is already selected, deselect it
     if (selectedSeat === seatId) {
       setSelectedSeat(null);
     } else {
-      // Otherwise, select the new seat (replacing any previous selection)
       setSelectedSeat(seatId);
     }
   };
 
   const handleConfirm = () => {
-    onSeatSelect(selectedSeat); // Pass the selected seat (or null) back to parent
-    onClose(); // Close the dialog
+    onSeatSelect(selectedSeat);
+    onClose(); 
   };
 
   const getSeatColor = (row: number) => {
-    if (seatClasses.first.rows.includes(row)) return "bg-emerald-500";
-    if (seatClasses.business.rows.includes(row)) return "bg-blue-600";
+    if (seatClasses.first.rows.includes(row)) return "bg-[#69347E]";
+    if (seatClasses.business.rows.includes(row)) return "bg-[#523E8C]";
     return "bg-blue-500";
   };
 
-   // Determine which rows to display based on the selected flightClass prop
    const getClassRows = () => {
     switch (flightClass) {
       case 'first': return seatClasses.first.rows;
       case 'business': return seatClasses.business.rows;
       case 'economy': return seatClasses.economy.rows;
-      default: return []; // Should not happen with defined types
+      default: return []; 
     }
   };
   const visibleRows = getClassRows();
-  const allRows = Array.from({ length: 30 }, (_, i) => i + 1); // All possible rows for layout structure
+  const allRows = Array.from({ length: 30 }, (_, i) => i + 1); 
 
-  // Check if we should render a seat or an exit space
+  
   const shouldRenderSeat = (row: number) => !exitRows.includes(row);
 
   const renderSeat = (row: number, seat: string) => {
-    // If this is an exit row, don't render the seat
+    
     if (!shouldRenderSeat(row)) {
       return <div key={`${row}${seat}`} className="w-8 h-8 m-1"></div>;
     }
 
     const seatId = `${row}${seat}`;
     const isReserved = reservedSeats.includes(seatId);
-    const isSelected = selectedSeat === seatId; // Check against the single selected seat
+    const isSelected = selectedSeat === seatId;
 
     return (
       <div
@@ -163,7 +158,7 @@ export default function SeatMapPopup({
             {/* Seat grid */}
             <div className="flex flex-col">
               {allRows.map(row => {
-                // Only render rows belonging to the selected class
+                
                 if (!visibleRows.includes(row)) {
                     return null;
                 }
