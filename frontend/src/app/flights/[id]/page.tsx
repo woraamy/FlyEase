@@ -49,7 +49,6 @@ const passengerSchema = z.object({
   nationality: z.string().min(3, "Nationality must be valid"),
 });
 
-
 type PassengerFormData = z.infer<typeof passengerSchema>;
 
 export default function FlightDetailsPage() {
@@ -64,6 +63,18 @@ export default function FlightDetailsPage() {
   const [selectedBaggage, setSelectedBaggage] = useState("No Extra Baggage");
   const [selectedService, setSelectedService] = useState("No Assistance");
   const [updatedPrice, setUpdatedPrice] = useState(flight?.base_price);
+  
+  // Add state for passenger data
+  const [passengerData, setPassengerData] = useState<PassengerFormData>({
+    firstName: "",
+    lastName: "",
+    age: 0,
+    gender: "prefer_not_to_say",
+    contactNumber: "",
+    email: "",
+    passportNumber: "",
+    nationality: ""
+  });
 
   const handleSeatSelection = (seat: { name: string; multiplier: number }) => {
     setSelectedSeat(seat.name as "First Class" | "Business Class" | "Premium Economy Class" | "Economy Class");
@@ -81,8 +92,6 @@ export default function FlightDetailsPage() {
     }
   };
 
-  
-  
   // Helper function to get the seat multiplier
   const getSeatMultiplier = (seatName: "First Class" | "Business Class" | "Premium Economy Class" | "Economy Class") => {
       const seatMap = {
@@ -94,7 +103,6 @@ export default function FlightDetailsPage() {
       
       return seatMap[seatName] || 1;
     };
-
 
   const handleMealSelection = (meal: string) => {
     setSelectedMeal(meal);
@@ -108,12 +116,28 @@ export default function FlightDetailsPage() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<PassengerFormData>({
     resolver: zodResolver(passengerSchema),
+    defaultValues: passengerData,
   });
+
+  // Update the form values in real-time
+  useEffect(() => {
+    const subscription = watch((value) => {
+      // Partial update of passenger data without validation
+      setPassengerData(prev => ({
+        ...prev,
+        ...value as PassengerFormData
+      }));
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const onSubmit = (data: PassengerFormData) => {
     console.log("Valid Data Submitted:", data);
+    setPassengerData(data);
   };
 
   useEffect(() => {
@@ -338,8 +362,30 @@ export default function FlightDetailsPage() {
             
             {isSignedIn ? (
               <>
-                <EmbeddedCheckoutForm price={(updatedPrice ?? flight?.base_price ?? 0) * 1.1} name="Flight Booking" />
-                <Button className="w-full rounded-xl mt-3">Place order</Button>
+                <div className="mt-4">
+                  {(!passengerData.firstName || !passengerData.lastName) && (
+                    <p className="text-amber-600 mb-2 text-center">
+                      Please fill in passenger details to continue
+                    </p>
+                  )}
+                </div>
+                <EmbeddedCheckoutForm 
+                  price={(updatedPrice ?? flight?.base_price ?? 0) * 1.1}
+                  firstName={passengerData.firstName}
+                  lastName={passengerData.lastName}
+                  selectedSeat={selectedSeat}
+                  selectedMeal={selectedMeal}
+                  selectedService={selectedService}
+                  SelectedBaggage={selectedBaggage}
+                  id={Number(flightId)}
+                  flight_number={flight.flight_number}
+                  age={passengerData.age}
+                  gender={passengerData.gender}
+                  contactNumber={passengerData.contactNumber}
+                  email={passengerData.email}
+                  passportNumber={passengerData.passportNumber}
+                  nationality={passengerData.nationality}
+                />
               </>
             ) : (
               <div className="mt-4 text-center flex flex-col items-center gap-3">
