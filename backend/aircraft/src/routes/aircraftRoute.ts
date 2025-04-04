@@ -79,4 +79,28 @@ router.get('/layout/:flight_number', async (req, res) => {
     return;
 });
 
+// Get All Aircraft Class Details
+router.get('/class-details', async (req, res) => {
+    // Fetch all aircraft class details from the database
+    const aircraftClassDetails = await aircraftWarehouseRepo.find({
+        relations: ["aircraft.classes"]
+    });
+
+    const result = aircraftClassDetails.reduce((acc, flight) => {
+        const classes = flight.aircraft.classes.reduce((clsAcc, cls) => {
+          const name = cls.travel_class.toLowerCase();
+          clsAcc[name.charAt(0).toUpperCase() + name.slice(1)] = true;
+          return clsAcc;
+        }, { Economy: false, Business: false, First: false });
+      
+        acc[flight.flightNumber] = classes;
+        return acc;
+      }, {});      
+
+    // success response
+    res.status(200).json(result);
+    return;
+         
+});
+
 export default router;

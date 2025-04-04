@@ -40,8 +40,6 @@ router.get("/search", async (req, res) => {
         const query = flightRepo.createQueryBuilder("flight")
             .leftJoinAndSelect("flight.departure_airport", "departure_airport")
             .leftJoinAndSelect("flight.arrival_airport", "arrival_airport")
-            .leftJoinAndSelect("flight.class_details", "class_details")
-            .leftJoinAndSelect("class_details.travel_class", "travel_class");
 
         if (departure_airport_city) {
             query.andWhere("departure_airport.city ILIKE :departure_airport_city", { departure_airport_city: `%${departure_airport_city}%` });
@@ -67,15 +65,31 @@ router.get("/search", async (req, res) => {
             query.andWhere("flight.arrival_time BETWEEN :start AND :end", { start, end });
         }
 
-        if (travel_class_name) {
-            query.andWhere("travel_class.name ILIKE :travel_class_name", { travel_class_name: `%${travel_class_name}%` });
-        }
-
         const flights = await query.getMany();
         // console.log("Flights found:", flights); // Debug log
 
+        var flightResult: any = [];
+        
+        if (!travel_class_name) {
+            res.status(200).json(flights);
+            return;
+        } else {
+            const data = await fetch(`http://localhost:4001/aircraft/class-details`);
+            const flightNumberMap = await data.json();
+            // loop through the flights and check if the travel class is available
+            for (const flight of flights) {
+                const flightNumber = flight.flight_number;
+                // check if the travel_class_name exists in the flightNumber
+                const classes = flightNumberMap[flightNumber][travel_class_name];
+                // if classes is true, then add the flight to the flights array
+                if (classes) {
+                    flightResult.push(flight);
+                }
+            }            
+        }
+
         // success response
-        res.status(200).json(flights);
+        res.status(200).json(flightResult);
         return;
     } catch (error) {
         console.error('Error searching flights:', error);
