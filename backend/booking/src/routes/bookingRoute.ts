@@ -39,12 +39,14 @@ router.post('/success', async (req, res) => {
     }
 
     try {
+
+        console.log('Payment Intent:', paymentIntent);
         // Check if the person info exists in the database
         var passenger = await passengerRepo.findOne({
             where: { passport: passport_number },
             select: ['id'],
         })
-        
+        console.log('step 1', passenger);
         // if the person does not exist, create a new passenger
         if (!passenger) {
             passenger = passengerRepo.create({
@@ -59,6 +61,7 @@ router.post('/success', async (req, res) => {
             });
             await passengerRepo.save(passenger);
         }
+        console.log('step 2');
 
         // Generate a unique booking code
         const booking_code = Math.random().toString(36).substr(2, 6).toUpperCase();
@@ -83,7 +86,7 @@ router.post('/success', async (req, res) => {
         });
 
     } catch (error) {
-        // console.log('Error fetching passenger:', error);
+        console.log('Error fetching passenger:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

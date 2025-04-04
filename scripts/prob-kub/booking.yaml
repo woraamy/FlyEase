@@ -7,20 +7,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: aircraft
+  name: booking
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: aircraft
+      app: booking
   template:
     metadata:
       labels:
-        app: aircraft
+        app: booking
     spec:
       containers: 
-      - name: aircraft
-        image: $CONTAINER_REGISTRY/aircraft:1
+      - name: booking
+        image: $CONTAINER_REGISTRY/booking:1
         imagePullPolicy: IfNotPresent
         env:
         - name: PORT
@@ -32,10 +32,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: aircraft
+  name: booking
 spec:
   selector:
-    app: aircraft
+    app: booking
   type: ClusterIP
   ports:
     - protocol: TCP

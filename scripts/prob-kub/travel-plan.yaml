@@ -7,35 +7,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: aircraft
+  name: travel-plan
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: aircraft
+      app: travel-plan
   template:
     metadata:
       labels:
-        app: aircraft
+        app: travel-plan
     spec:
       containers: 
-      - name: aircraft
-        image: $CONTAINER_REGISTRY/aircraft:1
+      - name: travel-plan
+        image: $CONTAINER_REGISTRY/travel-plan:1
         imagePullPolicy: IfNotPresent
         env:
         - name: PORT
           value: "4000"
         - name: DATABASE_URL
-          value: $DATABASE_URL
+          value: $MONGO_DATABASE_URL
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: aircraft
+  name: travel-plan
 spec:
   selector:
-    app: aircraft
+    app: travel-plan
   type: ClusterIP
   ports:
     - protocol: TCP

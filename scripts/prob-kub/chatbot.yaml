@@ -1,0 +1,62 @@
+#
+# To deploy:
+#
+# kubectl apply -f scripts/deploy.yaml
+#
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatbot
+  template:
+    metadata:
+      labels:
+        app: chatbot
+    spec:
+      containers: 
+      - name: chatbot
+        image: $CONTAINER_REGISTRY/chatbot:1
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: LANGSMITH_TRACING
+          value: "${LANGSMITH_TRACING}"
+        - name: LANGSMITH_API_KEY
+          value: "${LANGSMITH_API_KEY}"
+        - name: LANGSMITH_PROJECT
+          value: "${LANGSMITH_PROJECT}"
+        - name: OPENAI_API_KEY
+          value: "${OPENAI_API_KEY}"
+        - name: HUGGINGFACE_API_KEY
+          value: "${HUGGINGFACE_API_KEY}"
+        - name: OPENROUTER_API_KEY
+          value: "${OPENROUTER_API_KEY}"
+        - name: ACCUWEATHER_API_KEY
+          value: "${ACCUWEATHER_API_KEY}"
+        - name: TAVILY_API_KEY
+          value: "${TAVILY_API_KEY}"
+        - name: ASTRA_DB_APPLICATION_TOKEN
+          value: "${ASTRA_DB_APPLICATION_TOKEN}"
+        - name: CONNECTION_POSTGRES
+          value: "${CONNECTION_POSTGRES}"
+        - name: COLLECTION_NAME
+          value: "${COLLECTION_NAME}"
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatbot
+spec:
+  selector:
+    app: chatbot
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000

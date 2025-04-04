@@ -20,8 +20,8 @@ spec:
     spec:
       containers: 
       - name: frontend
-        image: frontend:1
-        imagePullPolicy: Never
+        image: $CONTAINER_REGISTRY/frontend:1
+        imagePullPolicy: IfNotPresent
         env:
         - name: DATABASE_URL
           value: $DATABASE_URL
@@ -54,7 +54,7 @@ metadata:
 spec:
   selector:
     app: frontend
-  type: NodePort
+  type: LoadBalancer
   ports:
     - protocol: TCP
       port: 80

@@ -1,5 +1,5 @@
 #
-# Builds and deploys all microservices to a local Kubernetes instance.
+# buildx build --platform linux/amd64s and deploys all microservices to a local Kubernetes instance.
 #
 # Usage:
 #
@@ -24,19 +24,33 @@ set -u
 : "$ASTRA_DB_APPLICATION_TOKEN"
 : "$CONNECTION_POSTGRES"
 : "$COLLECTION_NAME"
+: "$CONTAINER_REGISTRY"
 
 
 #
-# Build Docker images.
+# build Docker images.
 #
 
-docker build -t aircraft:1 --file ../../backend/aircraft/Dockerfile-prod ../../backend/aircraft
-docker build -t booking:1 --file ../../backend/booking/Dockerfile-prod ../../backend/booking
-docker build -t flight:1 --file ../../backend/flight/Dockerfile-prod ../../backend/flight
-docker build -t travel-plan:1 --file ../../backend/travel-plan/Dockerfile-prod ../../backend/travel-plan
-docker build -t chatbot:1 --file ../../backend/chatbot/Dockerfile-prod ../../backend/chatbot
-docker build -t recommend:1 --file ../../backend/recommend/Dockerfile-prod ../../backend/recommend
-docker build -t frontend:1 --file ../../frontend/Dockerfile-prod ../../frontend
+docker buildx build --platform linux/amd64 -t $CONTAINER_REGISTRY/aircraft:1 --file ../../backend/aircraft/Dockerfile-prod ../../backend/aircraft
+docker push $CONTAINER_REGISTRY/aircraft:1
+
+docker buildx build --platform linux/amd64 -t $CONTAINER_REGISTRY/booking:1 --file ../../backend/booking/Dockerfile-prod ../../backend/booking
+docker push $CONTAINER_REGISTRY/booking:1
+
+docker buildx build --platform linux/amd64 -t $CONTAINER_REGISTRY/flight:1 --file ../../backend/flight/Dockerfile-prod ../../backend/flight
+docker push $CONTAINER_REGISTRY/flight:1
+
+docker buildx build --platform linux/amd64 -t $CONTAINER_REGISTRY/travel-plan:1 --file ../../backend/travel-plan/Dockerfile-prod ../../backend/travel-plan
+docker push $CONTAINER_REGISTRY/travel-plan:1
+
+docker buildx build --platform linux/amd64 -t $CONTAINER_REGISTRY/chatbot:1 --file ../../backend/chatbot/Dockerfile-prod ../../backend/chatbot
+docker push $CONTAINER_REGISTRY/chatbot:1
+
+docker buildx build --platform linux/amd64 -t $CONTAINER_REGISTRY/recommend:1 --file ../../backend/recommend/Dockerfile-prod ../../backend/recommend
+docker push $CONTAINER_REGISTRY/recommend:1
+
+docker buildx build --platform linux/amd64 -t $CONTAINER_REGISTRY/frontend:1 --file ../../frontend/Dockerfile-prod ../../frontend
+docker push $CONTAINER_REGISTRY/frontend:1
 
 # 
 # Deploy containers to Kubernetes.
@@ -46,9 +60,7 @@ docker build -t frontend:1 --file ../../frontend/Dockerfile-prod ../../frontend
 #   kubectl config use-context docker-desktop
 
 
-kubectl apply -f ingress.yaml
 kubectl apply -f recommend.yaml
-
 envsubst < aircraft.yaml | kubectl apply -f -
 envsubst < booking.yaml | kubectl apply -f -
 envsubst < flight.yaml | kubectl apply -f -

@@ -7,37 +7,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: aircraft
+  name: recommend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: aircraft
+      app: recommend
   template:
     metadata:
       labels:
-        app: aircraft
+        app: recommend
     spec:
       containers: 
-      - name: aircraft
-        image: $CONTAINER_REGISTRY/aircraft:1
+      - name: recommend
+        image: $CONTAINER_REGISTRY/recommend:1
         imagePullPolicy: IfNotPresent
-        env:
-        - name: PORT
-          value: "4000"
-        - name: DATABASE_URL
-          value: $DATABASE_URL
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: aircraft
+  name: recommend
 spec:
   selector:
-    app: aircraft
+    app: recommend
   type: ClusterIP
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 4000
+      targetPort: 5000
