@@ -5,11 +5,13 @@ from typing import Dict, Any, List
 # Use the older PGVector implementation
 from langchain.vectorstores.pgvector import PGVector
 from langchain_huggingface import HuggingFaceEmbeddings
-
+# import dotenv
+from .config import CONNECTION_POSTGRES, COLLECTION_NAME
 # Constants
-COLLECTION_NAME = "flights"
-CONNECTION_STRING = "postgresql+psycopg2://postgres:test@localhost:6543/vector_db"
-
+# COLLECTION_NAME = "flights"
+# CONNECTION_STRING = "postgresql+psycopg2://postgres:test@localhost:6543/vector_db"
+CONNECTION_STRING = CONNECTION_POSTGRES
+# print(f"Connection string: {CONNECTION_STRING}")
 def store_query_in_vector_db(query: str, response: str = None, metadata: Dict[str, Any] = None):
     """Store user query and response in vector database with metadata"""
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")

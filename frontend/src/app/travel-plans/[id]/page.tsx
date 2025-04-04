@@ -4,7 +4,7 @@ import { CalendarDays, MapPin, Plane } from "lucide-react";
 import Link from "next/link";
 
 import { FlightRecCard } from "@/components/FightRecCard"; // Ensure correct path
-import { travelPlanAPI } from "./action";
+import { getTravelPlanById } from "@/app/action";
 import { getFlightByArrCity } from "@/app/action"; // Ensure correct path
 
 // Interfaces (Airport, Flight, TravelPlan) remain the same as before
@@ -13,16 +13,15 @@ interface Flight { id: number; flight_number: string; departure_airport: Airport
 interface TravelPlan { _id: string; header_topic: string; departure_city: string; departure_country: string; arrival_city: string; arrival_country: string; introduction: string; header_img: string; paragraphs: Record<string, string>; createdAt: string; }
 
 
-export default async function TravelPlanDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function TravelPlanDetailPage({ params }: { params: Promise<{ id: string }>}) {
+  const { id } = await params;
 
   let travelPlan: TravelPlan | null = null;
   let flights: Flight[] = [];
   let fetchError: string | null = null;
 
   try {
-    // ... (Data fetching logic remains the same) ...
-    const planResponse = await travelPlanAPI.getTravelPlanById(id);
+    const planResponse = await getTravelPlanById(id);
     if (!planResponse.ok) {
         if (planResponse.status === 404) notFound();
         throw new Error(`Failed to fetch travel plan: ${planResponse.statusText}`);

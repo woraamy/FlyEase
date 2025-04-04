@@ -79,6 +79,8 @@ export async function POST(request: Request) {
             expires_at: Math.floor(Date.now() / 1000) + 60 * 30, // 30 minutes
             return_url: `${request.headers.get('origin')}/return?session_id={CHECKOUT_SESSION_ID}`,
         });
+        // console.log('session:', session);
+        
 
         return NextResponse.json({ id: session.id, client_secret: session.client_secret });
     } catch (error: any) {

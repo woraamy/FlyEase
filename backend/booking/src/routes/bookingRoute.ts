@@ -30,10 +30,10 @@ router.post('/success', async (req, res) => {
     // Check if all required fields are present
     if  (
         !booking_id || !passport_number || !first_name || !last_name || !email || 
-        !contact_number || !clerkUserId || nationality || gender || age
+        !contact_number || !clerkUserId || !nationality || !gender || !age
         ) 
      {
-        // console.log('validation error: ', paymentIntent);
+        console.log('validation error: ', paymentIntent);
         res.status(400).json({ message: 'All fields are required' });
         return;
     }
@@ -62,7 +62,7 @@ router.post('/success', async (req, res) => {
 
         // Generate a unique booking code
         const booking_code = Math.random().toString(36).substr(2, 6).toUpperCase();
-
+        console.log('Booking code:', booking_code);
         // Update the booking with the passenger ID and status
         bookingRepo.update({ id: booking_id }, {
             passenger: passenger.id,
@@ -87,6 +87,7 @@ router.post('/success', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 router.post('/decline', async (req, res) => {
     const { booking_id } = req.body;
 
@@ -167,7 +168,7 @@ router.get('/reserved-seats/:flight_number', async (req, res) => {
         });
 
     if (seats.length === 0) {
-        res.status(200).json({});  // No reserved seats
+        res.status(200).json([]);  // No reserved seats
         return;
     }
     // Extract seat IDs from the bookings

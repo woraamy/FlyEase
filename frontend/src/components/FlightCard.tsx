@@ -41,7 +41,7 @@ const FlightCard = ({ flight }: FlightCardProps) => {
     ? parseFloat(flight.base_price) 
     : (flight.base_price || 0);
   
-  const discountPrice = (basePrice * 0.8).toFixed(2);
+  // const discountPrice = (basePrice * 0.8).toFixed(2);
 
   return (
     <div 
@@ -85,8 +85,8 @@ const FlightCard = ({ flight }: FlightCardProps) => {
           </div>
         </div>
         <div className="text-right">
-          <p className="text-lg font-bold">${discountPrice}</p>
-          <p className="text-black line-through">${basePrice.toFixed(2)}</p>
+          {/* <p className="text-lg font-bold">${discountPrice}</p> */}
+          <p className="text-black text-lg font-bold">${basePrice.toFixed(2)}</p>
         </div>
       </div>
     </div>

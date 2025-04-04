@@ -1,4 +1,5 @@
 "use server"
+
 import { auth } from "@clerk/nextjs/server";
 import { SearchParams } from '@/types/searchtype';
 import { Airport, Recommendation, RecommendationRequest, Flight, RecommendedDestination} from '@/types/flight';
@@ -409,7 +410,7 @@ export interface BookingCardData {
   arrivalCountry: string;
   arrivalAirport: string;
   seatNumber: string;
-  status: "checked-in" | "waiting for check-in";
+  status: "CONFIRMED" | "PENDING";
   bookingCode: string;
 }
 
@@ -530,7 +531,9 @@ export async function getBookingsWithFlightDetails(): Promise<BookingCardData[]>
         arrivalAirport: flight.arrival_airport.name,
         seatNumber: booking.seat_id,
         qrCodeUrl: `/api/qrcode?code=${booking.booking_code}`, // Assuming you have a QR code API
-        status: booking.status === "CONFIRMED" ? "checked-in" : "waiting for check-in",
+        // status: booking.status === "CONFIRMED" ? "CONFIRMED" : "PENDING",
+        status: booking.status === "CONFIRMED" ? "CONFIRMED" : "PENDING",
+        
         bookingCode: booking.booking_code
       };
       
@@ -543,4 +546,49 @@ export async function getBookingsWithFlightDetails(): Promise<BookingCardData[]>
   const validBookings = bookingsWithDetails.filter(Boolean) as BookingCardData[];
   console.log(`Returning ${validBookings.length} valid bookings with flight details`);
   return validBookings;
+}
+
+
+// console.log(API_BASE_URL);
+
+
+// export async function getFlightById (id: number) {
+//   const url = `${API_BASE_URL}/${id}`;
+//   const res = await fetch(url);
+//   return res;
+// }
+
+export async function getFlightById(id: number) {
+  // const API_BASE_URL = process.env.NEXT_PUBLIC_FLIGHT_URL;
+  const url = `${API_BASE_URL}/${id}`;
+  
+  try {
+    const res = await fetch(url);
+    
+    if (!res.ok) {
+      throw new Error(`API Error: ${res.status} ${res.statusText}`);
+    }
+    
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching flight:", error);
+    throw error;
+  }
+}
+
+
+// console.log(API_BASE_URL);
+// export const travelPlanAPI = {
+//     getTravelPlanById: async (id: string) => {
+//       const url = `${API_BASE_URL_TRAVEL_PLANS}/${id}`;
+//       const res = await fetch(url);
+      
+//       return res;
+//     },
+// };
+
+export async function getTravelPlanById(id: string) {
+  const url = `${API_BASE_URL_TRAVEL_PLANS}/${id}`;
+  const res = await fetch(url);
+  return res;
 }
