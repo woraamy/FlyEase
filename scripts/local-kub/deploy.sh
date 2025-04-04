@@ -13,6 +13,18 @@ set -u
 : "$STRIPE_WEBHOOK_SECRET"
 : "$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"
 : "$CLERK_SECRET_KEY"
+: "$LANGSMITH_TRACING"
+: "$LANGSMITH_API_KEY"
+: "$LANGSMITH_PROJECT"
+: "$OPENAI_API_KEY"
+: "$HUGGINGFACE_API_KEY"
+: "$OPENROUTER_API_KEY"
+: "$ACCUWEATHER_API_KEY"
+: "$TAVILY_API_KEY"
+: "$ASTRA_DB_APPLICATION_TOKEN"
+: "$CONNECTION_POSTGRES"
+: "$COLLECTION_NAME"
+
 
 #
 # Build Docker images.
@@ -35,11 +47,11 @@ docker build -t frontend:1 --file ../../frontend/Dockerfile-prod ../../frontend
 
 
 kubectl apply -f ingress.yaml
-# kubectl apply -f chatbot.yaml
-# kubectl apply -f recommend.yaml#
+kubectl apply -f recommend.yaml
 
 envsubst < aircraft.yaml | kubectl apply -f -
 envsubst < booking.yaml | kubectl apply -f -
 envsubst < flight.yaml | kubectl apply -f -
-# envsubst < travel-plan.yaml | kubectl apply -f -
+envsubst < travel-plan.yaml | kubectl apply -f -
 envsubst < frontend.yaml | kubectl apply -f -
+envsubst < chatbot.yaml | kubectl apply -f -
