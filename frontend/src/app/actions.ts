@@ -9,6 +9,7 @@ import axios from 'axios';
 const FLIGHTURL = process.env.NEXT_PUBLIC_FLIGHT_URL;
 const TRAVELURL = process.env.NEXT_PUBLIC_TRAVEL_PLANS_URL;
 const CHATBOTURL = process.env.NEXT_PUBLIC_CHAT_BOT_URL;
+const BOOKINGURL = process.env.NEXT_PUBLIC_BOOKING_URL;
 
 interface BookingFlight {
   id: number;
@@ -232,7 +233,7 @@ export const fetchQuery = async (query: string, sessionId: string | undefined) =
 };
 
 export async function getFlightByNumber(flightNumber: string): Promise<BookingFlight | null> {
-  const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/by-number/${flightNumber}`;
+  const apiUrl = `${FLIGHTURL}/flights/by-number/${flightNumber}`;
   // console.log(`Fetching flight from: ${apiUrl}`);
   
   try {
@@ -271,8 +272,7 @@ export async function getUserBookings(): Promise<Booking[]> {
     return [];
   }
 
-  const bookingUrl = `${process.env.NEXT_PUBLIC_BOOKING_URL}/booking/mybook`;
-  // console.log(`Fetching bookings from: ${bookingUrl} for user: ${userId}`);
+  const bookingUrl = `${BOOKINGURL}/booking/mybook`;
   
   try {
     const response = await fetch(bookingUrl, {
