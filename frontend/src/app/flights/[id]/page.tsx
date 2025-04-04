@@ -45,7 +45,11 @@ const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL;
 const passengerSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  age: z.number().min(1, "Age must be at least 1").max(120, "Age must be less than 120"),
+  age: z.number()
+        .min(1, "Age must be at least 1")
+        .max(120, "Age must be less than 120")
+        .positive("Age must be positive")
+        .int("Age must be a whole number"),
   gender: z.enum(["male", "female", "prefer_not_to_say"]),
   contactNumber: z
     .string()
@@ -60,6 +64,27 @@ type PassengerFormData = z.infer<typeof passengerSchema>;
 type FlightSeatClass = 'first' | 'business' | 'economy';
 type SeatClassDisplayName = "First Class" | "Business Class" | "Economy Class";
 
+const nationalities = [
+  "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan", "Argentine", "Armenian", "Australian", "Austrian",
+  "Azerbaijani", "Bahamian", "Bahraini", "Bangladeshi", "Barbadian", "Belarusian", "Belgian", "Belizean", "Beninese", "Bhutanese",
+  "Bolivian", "Bosnian", "Botswanan", "Brazilian", "British", "Bruneian", "Bulgarian", "Burkinabe", "Burundian", "Cambodian",
+  "Cameroonian", "Canadian", "Cape Verdean", "Central African", "Chadian", "Chilean", "Chinese", "Colombian", "Comoran", "Congolese",
+  "Costa Rican", "Croatian", "Cuban", "Cypriot", "Czech", "Danish", "Djiboutian", "Dominican", "Dutch", "East Timorese",
+  "Ecuadorean", "Egyptian", "Emirati", "Equatorial Guinean", "Eritrean", "Estonian", "Ethiopian", "Fijian", "Filipino", "Finnish",
+  "French", "Gabonese", "Gambian", "Georgian", "German", "Ghanaian", "Greek", "Grenadian", "Guatemalan", "Guinean",
+  "Guyanese", "Haitian", "Honduran", "Hungarian", "Icelandic", "Indian", "Indonesian", "Iranian", "Iraqi", "Irish",
+  "Israeli", "Italian", "Ivorian", "Jamaican", "Japanese", "Jordanian", "Kazakhstani", "Kenyan", "Kiribati", "Kosovan",
+  "Kuwaiti", "Kyrgyz", "Laotian", "Latvian", "Lebanese", "Liberian", "Libyan", "Liechtensteiner", "Lithuanian", "Luxembourger",
+  "Macedonian", "Malagasy", "Malawian", "Malaysian", "Maldivan", "Malian", "Maltese", "Marshallese", "Mauritanian", "Mauritian",
+  "Mexican", "Micronesian", "Moldovan", "Monacan", "Mongolian", "Montenegrin", "Moroccan", "Mosotho", "Motswana", "Mozambican",
+  "Namibian", "Nauruan", "Nepalese", "New Zealander", "Nicaraguan", "Nigerian", "Nigerien", "North Korean", "Norwegian", "Omani",
+  "Pakistani", "Palauan", "Palestinian", "Panamanian", "Papua New Guinean", "Paraguayan", "Peruvian", "Polish", "Portuguese", "Qatari",
+  "Romanian", "Russian", "Rwandan", "Saint Lucian", "Salvadoran", "Samoan", "San Marinese", "Sao Tomean", "Saudi Arabian", "Senegalese",
+  "Serbian", "Seychellois", "Sierra Leonean", "Singaporean", "Slovak", "Slovenian", "Solomon Islander", "Somali", "South African", "South Korean",
+  "South Sudanese", "Spanish", "Sri Lankan", "Sudanese", "Surinamer", "Swazi", "Swedish", "Swiss", "Syrian", "Taiwanese",
+  "Tajik", "Tanzanian", "Thai", "Togolese", "Tongan", "Trinidadian/Tobagonian", "Tunisian", "Turkish", "Tuvaluan", "Ugandan",
+  "Ukrainian", "Uruguayan", "Uzbekistani", "Vanuatuan", "Venezuelan", "Vietnamese", "Yemeni", "Zambian", "Zimbabwean"
+];
 
 export default function FlightDetailsPage() {
   const { id: flightId } = useParams<{ id: string }>();
@@ -242,14 +267,14 @@ export default function FlightDetailsPage() {
       return;
     }
 
-    const mockReservedSeats: string[] = [
-      "1A", "3F",
-      "6C", "8B", "10E",
-      "12A", "15D", "15E", "18F", "21C", "25A", "29B"
-    ];
-    setReservedSeats(mockReservedSeats);
-    setLoading(false);
-    console.log("Mock reserved seats set:", mockReservedSeats);
+    // const mockReservedSeats: string[] = [
+    //   "1A", "3F",
+    //   "6C", "8B", "10E",
+    //   "12A", "15D", "15E", "18F", "21C", "25A", "29B"
+    // ];
+    // setReservedSeats(mockReservedSeats);
+    // setLoading(false);
+    // console.log("Mock reserved seats set:", mockReservedSeats);
 
     async function fetchReservedSeats() {
       setLoading(true);
@@ -316,8 +341,6 @@ export default function FlightDetailsPage() {
     );
   }
 
-  // Calculate final total price safely
-  // FIX: Use helper function for base price in fallback calculation
   const basePriceNumber = getBasePriceAsNumber();
   const currentPrice = updatedPrice ?? (basePriceNumber * getSeatClassMultiplier(selectedSeatClass) + getBaggagePrice(selectedBaggage));
   const tax = currentPrice * 0.1;
@@ -327,7 +350,6 @@ export default function FlightDetailsPage() {
     <div className="flex flex-col lg:flex-row px-4 sm:px-6 py-4 gap-6">
       {/* Left Column */}
       <div className="flex-[3] space-y-6 p-4 border rounded-lg shadow-sm bg-white">
-        {/* ... (Header, Flight Info Cards, Services remain the same) ... */}
         {/* Header */}
         <div className="flex flex-col space-y-4">
           <p className="text-2xl md:text-3xl font-semibold text-center">Flight Details</p>
@@ -377,17 +399,14 @@ export default function FlightDetailsPage() {
         {/* Preferences Component & Seat Selection Trigger */}
         <div>
           <Preferences
-            // Handler for CLASS selection change
             onSeatClassChange={handleSeatClassChange}
-            // Handler to open the SEAT MAP
-            onOpenSeatMap={openSeatMapHandler} // The function you created: () => setIsSeatMapOpen(true)
-            // Other handlers
+            onOpenSeatMap={openSeatMapHandler}
             onMealChange={handleMealSelection}
             onBaggageChange={handleBaggageSelection}
             onServiceChange={handleServiceSelection}
-            // Selected states
-            selectedSeatClass={selectedSeatClass} // Pass the CLASS name
-            selectedSeatId={selectedSeatId}     // Pass the specific SEAT ID
+
+            selectedSeatClass={selectedSeatClass} 
+            selectedSeatId={selectedSeatId}     
             selectedMeal={selectedMeal}
             selectedBaggage={selectedBaggage}
             selectedService={selectedService}
@@ -433,7 +452,7 @@ export default function FlightDetailsPage() {
             </div>
             <div>
               <Label htmlFor="age">Age</Label>
-              <Input id="age" className="text-gray-600 bg-[#E9F1ED]" type="number" {...register("age", { valueAsNumber: true })} placeholder="e.g. 29" />
+              <Input id="age" className="text-gray-600 bg-[#E9F1ED]" type="number" min="1" step="1" {...register("age", { valueAsNumber: true })} placeholder="e.g. 29" />
               {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age.message}</p>}
             </div>
             <div>
@@ -462,11 +481,19 @@ export default function FlightDetailsPage() {
             </div>
             <div>
               <Label htmlFor="nationality">Nationality</Label>
-              <Input id="nationality" className="text-gray-600 bg-[#E9F1ED]" {...register("nationality")} placeholder="e.g. American" />
-              {errors.nationality && <p className="text-red-500 text-xs mt-1">{errors.nationality.message}</p>}
-            </div>
-            <div className="col-span-1 md:col-span-2 mt-4 flex space-x-4">
-              <Button type="submit">Save Details</Button>
+              <select
+                id="nationality"
+                className="text-gray-600 bg-[#E9F1ED] rounded-md p-2 w-full border h-[40px]"
+                {...register("nationality")}
+                defaultValue="" // Set default value for the placeholder
+              >
+                <option value="" disabled> -- Select Nationality -- </option>
+                {nationalities.sort().map((nationality) => ( // Sort list alphabetically
+                  <option key={nationality} value={nationality}>
+                    {nationality}
+                  </option>
+                ))}
+              </select>
             </div>
           </form>
         </div>
@@ -573,6 +600,7 @@ export default function FlightDetailsPage() {
         reservedSeats={reservedSeats}
         initialSelectedSeat={selectedSeatId}
         flightClass={mapDisplayNameToInternalClass(selectedSeatClass)}
+        flight_number={flight.flight_number}
       />
 
     </div>
