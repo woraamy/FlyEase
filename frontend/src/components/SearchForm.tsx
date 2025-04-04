@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import { searchFlights} from "@/app/action";
+import { searchFlights} from "@/app/actions";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import {
@@ -163,7 +163,7 @@ const SearchForm = () => {
                 <SelectContent>
                   <SelectItem value="Economy">Economy</SelectItem>
                   <SelectItem value="Business">Business</SelectItem>
-                  <SelectItem value="First Class">First Class</SelectItem>
+                  <SelectItem value="First">First Class</SelectItem>
                 </SelectContent>
               </Select>
             </div>

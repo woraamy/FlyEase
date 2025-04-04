@@ -1,12 +1,13 @@
 // app/page.tsx
 import { Suspense } from 'react';
-import { getFlights } from '@/app/action';
+import { getFlights } from '@/app/actions';
 import FlightList from '@/components/FlightList';
 import SearchForm from '@/components/SearchForm';
 import Loading from '@/components/Loading';
 import RecommendedFlights from '@/components/RecommendedFlights';
 
 
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const initialFlights = await getFlights();

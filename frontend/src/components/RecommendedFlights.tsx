@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { getRecommendedDestinations, getAirports, matchRecommendationsWithAirports } from '@/app/action';
+import { getRecommendedDestinations, getAirports, matchRecommendationsWithAirports } from '@/app/actions';
 import { RenderRow } from "@/components/RenderRow"; 
 import { Recommendation } from '@/types/recommendation';
 import { Skeleton } from "@/components/ui/skeleton";

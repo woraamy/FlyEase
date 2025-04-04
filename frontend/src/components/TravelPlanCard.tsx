@@ -1,38 +1,63 @@
-import Image from "next/image"
-import Link from "next/link"
+import Image from "next/image";
+import Link from "next/link";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { MapPin } from "lucide-react";
 
 interface TravelPlanCardProps {
-  title: string
-  from: string
-  to: string
-  description: string
-  imageUrl: string
-  href: string
+  title: string;
+  from: string;
+  to: string;
+  description: string;
+  imageUrl: string;
+  href: string;
 }
 
-export function TravelPlanCard({ title, from, to, description, imageUrl, href }: TravelPlanCardProps) {
-    return (
-      <Link href={href} className="block transition-all hover:shadow-lg">
-        <Card className="overflow-hidden rounded-lg shadow-md" style={{ background: "linear-gradient(90deg, rgba(161,191,159,1) 0%, rgba(219,239,218,1) 57%, rgba(222,242,221,1) 100%)" }}>
-          <CardHeader className="relative h-60 w-full overflow-hidden">
-            <Image
-              src={imageUrl || "/placeholder.svg"}
-              alt={title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          </CardHeader>
-          <CardContent className="bg-[#e8f0e8] p-6">
-            <div className="mb-2 flex items-start justify-between">
-              <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
-            </div>
-            <p className="mb-3 text-sm text-gray-600">From {from} to {to}</p>
-            <p className="text-gray-700">{description}</p>
-          </CardContent>
-        </Card>
-      </Link>
-    );
-  }
-  
+export function TravelPlanCard({
+  title,
+  from,
+  to,
+  description,
+  imageUrl,
+  href,
+}: TravelPlanCardProps) {
+  return (
+    <Link href={href} className="group block outline-none" aria-label={`View details for ${title}`}>
+      <Card
+        className="
+          h-full overflow-hidden rounded-lg border
+          shadow-sm transition-all duration-300 ease-in-out
+          hover:shadow-xl hover:scale-[1.02]
+          bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100  /* --- Green Radiant Gradient --- */
+          text-gray-800 /* Adjust text color for contrast if needed */
+        "
+        // Note: Removed bg-card as gradient takes precedence. Added text-gray-800 for potentially better contrast on light gradient.
+      >
+        <CardHeader className="relative h-48 w-full p-0">
+          <Image
+            src={imageUrl || "/placeholder.svg"}
+            alt={`Image for ${title}`}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </CardHeader>
+        <CardContent className="p-4 space-y-2">
+          <h3 className="text-xl font-semibold leading-tight tracking-tight text-gray-900 group-hover:text-emerald-700 transition-colors"> {/* Adjusted hover color */}
+            {title}
+          </h3>
+
+          <div className="flex items-center gap-2 text-sm text-gray-600"> {/* Adjusted muted color */}
+            <MapPin className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">
+              {from} <span className="mx-1">→</span> {to}
+            </span>
+          </div>
+
+          <p className="text-sm text-gray-700 line-clamp-3"> {/* Adjusted description color */}
+            {description}
+          </p>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}

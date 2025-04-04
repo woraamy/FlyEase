@@ -4,61 +4,101 @@ import { AppDataSource } from "../data-source";
 import { MoreThan } from "typeorm";
 import axios from "axios";
 
+const RECOMMEND_URL = process.env.RECOMMEND_URL;
+const AIRCRAFT_URL = process.env.AIRCRAFT_URL;
+export const router = Router();
+export const flightRepo = AppDataSource.getRepository(Flight);
 
-const router = Router();
-const flightRepo = AppDataSource.getRepository(Flight);
-
-// ✅ List Available Flights
+// ✅ List Available Flights - FIXED
 router.get("/", async (req, res) => {
-    const flights = await flightRepo.find({
-        where: { available_seats: MoreThan(0)},
-        relations: ["departure_airport", "arrival_airport", "class_details", "travel_classes"],
-    });
+    try {
+        // Fetch all available flights
+        const flights = await flightRepo.find({
+            where: { available_seats: MoreThan(0)},
+            relations: ["departure_airport", "arrival_airport", "class_details", "travel_classes"],
+        });
 
-    res.json(flights);
+        // Check if flights are available
+        if (!flights || flights.length === 0) {
+            res.status(404).json({ message: "No flights available" });
+            return;
+        }
+        
+        // success response
+        res.status(200).json(flights);
+        return;
+    } catch (error) {
+        // console.error('Error fetching flights:', error);
+        res.status(500).json({ error: "Something went wrong" });
+        return;
+    }
+});
+// ✅ Search Flights - FIXED
+router.get("/search", async (req, res) => {
+    try {
+        const { departure_airport_city, arrival_airport_city, departure_date, arrival_date, travel_class_name } = req.query;
+
+        const query = flightRepo.createQueryBuilder("flight")
+            .leftJoinAndSelect("flight.departure_airport", "departure_airport")
+            .leftJoinAndSelect("flight.arrival_airport", "arrival_airport")
+
+        if (departure_airport_city) {
+            query.andWhere("departure_airport.city ILIKE :departure_airport_city", { departure_airport_city: `%${departure_airport_city}%` });
+        }
+
+        if (arrival_airport_city) {
+            query.andWhere("arrival_airport.city ILIKE :arrival_airport_city", { arrival_airport_city: `%${arrival_airport_city}%` });
+        }
+
+        if (departure_date) {
+            const start = new Date(departure_date as string);
+            const end = new Date(departure_date as string);
+            end.setHours(23, 59, 59, 999);
+            // Fix: Use the correct column name with underscore
+            query.andWhere("flight.departure_time BETWEEN :start AND :end", { start, end });
+        }
+
+        if (arrival_date) {
+            const start = new Date(arrival_date as string);
+            const end = new Date(arrival_date as string);
+            end.setHours(23, 59, 59, 999);
+            // Fix: Use the correct column name with underscore
+            query.andWhere("flight.arrival_time BETWEEN :start AND :end", { start, end });
+        }
+
+        const flights = await query.getMany();
+
+        var flightResult: any = [];
+        
+        if (!travel_class_name) {
+            res.status(200).json(flights);
+            return;
+        } else {
+            const data = await fetch(`${AIRCRAFT_URL}/aircraft/class-details`);
+            const flightNumberMap = await data.json();
+            // loop through the flights and check if the travel class is available
+            for (const flight of flights) {
+                const flightNumber = flight.flight_number;
+                // check if the travel_class_name exists in the flightNumber
+                const classes = flightNumberMap[flightNumber][travel_class_name];
+                // if classes is true, then add the flight to the flights array
+                if (classes) {
+                    flightResult.push(flight);
+                }
+            }            
+        }
+
+        // success response
+        res.status(200).json(flightResult);
+        return;
+    } catch (error) {
+        console.error('Error searching flights:', error);
+        res.status(500).json({ error: "Something went wrong" });
+        return;
+    }
 });
 
-// ✅ Search Flights
-router.get("/search", async (req, res) => {
-    const { departure_airport_city, arrival_airport_city, departure_date, arrival_date, travel_class_name } = req.query;
-
-
-    const query = flightRepo.createQueryBuilder("flight")
-        .leftJoinAndSelect("flight.departure_airport", "departure_airport")
-        .leftJoinAndSelect("flight.arrival_airport", "arrival_airport")
-        .leftJoinAndSelect("flight.class_details", "class_details")
-        .leftJoinAndSelect("class_details.travel_class", "travel_class");
-
-    if (departure_airport_city) {
-        query.andWhere("departure_airport.city ILIKE :departure_airport_city", { departure_airport_city: `%${departure_airport_city}%` });
-    }
-
-    if (arrival_airport_city) {
-        query.andWhere("arrival_airport.city ILIKE :arrival_airport_city", { arrival_airport_city: `%${arrival_airport_city}%` });
-    }
-
-    if (departure_date) {
-        const start = new Date(departure_date as string);
-        const end = new Date(departure_date as string);
-        end.setHours(23, 59, 59, 999);
-        query.andWhere("flight.departureTime BETWEEN :start AND :end", { start, end });
-    }
-
-    if (arrival_date) {
-        const start = new Date(arrival_date as string);
-        const end = new Date(arrival_date as string);
-        end.setHours(23, 59, 59, 999);
-        query.andWhere("flight.arrivalTime BETWEEN :start AND :end", { start, end });
-    }
-
-    if (travel_class_name) {
-        query.andWhere("class_details.name ILIKE :travel_class_name", { travel_class_name: `%${travel_class_name}%` });
-    }
-
-    const flights = await query.getMany();
-    res.json(flights);});
-
-// ✅ Get Flight by ID
+// ✅ Get Flight by ID - FIXED
 router.get("/:flightId", async (req, res) => {
     try {
         const { flightId } = req.params;
@@ -69,16 +109,19 @@ router.get("/:flightId", async (req, res) => {
 
         if (!flight) {
             res.status(404).json({ message: "Flight not found" });
+            return;
         }
 
-        res.json(flight);
+        // success response
+        res.status(200).json(flight);
     } catch (error) {
         res.status(500).json({ error: "Something went wrong" });
     }
+    return;
 });
 
 
-// ✅ Get Flights by Arrival City
+// ✅ Get Flights by Arrival City - FIXED
 router.get("/travel-rec/:arrivalCity", async (req, res) => {
     console.log("route hit")
     try {
@@ -86,6 +129,7 @@ router.get("/travel-rec/:arrivalCity", async (req, res) => {
       console.log(arrivalCity)
       if (!arrivalCity) {
         res.status(400).json({ error: "Arrival city is required" });
+        return;
       }
       
       const flights = await flightRepo
@@ -107,8 +151,8 @@ router.get("/travel-rec/:arrivalCity", async (req, res) => {
       console.error('Error occurred:', error); // Log full error
       res.status(500).json({ error: "Something went wrong", details: error }); // Add 'details' for debugging
     }
-  });
-
+    return;
+});
 
 interface RecommendationRequest {
     wants_extra_baggage: boolean;
@@ -138,7 +182,7 @@ router.post('/recommend', async (req, res) => {
         // console.log('Sending recommendation request:', JSON.stringify(requestData));
 
         const response = await axios.post(
-            'http://localhost:5001/recommend/new_user',
+            `${RECOMMEND_URL}/recommend/new_user`,
             requestData,
             {
                 headers: {
@@ -164,12 +208,12 @@ router.get('/by-airport/:code', async (req, res) => {
         const { code } = req.params;
         const upperCode = code.toUpperCase(); // Convert to uppercase immediately
 
-        // if (!code || upperCode.length !== 3 || ) {
         if (!code || (upperCode.length !== 3 && upperCode.length !== 4)) {
             res.status(400).json({ 
                 error: 'Bad request',
-                message: 'Invalid airport code format. Code must be 3 characters.'
+                message: 'Invalid airport code format. Code must be 3 or 4 characters.'
             });
+            return;
         }
 
         const flights = await flightRepo.createQueryBuilder('flight')
@@ -184,74 +228,46 @@ router.get('/by-airport/:code', async (req, res) => {
             res.status(404).json({
                 message: `No flights found for airport code ${upperCode}`
             });
+            return;
         }
-
         res.json(flights);
     } catch (error) {
-        console.error('Error fetching flights by airport code:', error);
+        // console.error('Error fetching flights by airport code:', error);
         res.status(500).json({ 
             error: 'Internal server error',
             message: 'An error occurred while fetching flights'
         });
     }
+
+    return;
 });
 
 
-
-router.get('/search-detailed', async (req: Request, res: Response) => {
+// Get Flight by Flight Number
+router.get("/by-number/:flightNumber", async (req, res) => {
     try {
-        const {
-            departure_airport,
-            arrival_airport,
-            date,
-            min_price,
-            max_price
-        } = req.query;
+      const { flightNumber } = req.params;
+      
+      const flight = await flightRepo.findOne({
+        where: { flight_number: flightNumber },
+        relations: ["departure_airport", "arrival_airport", "class_details", "travel_classes"],
+      });
+  
+      if (!flight) {
+        res.status(404).json({ error: "Flight not found" });
+        return;
+      }
+  
+      res.json(flight);
 
-        const flightRepository = AppDataSource.getRepository(Flight);
-        const queryBuilder = flightRepository
-            .createQueryBuilder('flight')
-            .leftJoinAndSelect('flight.departure_airport', 'departure_airport')
-            .leftJoinAndSelect('flight.arrival_airport', 'arrival_airport')
-            .leftJoinAndSelect('flight.travel_classes', 'travel_classes')
-            .where('flight.available_seats > :minSeats', { minSeats: 0 });
-
-        if (departure_airport) {
-            queryBuilder.andWhere('departure_airport.code = :departure_airport', { departure_airport });
-        }
-
-        if (arrival_airport) {
-            queryBuilder.andWhere('arrival_airport.code = :arrival_airport', { arrival_airport });
-        }
-
-        if (date) {
-            const searchDate = new Date(date as string);
-            const nextDay = new Date(searchDate);
-            nextDay.setDate(nextDay.getDate() + 1);
-            
-            queryBuilder.andWhere('flight.departure_time BETWEEN :start AND :end', {
-                start: searchDate,
-                end: nextDay
-            });
-        }
-
-        if (min_price) {
-            queryBuilder.andWhere('flight.base_price >= :min_price', { min_price });
-        }
-
-        if (max_price) {
-            queryBuilder.andWhere('flight.base_price <= :max_price', { max_price });
-        }
-
-        const flights = await queryBuilder
-            .orderBy('flight.departure_time', 'ASC')
-            .getMany();
-
-        res.json(flights);
     } catch (error) {
-        console.error('Error searching flights:', error);
-        res.json([]);
+
+      console.error('Error fetching flight by number:', error);
+      res.status(500).json({ error: "Something went wrong" });
+
     }
-});
+
+    return;
+  });
 
 export default router;

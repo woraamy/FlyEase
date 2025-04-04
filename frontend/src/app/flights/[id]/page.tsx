@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
-import { 
-  Plane, Wifi, Tv, UtensilsCrossed, Star, LoaderCircle, PlaneTakeoff, PlaneLanding, CalendarArrowUp, CalendarArrowDown
+import {
+  Plane, Wifi, Tv, UtensilsCrossed, Star, LoaderCircle, PlaneTakeoff, PlaneLanding, CalendarArrowUp, CalendarArrowDown, Armchair
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth, SignInButton } from "@clerk/nextjs"; // Import Clerk auth hooks
+import { useAuth, SignInButton } from "@clerk/nextjs";
 
-import { flightAPI } from "./action";
+import { getFlightById } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -19,15 +19,18 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Label } from "@/components/ui/label";
 import EmbeddedCheckoutForm from "@/components/EmbeddedCheckoutForm";
 import Preferences from "@/components/PreferencesCard";
+import SeatMapPopup from "@/components/SeatMapPopup";
+import { Badge } from "@/components/ui/badge";
 
 interface Flight {
   id: number;
   flight_number: string;
   departure_airport: { code: string; name: string; city: string };
-  arrival_airport: { code: string; name: string; city: string};
+  arrival_airport: { code: string; name: string; city: string };
   departure_time: string;
   arrival_time: string;
-  base_price: number;
+  // explicitly define base_price as potentially string from API
+  base_price: number | string;
   available_seats: number;
   rating: number;
   featured_image: string;
@@ -42,7 +45,11 @@ const BOOKING_URL = "http://booking";
 const passengerSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  age: z.number().min(1, "Age must be at least 1").max(120, "Age must be less than 120"),
+  age: z.number()
+        .min(1, "Age must be at least 1")
+        .max(120, "Age must be less than 120")
+        .positive("Age must be positive")
+        .int("Age must be a whole number"),
   gender: z.enum(["male", "female", "prefer_not_to_say"]),
   contactNumber: z
     .string()
@@ -54,69 +61,118 @@ const passengerSchema = z.object({
 
 type PassengerFormData = z.infer<typeof passengerSchema>;
 
+type FlightSeatClass = 'first' | 'business' | 'economy';
+type SeatClassDisplayName = "First Class" | "Business Class" | "Economy Class";
+
+const nationalities = [
+  "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan", "Argentine", "Armenian", "Australian", "Austrian",
+  "Azerbaijani", "Bahamian", "Bahraini", "Bangladeshi", "Barbadian", "Belarusian", "Belgian", "Belizean", "Beninese", "Bhutanese",
+  "Bolivian", "Bosnian", "Botswanan", "Brazilian", "British", "Bruneian", "Bulgarian", "Burkinabe", "Burundian", "Cambodian",
+  "Cameroonian", "Canadian", "Cape Verdean", "Central African", "Chadian", "Chilean", "Chinese", "Colombian", "Comoran", "Congolese",
+  "Costa Rican", "Croatian", "Cuban", "Cypriot", "Czech", "Danish", "Djiboutian", "Dominican", "Dutch", "East Timorese",
+  "Ecuadorean", "Egyptian", "Emirati", "Equatorial Guinean", "Eritrean", "Estonian", "Ethiopian", "Fijian", "Filipino", "Finnish",
+  "French", "Gabonese", "Gambian", "Georgian", "German", "Ghanaian", "Greek", "Grenadian", "Guatemalan", "Guinean",
+  "Guyanese", "Haitian", "Honduran", "Hungarian", "Icelandic", "Indian", "Indonesian", "Iranian", "Iraqi", "Irish",
+  "Israeli", "Italian", "Ivorian", "Jamaican", "Japanese", "Jordanian", "Kazakhstani", "Kenyan", "Kiribati", "Kosovan",
+  "Kuwaiti", "Kyrgyz", "Laotian", "Latvian", "Lebanese", "Liberian", "Libyan", "Liechtensteiner", "Lithuanian", "Luxembourger",
+  "Macedonian", "Malagasy", "Malawian", "Malaysian", "Maldivan", "Malian", "Maltese", "Marshallese", "Mauritanian", "Mauritian",
+  "Mexican", "Micronesian", "Moldovan", "Monacan", "Mongolian", "Montenegrin", "Moroccan", "Mosotho", "Motswana", "Mozambican",
+  "Namibian", "Nauruan", "Nepalese", "New Zealander", "Nicaraguan", "Nigerian", "Nigerien", "North Korean", "Norwegian", "Omani",
+  "Pakistani", "Palauan", "Palestinian", "Panamanian", "Papua New Guinean", "Paraguayan", "Peruvian", "Polish", "Portuguese", "Qatari",
+  "Romanian", "Russian", "Rwandan", "Saint Lucian", "Salvadoran", "Samoan", "San Marinese", "Sao Tomean", "Saudi Arabian", "Senegalese",
+  "Serbian", "Seychellois", "Sierra Leonean", "Singaporean", "Slovak", "Slovenian", "Solomon Islander", "Somali", "South African", "South Korean",
+  "South Sudanese", "Spanish", "Sri Lankan", "Sudanese", "Surinamer", "Swazi", "Swedish", "Swiss", "Syrian", "Taiwanese",
+  "Tajik", "Tanzanian", "Thai", "Togolese", "Tongan", "Trinidadian/Tobagonian", "Tunisian", "Turkish", "Tuvaluan", "Ugandan",
+  "Ukrainian", "Uruguayan", "Uzbekistani", "Vanuatuan", "Venezuelan", "Vietnamese", "Yemeni", "Zambian", "Zimbabwean"
+];
+
 export default function FlightDetailsPage() {
-  const { id: flightId } = useParams<{ id: string }>(); 
+  const { id: flightId } = useParams<{ id: string }>();
   const [flight, setFlight] = useState<Flight | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { isSignedIn } = useAuth(); // Use Clerk's authentication hook
+  const { isSignedIn, userId } = useAuth();
 
-  const [selectedSeat, setSelectedSeat] = useState<"First Class" | "Business Class" | "Premium Economy Class" | "Economy Class">("Economy Class");
+  const [selectedSeatClass, setSelectedSeatClass] = useState<SeatClassDisplayName>("Economy Class");
+  const [selectedSeatId, setSelectedSeatId] = useState<string | null>(null);
+  const [isSeatMapOpen, setIsSeatMapOpen] = useState(false);
+
   const [selectedMeal, setSelectedMeal] = useState("Standard Meal");
   const [selectedBaggage, setSelectedBaggage] = useState("No Extra Baggage");
   const [selectedService, setSelectedService] = useState("No Assistance");
-  const [updatedPrice, setUpdatedPrice] = useState(flight?.base_price);
-  
-  // Add state for passenger data
+  const [updatedPrice, setUpdatedPrice] = useState<number | undefined>(undefined);
+
   const [passengerData, setPassengerData] = useState<PassengerFormData>({
-    firstName: "",
-    lastName: "",
-    age: 0,
-    gender: "prefer_not_to_say",
-    contactNumber: "",
-    email: "",
-    passportNumber: "",
-    nationality: ""
+    firstName: "", lastName: "", age: 0, gender: "prefer_not_to_say",
+    contactNumber: "", email: "", passportNumber: "", nationality: ""
   });
 
-  const [flightData, setFlightData] = useState<any>(null);
   const [reservedSeats, setReservedSeats] = useState<string[]>([]);
 
-  const handleSeatSelection = (seat: { name: string; multiplier: number }) => {
-    setSelectedSeat(seat.name as "First Class" | "Business Class" | "Premium Economy Class" | "Economy Class");
+  const openSeatMapHandler = () => setIsSeatMapOpen(true);
+
+  // Helper to safely get base price as a number
+  const getBasePriceAsNumber = (): number => {
+    if (!flight) return 0;
+    // Use parseFloat for potentially string values, default to 0 if invalid
+    const price = parseFloat(String(flight.base_price));
+    return isNaN(price) ? 0 : price;
+  };
+
+
+  const handleSeatClassChange = (seat: { name: SeatClassDisplayName; multiplier: number }) => {
+    setSelectedSeatClass(seat.name);
+    setSelectedSeatId(null);
     if (flight) {
-      setUpdatedPrice(flight.base_price * seat.multiplier);
+      const baggagePrice = getBaggagePrice(selectedBaggage);
+      // FIX: Use helper function for base price
+      setUpdatedPrice(getBasePriceAsNumber() * seat.multiplier + baggagePrice);
     }
+  };
+
+  const handleSeatIdSelect = (seatId: string | null) => {
+    setSelectedSeatId(seatId);
+    setIsSeatMapOpen(false);
+  };
+
+  const getSeatClassMultiplier = (seatClassName: SeatClassDisplayName): number => {
+    const seatMap = {
+      "First Class": 2,
+      "Business Class": 1.75,
+      "Premium Economy Class": 1.5,
+      "Economy Class": 1
+    };
+    return seatMap[seatClassName] || 1;
+  };
+
+  const getBaggagePrice = (baggageName: string): number => {
+    const baggageOptions = {
+      "No Extra Baggage": 0,
+      "1 Extra Bag (23kg)": 50,
+      "2 Extra Bags (23kg each)": 120,
+    };
+    return baggageOptions[baggageName as keyof typeof baggageOptions] || 0;
   };
 
   const handleBaggageSelection = (baggage: { name: string; price: number }) => {
     setSelectedBaggage(baggage.name);
     if (flight) {
-      // Recalculate the price with the current seat multiplier
-      const seatMultiplier = getSeatMultiplier(selectedSeat);
-      setUpdatedPrice(flight.base_price * seatMultiplier + baggage.price);
+      const seatMultiplier = getSeatClassMultiplier(selectedSeatClass);
+      setUpdatedPrice(getBasePriceAsNumber() * seatMultiplier + baggage.price);
     }
   };
 
-  // Helper function to get the seat multiplier
-  const getSeatMultiplier = (seatName: "First Class" | "Business Class" | "Premium Economy Class" | "Economy Class") => {
-      const seatMap = {
-        "First Class": 2,
-        "Business Class": 1.75,
-        "Premium Economy Class": 1.5,
-        "Economy Class": 1
-      };
-      
-      return seatMap[seatName] || 1;
-    };
-
-  const handleMealSelection = (meal: string) => {
-    setSelectedMeal(meal);
+  const mapDisplayNameToInternalClass = (displayName: SeatClassDisplayName): FlightSeatClass => {
+    switch (displayName) {
+      case "First Class": return "first";
+      case "Business Class": return "business";
+      case "Economy Class":
+      default: return "economy";
+    }
   };
 
-  const handleServiceSelection = (service: string) => {
-    setSelectedService(service);
-  };
+  const handleMealSelection = (meal: string) => setSelectedMeal(meal);
+  const handleServiceSelection = (service: string) => setSelectedService(service);
 
   const {
     register,
@@ -128,16 +184,10 @@ export default function FlightDetailsPage() {
     defaultValues: passengerData,
   });
 
-  // Update the form values in real-time
   useEffect(() => {
     const subscription = watch((value) => {
-      // Partial update of passenger data without validation
-      setPassengerData(prev => ({
-        ...prev,
-        ...value as PassengerFormData
-      }));
+      setPassengerData(prev => ({ ...prev, ...value as PassengerFormData }));
     });
-    
     return () => subscription.unsubscribe();
   }, [watch]);
 
@@ -154,58 +204,103 @@ export default function FlightDetailsPage() {
     }
 
     async function fetchFlight() {
+      setLoading(true);
+      setError(null);
       try {
         console.log(`Fetching flight with ID: ${flightId}`);
-        const res = await flightAPI.getFlightById(Number(flightId));
-
-        if (!res.ok) {
-          throw new Error(`API Error: ${res.status} ${res.statusText}`);
-        }
-
-        const contentType = res.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Invalid JSON response. The API might be returning an error page.");
-        }
-
-        const data = await res.json();
+        const data = await getFlightById(Number(flightId));
+        
         if (!data || Object.keys(data).length === 0) {
-          throw new Error("Flight not found.");
+          throw new Error("Flight not found or empty response.");
         }
-
+    
+        // Set flight data directly
         setFlight(data);
-        setUpdatedPrice(data.base_price); // Initialize price
+        
+        const basePriceNum = parseFloat(String(data.base_price));
+        if (isNaN(basePriceNum)) {
+          console.error("Fetched base_price is not a valid number:", data.base_price);
+          throw new Error("Invalid base price received from API.");
+        }
+    
+        const initialMultiplier = getSeatClassMultiplier("Economy Class");
+        const initialBaggagePrice = getBaggagePrice(selectedBaggage);
+        setUpdatedPrice(basePriceNum * initialMultiplier + initialBaggagePrice);
+        
       } catch (err) {
         console.error("Error fetching flight:", err);
         if (err instanceof Error) {
           setError(err.message);
         } else {
-          setError("An unknown error occurred.");
+          setError("An unknown error occurred during flight fetch.");
         }
+        setFlight(null);
+        setUpdatedPrice(undefined);
       } finally {
         setLoading(false);
       }
     }
 
     fetchFlight();
-  }, [flightId]); 
+  }, [flightId]);
+
 
   useEffect(() => {
-    async function fetchFlightData() {
-      const flightRes = await fetch(`${AIRCRAFT_URL}/aircraft/layout/${flight?.flight_number}`);
-      const flightJson = await flightRes.json();
-      setFlightData(flightJson[0]); // [{object}]
+    if (!flight || !flight.flight_number) {
+      if (!flight) setReservedSeats([]);
+      return;
     }
+
+    // const mockReservedSeats: string[] = [
+    //   "1A", "3F",
+    //   "6C", "8B", "10E",
+    //   "12A", "15D", "15E", "18F", "21C", "25A", "29B"
+    // ];
+    // setReservedSeats(mockReservedSeats);
+    // setLoading(false);
+    // console.log("Mock reserved seats set:", mockReservedSeats);
 
     async function fetchReservedSeats() {
-      const reservedRes = await fetch(`${BOOKING_URL}/booking/reserved-seats/${flight?.flight_number}`);
-      const reservedJson = await reservedRes.json();
-      setReservedSeats(reservedJson.map((s: any) => s.seat_number));
+      setLoading(true);
+      try {
+        console.log(`Workspaceing reserved seats for flight: ${flight?.flight_number}`);
+        const reservedRes = await fetch(`${BOOKING_URL}/booking/reserved-seats/${flight?.flight_number}`);
+
+        if (!reservedRes.ok) {
+          throw new Error(`API Error fetching reserved seats: ${reservedRes.status} ${reservedRes.statusText}`);
+        }
+        const contentType = reservedRes.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          const errorText = await reservedRes.text();
+          console.error("Non-JSON Response (Reserved Seats):", errorText);
+          throw new Error(`Invalid API response for reserved seats.`);
+        }
+        const reservedJson = await reservedRes.json();
+        if (Array.isArray(reservedJson)) {
+          const seats = reservedJson
+            .map((s: any) => s?.seat_number)
+            .filter((seat): seat is string => typeof seat === 'string' && seat.length > 0);
+          setReservedSeats(seats);
+          console.log("Reserved seats fetched:", seats);
+        } else {
+          console.warn("Unexpected format for reserved seats response:", reservedJson);
+          setReservedSeats([]);
+          setError(prev => prev ? `${prev}\nCould not parse reserved seats.` : "Could not parse reserved seats.");
+        }
+      } catch (err) {
+        console.error("Error fetching reserved seats:", err);
+        setError(prev => prev ? `${prev}\n${err instanceof Error ? err.message : "Failed to fetch reserved seats."}` : (err instanceof Error ? err.message : "Failed to fetch reserved seats."));
+        setReservedSeats([]);
+      } finally {
+        setLoading(false);
+      }
     }
-
-    fetchFlightData();
     fetchReservedSeats();
-  }, []);
 
+  }, [flight]);
+
+
+  // --- Loading/Error/Render Logic ---
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -214,226 +309,285 @@ export default function FlightDetailsPage() {
     );
   }
 
-  if (error || !flight) {
+  if (!loading && !flight && error) { // Specific condition for flight load failure
     return (
-      <div className="text-center text-red-600 min-h-screen flex items-center justify-center">
-        <p className="text-lg font-semibold">{error || "Flight not found."}</p>
+      <div className="text-center text-red-600 min-h-screen flex items-center justify-center p-4">
+        <p className="text-lg font-semibold">Error loading flight details: {error}</p>
       </div>
     );
   }
 
+  if (!flight) { // Fallback if loading is done, no error set, but flight is still null
+    return (
+      <div className="text-center text-gray-600 min-h-screen flex items-center justify-center">
+        <p className="text-lg font-semibold">Flight data could not be loaded. Please try again later.</p>
+      </div>
+    );
+  }
+
+  const basePriceNumber = getBasePriceAsNumber();
+  const currentPrice = updatedPrice ?? (basePriceNumber * getSeatClassMultiplier(selectedSeatClass) + getBaggagePrice(selectedBaggage));
+  const tax = currentPrice * 0.1;
+  const totalPrice = currentPrice + tax;
+
   return (
-    <div className="flex px-6 py-4">
-      {/* Left */}
-      <div className="flex-[3] items-center justify-center p-6">
+    <div className="flex flex-col lg:flex-row px-4 sm:px-6 py-4 gap-6">
+      {/* Left Column */}
+      <div className="flex-[3] space-y-6 p-4 border rounded-lg shadow-sm bg-white">
         {/* Header */}
         <div className="flex flex-col space-y-4">
-          <p className="text-3xl font-semibold text-center">Flight Details</p>
-          <h1 className="text-xl text-center">from {flight.departure_airport.city} to {flight.arrival_airport.city}</h1>
-          <p className="text-sm flex items-center"><Star className="text-yellow-500 mr-1" /> Ratings {flight.rating} / 5</p>
-          {/* Container for cards and button */}
-          <img
+          <p className="text-2xl md:text-3xl font-semibold text-center">Flight Details</p>
+          <h1 className="text-lg md:text-xl text-center text-gray-700">From {flight.departure_airport.city} to {flight.arrival_airport.city}</h1>
+          <p className="text-sm flex items-center justify-center"><Star className="text-yellow-500 mr-1 h-4 w-4" /> Ratings {flight.rating} / 5</p>
+          {flight.featured_image && (
+            <img
               src={flight.featured_image}
-              alt="Beach"
-              className="w-full h-96 object-cover mt-6 rounded-lg"
+              alt={`Flight ${flight.flight_number} route`}
+              className="w-full h-64 md:h-96 object-cover mt-4 rounded-lg shadow"
             />
-          <div className="flex justify-between items-center space-x-4">
-            {/* Cards */}
-            <div className="grid grid-cols-5 gap-4 w-full">
-                <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
-                  <Plane />
-                  <span className="flex flex-col">
-                    <p className="text-xs">Flight Number</p>
-                    <p className="text-sm">{flight.flight_number}</p>
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
-                  <CalendarArrowUp />
-                  <span className="flex flex-col">
-                    <p className="text-xs">Departure Time</p>
-                    <p className="text-sm">{format(new Date(flight.departure_time), "EE, MMMM d, yyyy h:mm a")}</p>
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
-                  <CalendarArrowDown />
-                  <span className="flex flex-col">
-                    <p className="text-xs">Arrival Time</p>
-                    <p className="text-sm">{format(new Date(flight.arrival_time), "EE, MMMM d, yyyy h:mm a")}</p>
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
-                  <PlaneTakeoff />
-                  <span className="flex flex-col">
-                    <p className="text-xs">Departure Airport</p>
-                    <p className="text-sm">{flight.departure_airport.name}</p>
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2 border-[1px] rounded-xl p-3">
-                  <PlaneLanding />
-                  <span className="flex flex-col">
-                    <p className="text-xs">Arrival Airport</p>
-                    <p className="text-sm">{flight.arrival_airport.name}</p>
-                  </span>
-                </div>
-            </div>
+          )}
+          {/* Flight Info Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 mt-4">
+            {[
+              { Icon: Plane, label: "Flight Number", value: flight.flight_number },
+              { Icon: CalendarArrowUp, label: "Departure Time", value: format(new Date(flight.departure_time), "PPpp") },
+              { Icon: CalendarArrowDown, label: "Arrival Time", value: format(new Date(flight.arrival_time), "PPpp") },
+              { Icon: PlaneTakeoff, label: "Departure Airport", value: `${flight.departure_airport.name} (${flight.departure_airport.code})` },
+              { Icon: PlaneLanding, label: "Arrival Airport", value: `${flight.arrival_airport.name} (${flight.arrival_airport.code})` },
+            ].map(({ Icon, label, value }) => (
+              <div key={label} className="flex items-center space-x-2 border rounded-lg p-3 text-sm bg-gray-50">
+                <Icon className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                <span className="flex flex-col">
+                  <p className="text-xs text-gray-500">{label}</p>
+                  <p className="font-medium">{value}</p>
+                </span>
+              </div>
+            ))}
           </div>
         </div>
-        <Separator className="m-4" />
-        {/* Services on Flight */}
+        <Separator />
+        {/* Services */}
         <div className="flex flex-col">
-              <p className="text-2xl font-semibold pb-6">Services on Flight</p>
-              <div className="grid grid-cols-3 gap-4">
-                {flight.has_wifi && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl"><Wifi className="text-green-700" /><span>In-Flight WiFi</span></div>}
-                {flight.has_entertainment && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl"><Tv className="text-green-700" /><span>In-Flight Entertainment</span></div>}
-                {flight.has_meals && <div className="flex items-center space-x-2 p-3 bg-gray-100 rounded-xl">< UtensilsCrossed className="text-green-700" /><span>Complimentary Meal</span></div>}
-              </div>
-            </div>
-        <Separator className="m-4" />
-        
-        {/* Preferences Component */}
-        <Preferences 
-          onSeatChange={handleSeatSelection}
-          onMealChange={handleMealSelection}
-          onBaggageChange={handleBaggageSelection}
-          onServiceChange={handleServiceSelection}
-          selectedSeat={selectedSeat}
-          selectedMeal={selectedMeal}
-          selectedBaggage={selectedBaggage}
-          selectedService={selectedService}
-        />
+          <p className="text-xl font-semibold pb-4">Services on Flight</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {!flight.has_wifi && !flight.has_entertainment && !flight.has_meals && (
+              <p className="text-gray-500 col-span-full">No special services listed for this flight.</p>
+            )}
+            {flight.has_wifi && <div className="flex items-center space-x-2 p-3 bg-green-50 rounded-lg border border-green-200"><Wifi className="text-green-700 h-5 w-5" /><span>In-Flight WiFi</span></div>}
+            {flight.has_entertainment && <div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg border border-blue-200"><Tv className="text-blue-700 h-5 w-5" /><span>In-Flight Entertainment</span></div>}
+            {flight.has_meals && <div className="flex items-center space-x-2 p-3 bg-orange-50 rounded-lg border border-orange-200"><UtensilsCrossed className="text-orange-700 h-5 w-5" /><span>Complimentary Meal</span></div>}
+          </div>
+        </div>
+        <Separator />
 
-        {/* Passenger Information */}
+        {/* Preferences Component & Seat Selection Trigger */}
+        <div>
+          <Preferences
+            onSeatClassChange={handleSeatClassChange}
+            onOpenSeatMap={openSeatMapHandler}
+            onMealChange={handleMealSelection}
+            onBaggageChange={handleBaggageSelection}
+            onServiceChange={handleServiceSelection}
+
+            selectedSeatClass={selectedSeatClass} 
+            selectedSeatId={selectedSeatId}     
+            selectedMeal={selectedMeal}
+            selectedBaggage={selectedBaggage}
+            selectedService={selectedService}
+          />
+          <div className="mt-4 pl-4">
+            <Label className="text-md font-semibold">Seat Assignment</Label>
+            <div className="flex items-center gap-4 mt-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsSeatMapOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <Armchair className="h-5 w-5" />
+                {selectedSeatId ? `Change Seat Selection` : "Select Specific Seat"}
+              </Button>
+              {selectedSeatId && (
+                <Badge variant="secondary" className="text-lg px-3 py-1">
+                  Seat: {selectedSeatId}
+                </Badge>
+              )}
+              {!selectedSeatId && (
+                <p className="text-sm text-muted-foreground">No specific seat selected yet.</p>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 pl-1">Select your preferred seat within the chosen {selectedSeatClass}.</p>
+          </div>
+        </div>
+        <Separator />
+
+        {/* ... (Passenger Information form remains the same) ... */}
         <div>
           <p className="text-xl font-semibold pb-4">Passenger Information</p>
-          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label>First Name</Label>
-              <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl p-2 w-full" {...register("firstName")} placeholder="e.g. John" />
-              {errors.firstName && <p className="text-red-500">{errors.firstName.message}</p>}
+              <Label htmlFor="firstName">First Name</Label>
+              <Input id="firstName" className="text-gray-600 bg-[#E9F1ED]" {...register("firstName")} placeholder="e.g. John" />
+              {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>}
             </div>
             <div>
-              <Label>Last Name</Label>
-              <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl p-2 w-full" {...register("lastName")} placeholder="e.g. Doe" />
-              {errors.lastName && <p className="text-red-500">{errors.lastName.message}</p>}
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input id="lastName" className="text-gray-600 bg-[#E9F1ED]" {...register("lastName")} placeholder="e.g. Doe" />
+              {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>}
             </div>
             <div>
-              <Label>Age</Label>
-              <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl p-2 w-full" type="number" {...register("age", { valueAsNumber: true })} placeholder="e.g. 29" />
-              {errors.age && <p className="text-red-500">{errors.age.message}</p>}
+              <Label htmlFor="age">Age</Label>
+              <Input id="age" className="text-gray-600 bg-[#E9F1ED]" type="number" min="1" step="1" {...register("age", { valueAsNumber: true })} placeholder="e.g. 29" />
+              {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age.message}</p>}
             </div>
             <div>
-              <Label>Gender</Label>
-              <select {...register("gender")} className="text-gray-600 bg-[#E9F1ED] rounded-xl p-2 w-full">
+              <Label htmlFor="gender">Gender</Label>
+              <select id="gender" {...register("gender")} className="text-gray-600 bg-[#E9F1ED] rounded-md p-2 w-full border h-[40px]"> {/* Consistent height */}
                 <option value="male">Male</option>
                 <option value="female">Female</option>
-                <option value="prefer_not_to_say">Prefer Not To Say</option>
+                <option value="unidentify">Prefer Not To Say</option>
               </select>
-              {errors.gender && <p className="text-red-500">{errors.gender.message}</p>}
+              {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender.message}</p>}
             </div>
             <div>
-              <Label>Contact Number</Label>
-              <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl p-2 w-full" {...register("contactNumber")} placeholder="e.g. +123456789" />
-              {errors.contactNumber && <p className="text-red-500">{errors.contactNumber.message}</p>}
+              <Label htmlFor="contactNumber">Contact Number</Label>
+              <Input id="contactNumber" className="text-gray-600 bg-[#E9F1ED]" {...register("contactNumber")} placeholder="e.g. +123456789" />
+              {errors.contactNumber && <p className="text-red-500 text-xs mt-1">{errors.contactNumber.message}</p>}
             </div>
             <div>
-              <Label>Email</Label>
-              <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl p-2 w-full" {...register("email")} type="email" placeholder="e.g. johndoe@gmail.com" />
-              {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" className="text-gray-600 bg-[#E9F1ED]" {...register("email")} type="email" placeholder="e.g. johndoe@gmail.com" />
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
             <div>
-              <Label>Passport Number</Label>
-              <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl p-2 w-full" {...register("passportNumber")} placeholder="e.g. X12345678" />
-              {errors.passportNumber && <p className="text-red-500">{errors.passportNumber.message}</p>}
+              <Label htmlFor="passportNumber">Passport Number</Label>
+              <Input id="passportNumber" className="text-gray-600 bg-[#E9F1ED]" {...register("passportNumber")} placeholder="e.g. X12345678" />
+              {errors.passportNumber && <p className="text-red-500 text-xs mt-1">{errors.passportNumber.message}</p>}
             </div>
             <div>
-              <Label>Nationality</Label>
-              <Input className="text-gray-600 bg-[#E9F1ED] rounded-xl p-2 w-full" {...register("nationality")} placeholder="e.g. American" />
-              {errors.nationality && <p className="text-red-500">{errors.nationality.message}</p>}
-            </div>
-            <Separator className="col-span-2 my-4" />
-            <div className="col-span-2 flex space-x-4">
-              <Button type="submit">Save Details</Button>
-              <Button type="button">Cancel</Button>
+              <Label htmlFor="nationality">Nationality</Label>
+              <select
+                id="nationality"
+                className="text-gray-600 bg-[#E9F1ED] rounded-md p-2 w-full border h-[40px]"
+                {...register("nationality")}
+                defaultValue="" // Set default value for the placeholder
+              >
+                <option value="" disabled> -- Select Nationality -- </option>
+                {nationalities.sort().map((nationality) => ( // Sort list alphabetically
+                  <option key={nationality} value={nationality}>
+                    {nationality}
+                  </option>
+                ))}
+              </select>
             </div>
           </form>
-        <Separator className="m-8" />
+        </div>
       </div>
-      </div>
-      {/* Right */}
-      <div className="flex-[1] justify-center p-5">
-        <Card>
+
+      {/* Right Column (Checkout) */}
+      <div className="flex-[1] lg:sticky lg:top-6 h-fit">
+        <Card className="shadow-md">
           <CardHeader>
-            <CardTitle>Checkout</CardTitle>
+            <CardTitle>Checkout Summary</CardTitle>
           </CardHeader>
-          <CardContent className="pb-4">
-            <span className="flex justify-between">
-              <p className="text-gray-500">Base Price</p>
-              <p>${flight.base_price}</p>
-            </span>
-            <span className="flex justify-between">
-              <p className="text-gray-500">Additional Services</p>
-              <p>${(updatedPrice ?? flight?.base_price ?? 0) - flight.base_price > 0 ? ((updatedPrice ?? flight?.base_price ?? 0) - flight.base_price).toFixed(2) : '0.00'}</p>
-            </span>
-            <span className="flex justify-between">
-              <p className="text-gray-500">Tax</p>
-              <p>${((updatedPrice ?? flight?.base_price ?? 0) * 0.1).toFixed(2)}</p>
-            </span>
-            <span className="flex justify-between">
-              <p className="text-gray-500">Total</p>
-              <p className="font-bold">${((updatedPrice ?? flight?.base_price ?? 0) * 1.1).toFixed(2)}</p>
-            </span>
-            
+          <CardContent className="pb-4 space-y-2 text-sm">
+            {/* Show specific fetch/parse errors */}
+            {error && (
+              <p className="text-red-500 text-xs mb-2 p-2 bg-red-50 border border-red-200 rounded">
+                {error.includes("reserved seats") ? "Error fetching reserved seat data." : error}
+              </p>
+            )}
+            {/* --- Price Breakdown --- */}
+            <div className="flex justify-between">
+              <span className="text-gray-600">Base Price:</span>
+              <span>${basePriceNumber.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Seat Class ({selectedSeatClass}):</span>
+              <span>+${(basePriceNumber * getSeatClassMultiplier(selectedSeatClass) - basePriceNumber).toFixed(2)}</span>
+            </div>
+            {selectedSeatId && (
+              <div className="flex justify-between pl-4 text-xs">
+                <span className="text-gray-500">Selected Seat:</span>
+                <span className="font-medium">{selectedSeatId}</span>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span className="text-gray-600">Baggage ({selectedBaggage}):</span>
+              <span>+${getBaggagePrice(selectedBaggage).toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Subtotal:</span>
+              <span>${currentPrice.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Tax (10%):</span>
+              <span>${tax.toFixed(2)}</span>
+            </div>
+            <Separator className="my-2" />
+            <div className="flex justify-between font-bold text-lg">
+              <span>Total Price:</span>
+              <span>${totalPrice.toFixed(2)}</span>
+            </div>
+            {/* --- End Price Breakdown --- */}
+
             {isSignedIn ? (
               <>
                 <div className="mt-4">
-                  {(!passengerData.firstName || !passengerData.lastName) && (
-                    <p className="text-amber-600 mb-2 text-center">
-                      Please fill in passenger details to continue
-                    </p>
+                  {(!passengerData.firstName || !passengerData.lastName || !passengerData.email || !passengerData.contactNumber || !passengerData.passportNumber || !passengerData.nationality || passengerData.age <= 0) && (
+                  <p className="text-amber-600 mb-2 text-center text-xs font-medium bg-amber-50 p-2 rounded border border-amber-200">
+                    Please complete and save passenger details to proceed.
+                  </p>
+                  )}
+                  {!selectedSeatId && (
+                  <p className="text-red-500 text-xs mt-2 text-center">Please select a specific seat before checkout.</p>
+                  )}
+                  {passengerData.firstName && passengerData.lastName && passengerData.email && passengerData.contactNumber && passengerData.passportNumber && passengerData.nationality && passengerData.age > 0 && selectedSeatId && (
+                  <EmbeddedCheckoutForm
+                    clerkUserId={userId}
+                    price={Math.round(totalPrice * 100)}
+                    firstName={passengerData.firstName}
+                    lastName={passengerData.lastName}
+                    selectedSeatClass={selectedSeatClass}
+                    selectedSeatId={selectedSeatId}
+                    selectedMeal={selectedMeal}
+                    selectedService={selectedService}
+                    SelectedBaggage={selectedBaggage}
+                    id={Number(flightId)}
+                    flight_number={flight.flight_number}
+                    age={passengerData.age}
+                    gender={passengerData.gender}
+                    contactNumber={passengerData.contactNumber}
+                    email={passengerData.email}
+                    passportNumber={passengerData.passportNumber}
+                    nationality={passengerData.nationality}
+                  />
                   )}
                 </div>
-                <EmbeddedCheckoutForm 
-                  price={(updatedPrice ?? flight?.base_price ?? 0) * 1.1 * 100}  // *100 for cents unit
-                  firstName={passengerData.firstName}
-                  lastName={passengerData.lastName}
-                  selectedSeat={selectedSeat}
-                  selectedMeal={selectedMeal}
-                  selectedService={selectedService}
-                  SelectedBaggage={selectedBaggage}
-                  id={Number(flightId)}
-                  flight_number={flight.flight_number}
-                  age={passengerData.age}
-                  gender={passengerData.gender}
-                  contactNumber={passengerData.contactNumber}
-                  email={passengerData.email}
-                  passportNumber={passengerData.passportNumber}
-                  nationality={passengerData.nationality}
-                />
               </>
             ) : (
-              <div className="mt-4 text-center flex flex-col items-center gap-3">
-                <p className="text-red-500 mb-2">Please sign in to continue with checkout</p>
+              <div className="mt-4 text-center flex flex-col items-center gap-3 border-t pt-4">
+                <p className="text-red-600 mb-2 font-medium">Please sign in to book your flight</p>
                 <SignInButton mode="modal">
-                  <Button className="w-full rounded-xl">Sign In to Checkout</Button>
+                  <Button className="w-full rounded-lg">Sign In & Checkout</Button>
                 </SignInButton>
               </div>
             )}
           </CardContent>
-          
-          {isSignedIn && (
-            <>
-              <Separator className="m-4" />
-              <CardFooter className="flex justify-between pt-2">
-                <span className="flex flex-col space-y-2">
-                  <Label htmlFor="email">Promo code</Label>
-                  <Input type="email" id="email" placeholder="Enter code" />
-                </span>
-                <Button>Apply</Button>
-              </CardFooter>
-            </>
-          )}
         </Card>
       </div>
+
+      {/* Render Seat Map Popup */}
+      <SeatMapPopup
+        isOpen={isSeatMapOpen}
+        onClose={() => setIsSeatMapOpen(false)}
+        onSeatSelect={handleSeatIdSelect}
+        reservedSeats={reservedSeats}
+        initialSelectedSeat={selectedSeatId}
+        flightClass={mapDisplayNameToInternalClass(selectedSeatClass)}
+        flight_number={flight.flight_number}
+      />
+
     </div>
   );
 }
+

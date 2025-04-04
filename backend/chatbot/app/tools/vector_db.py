@@ -5,7 +5,6 @@ from typing import Dict, Any, List
 # Use the older PGVector implementation
 from langchain.vectorstores.pgvector import PGVector
 from langchain_huggingface import HuggingFaceEmbeddings
-
 from .config import CONNECTION_POSTGRES, COLLECTION_NAME
 
 
@@ -50,7 +49,7 @@ def retrieve_similar_contexts(query: str, top_k: int = 3):
 
         # Use the older PGVector implementation
         vector_store = PGVector(
-            connection_string=CONNECTION_STRING,
+            connection_string=CONNECTION_POSTGRES,
             collection_name=COLLECTION_NAME,
             embedding_function=embeddings  # Use embedding_function for older version
         )

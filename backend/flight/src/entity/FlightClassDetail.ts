@@ -1,8 +1,8 @@
 import { 
     Entity, PrimaryGeneratedColumn, ManyToOne, Column, Unique 
 } from "typeorm";
-import { Flight } from "./Flight";
 import { TravelClass } from "./TravelClass";
+import { Flight } from "./Flight";
 
 @Entity()
 @Unique(["flight", "travel_class"])
