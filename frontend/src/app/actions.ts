@@ -384,7 +384,7 @@ export async function getFlightById(id: number) {
 
 export async function getTravelPlanById(id: string) {
 
-  const url = `${TRAVELURL}/${id}`;
+  const url = `${TRAVELURL}/travel-plans/${id}`;
   
   try {
     const res = await fetch(url);

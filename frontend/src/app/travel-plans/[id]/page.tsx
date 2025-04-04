@@ -141,7 +141,6 @@ export default async function TravelPlanDetailPage({ params }: { params: Promise
                         departureAirport={flight.departure_airport.code}
                         arrivalAirport={flight.arrival_airport.code}
                         price={flight.base_price}
-                      // airline={flight.airline_name}
                       />
                     </Link>
                   ))
