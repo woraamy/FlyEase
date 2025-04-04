@@ -415,7 +415,7 @@ export interface BookingCardData {
 
 export async function getFlightByNumber(flightNumber: string): Promise<BookingFlight | null> {
   const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/by-number/${flightNumber}`;
-  console.log(`Fetching flight from: ${apiUrl}`);
+  // console.log(`Fetching flight from: ${apiUrl}`);
   
   try {
     const response = await fetch(apiUrl, {
@@ -454,7 +454,7 @@ export async function getUserBookings(): Promise<Booking[]> {
   }
 
   const bookingUrl = `${process.env.NEXT_PUBLIC_BOOKING_URL}/booking/mybook`;
-  console.log(`Fetching bookings from: ${bookingUrl} for user: ${userId}`);
+  // console.log(`Fetching bookings from: ${bookingUrl} for user: ${userId}`);
   
   try {
     const response = await fetch(bookingUrl, {
@@ -482,7 +482,7 @@ export async function getUserBookings(): Promise<Booking[]> {
 }
 
 export async function getBookingsWithFlightDetails(): Promise<BookingCardData[]> {
-  console.log("Starting to fetch bookings with flight details");
+  // console.log("Starting to fetch bookings with flight details");
   const bookings = await getUserBookings();
   
   if (!bookings || !bookings.length) {
@@ -494,11 +494,11 @@ export async function getBookingsWithFlightDetails(): Promise<BookingCardData[]>
   
   const bookingsWithDetails = await Promise.all(
     bookings.map(async (booking) => {
-      console.log(`Processing booking for flight: ${booking.flight_number}`);
+      // console.log(`Processing booking for flight: ${booking.flight_number}`);
       const flight = await getFlightByNumber(booking.flight_number);
       
       if (!flight) {
-        console.log(`No flight details found for ${booking.flight_number}`);
+        // console.log(`No flight details found for ${booking.flight_number}`);
         return null;
       }
 

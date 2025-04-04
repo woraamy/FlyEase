@@ -118,8 +118,38 @@ export function BookingCard({
   qrCodeData,
 }: BookingCardProps) {
   // Generate QR code data if not provided
+  // const qrData = qrCodeData || JSON.stringify({
+  //   booking: bookingCode,
+  //   seat: seatNumber,
+  //   passenger: name,
+  //   flight: {
+  //     from: {
+  //       code: departureAirport,
+  //       city: departureCity,
+  //       country: departureCountry
+  //     },
+  //     to: {
+  //       code: arrivalAirport,
+  //       city: arrivalCity,
+  //       country: arrivalCountry
+  //     },
+  //     departure: departureTime,
+  //     arrival: arrivalTime
+  //   }
+  // });
   const qrData = qrCodeData || 
-    `BOOKING:${bookingCode}|SEAT:${seatNumber}|NAME:${name}|FROM:${departureAirport}|TO:${arrivalAirport}`;
+  `✈️ FLIGHT BOARDING PASS ✈️  \n` +
+  `Passenger:      ${name}  \n` +
+  `Booking Code:   ${bookingCode}  \n` +
+  `Seat:           ${seatNumber}  \n\n` +
+  `FROM:  ${departureAirport} (${departureCity}, ${departureCountry})  \n` +
+  `TO:    ${arrivalAirport} (${arrivalCity}, ${arrivalCountry})  \n\n` +
+  `Departure:      ${departureTime}  \n` +
+  `Arrival:        ${arrivalTime}  \n\n` +
+  `Thank you for flying with us!`;
+
+
+
   
   // Normalize status for display
   const displayStatus = 
