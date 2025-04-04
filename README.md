@@ -12,6 +12,7 @@ This guide provides instructions on how to set up and run the various services f
 * [Python and pip](https://www.python.org/)
 * [Homebrew](https://brew.sh/) (for macOS users installing Stripe CLI)
 * Access to the environment variables document (see Environment Variables section).
+* Clone the GitHub repository
 
 ## 1. Stripe CLI Setup (Optional - If you need to test webhooks locally)
 
