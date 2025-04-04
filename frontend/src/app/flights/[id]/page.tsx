@@ -573,6 +573,7 @@ export default function FlightDetailsPage() {
         reservedSeats={reservedSeats}
         initialSelectedSeat={selectedSeatId}
         flightClass={mapDisplayNameToInternalClass(selectedSeatClass)}
+        flight_number={flight.flight_number}
       />
 
     </div>
