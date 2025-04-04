@@ -97,7 +97,7 @@ interface BookingCardProps {
   arrivalCountry: string;
   arrivalAirport: string;
   seatNumber: string;
-  status: "checked-in" | "waiting for check-in" | "CONFIRMED" | "PENDING";
+  status: "CONFIRMED" | "PENDING";
   bookingCode?: string;
   qrCodeData?: string;
 }
@@ -152,10 +152,16 @@ export function BookingCard({
 
   
   // Normalize status for display
-  const displayStatus = 
-    status === "CONFIRMED" ? "checked-in" : 
-    status === "PENDING" ? "waiting for check-in" : 
-    status;
+  let displayStatus = "";
+
+  if (status === "CONFIRMED") {
+    displayStatus = "CONFIRMED";
+  } else if (status === "PENDING") {
+    displayStatus = "PENDING";
+  } else {
+    displayStatus = status;
+  }
+  
 
   return (
     <motion.div
@@ -166,7 +172,7 @@ export function BookingCard({
       className="h-full"
     >
       <Card className="overflow-hidden rounded-xl shadow-md bg-white border border-gray-100 h-full transition-all hover:shadow-lg">
-        <div className={`h-1 ${displayStatus === "checked-in" ? "bg-emerald-500" : "bg-amber-500"}`} />
+        <div className={`h-1 ${status === "CONFIRMED" ? "bg-emerald-500" : "bg-amber-500"}`} />
         <CardContent className="p-4">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-base font-bold text-gray-900">{name}</h3>
@@ -174,7 +180,7 @@ export function BookingCard({
               variant="outline"
               className={`
                 px-2 py-0.5 text-xs font-medium rounded-full uppercase
-                ${displayStatus === "checked-in" 
+                ${status === "CONFIRMED" 
                   ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
                   : "bg-amber-50 text-amber-700 border-amber-200"}
               `}

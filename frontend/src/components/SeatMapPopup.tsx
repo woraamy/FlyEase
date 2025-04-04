@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LoaderCircle } from "lucide-react";
 
+// In SeatMapPopup.tsx
 interface SeatMapPopupProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,6 +22,8 @@ interface SeatMapPopupProps {
   initialSelectedSeat: string | null; // Expects "1A" format from parent
   flightClass: 'first' | 'business' | 'economy';
   flight_number: string;
+  // Add the missing property:
+  reservedSeats: string[];
 }
 
 // Constants and Color definitions (remain the same)

@@ -11,7 +11,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth, SignInButton } from "@clerk/nextjs";
 
-import { flightAPI } from "./action";
+import { getFlightById } from "@/app/action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -207,42 +207,26 @@ export default function FlightDetailsPage() {
       setLoading(true);
       setError(null);
       try {
-        console.log(`Workspaceing flight with ID: ${flightId}`);
-        const res = await flightAPI.getFlightById(Number(flightId));
-
-        if (!res.ok) {
-          throw new Error(`API Error: ${res.status} ${res.statusText}`);
-        }
-
-        const contentType = res.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          const errorText = await res.text();
-          console.error("Non-JSON Response:", errorText);
-          throw new Error(`Invalid API response. Expected JSON but received ${contentType}.`);
-        }
-
-        const data = await res.json();
+        console.log(`Fetching flight with ID: ${flightId}`);
+        const data = await getFlightById(Number(flightId));
+        
         if (!data || Object.keys(data).length === 0) {
           throw new Error("Flight not found or empty response.");
         }
-
-        // Ensure base_price is treated correctly before setting state
-        const fetchedFlightData: Flight = {
-          ...data,
-          base_price: data.base_price
-        };
-        setFlight(fetchedFlightData);
-
+    
+        // Set flight data directly
+        setFlight(data);
+        
         const basePriceNum = parseFloat(String(data.base_price));
         if (isNaN(basePriceNum)) {
           console.error("Fetched base_price is not a valid number:", data.base_price);
           throw new Error("Invalid base price received from API.");
         }
-
+    
         const initialMultiplier = getSeatClassMultiplier("Economy Class");
         const initialBaggagePrice = getBaggagePrice(selectedBaggage);
         setUpdatedPrice(basePriceNum * initialMultiplier + initialBaggagePrice);
-
+        
       } catch (err) {
         console.error("Error fetching flight:", err);
         if (err instanceof Error) {
@@ -250,8 +234,8 @@ export default function FlightDetailsPage() {
         } else {
           setError("An unknown error occurred during flight fetch.");
         }
-        setFlight(null); // Clear flight data on error
-        setUpdatedPrice(undefined); // Clear price
+        setFlight(null);
+        setUpdatedPrice(undefined);
       } finally {
         setLoading(false);
       }
@@ -606,3 +590,4 @@ export default function FlightDetailsPage() {
     </div>
   );
 }
+
