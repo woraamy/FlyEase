@@ -11,15 +11,23 @@ export const flightRepo = AppDataSource.getRepository(Flight);
 // ✅ List Available Flights - FIXED
 router.get("/", async (req, res) => {
     try {
+        // Fetch all available flights
         const flights = await flightRepo.find({
             where: { available_seats: MoreThan(0)},
             relations: ["departure_airport", "arrival_airport", "class_details", "travel_classes"],
         });
 
-        res.json(flights);
+        // Check if flights are available
+        if (!flights || flights.length === 0) {
+            res.status(404).json({ message: "No flights available" });
+            return;
+        }
+        
+        // success response
+        res.status(200).json(flights);
         return;
     } catch (error) {
-        console.error('Error fetching flights:', error);
+        // console.error('Error fetching flights:', error);
         res.status(500).json({ error: "Something went wrong" });
         return;
     }
@@ -64,8 +72,10 @@ router.get("/search", async (req, res) => {
         }
 
         const flights = await query.getMany();
-        console.log("Flights found:", flights); // Debug log
-        res.json(flights);
+        // console.log("Flights found:", flights); // Debug log
+
+        // success response
+        res.status(200).json(flights);
         return;
     } catch (error) {
         console.error('Error searching flights:', error);
@@ -88,7 +98,8 @@ router.get("/:flightId", async (req, res) => {
             return;
         }
 
-        res.json(flight);
+        // success response
+        res.status(200).json(flight);
     } catch (error) {
         res.status(500).json({ error: "Something went wrong" });
     }

@@ -1,17 +1,22 @@
 import { Router } from 'express';
 import { AppDataSource } from '../data-source';
 import { AircraftWarehouse } from '../entity/AircraftWarehouse';
-import { Aircraft } from '../entity/Aircraft';
 
 const router = Router();
-const aircraftRepo = AppDataSource.getRepository(Aircraft);
 const aircraftWarehouseRepo = AppDataSource.getRepository(AircraftWarehouse);
 
 //Get Aircraft-layout
 router.get('/layout/:flight_number', async (req, res) => {
     try {
         const { flight_number } = req.params;
-        console.log(flight_number);
+        
+        // Validate flight_number
+        if (!flight_number) {
+            res.status(400).json({ message: 'Flight number is required' });
+            return;
+        }
+
+        // Fetch the aircraft layout from the database
         const aircraft = await aircraftWarehouseRepo.find({
             relations: {
                 aircraft: {
@@ -35,16 +40,19 @@ router.get('/layout/:flight_number', async (req, res) => {
             where: { flightNumber: flight_number },
         });
 
+        // Check if the aircraft layout was found
         if (!aircraft) {
             res.status(404).json({ message: 'Aircraft not found' });
+            return;
         }
 
-        res.json(aircraft);
+        res.status(200).json(aircraft);
     } catch (error) {
         console.error('Error fetching aircraft layout:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 
+    return;
 });
 
 export default router;
