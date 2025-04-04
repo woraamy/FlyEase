@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { useState, useEffect } from "react";
 import {
@@ -23,7 +23,7 @@ interface SeatMapPopupProps {
   flightClass: 'first' | 'business' | 'economy';
   flight_number: string;
   // Add the missing property:
-  reservedSeats: string[];
+  // reservedSeats: string[];
 }
 
 // Constants and Color definitions (remain the same)
