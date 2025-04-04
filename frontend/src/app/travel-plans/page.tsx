@@ -44,7 +44,7 @@ export default async function TravelPlansPage() {
               Discover Your Next Journey
             </h1>
             <h2 className="mt-3 text-xl font-medium text-gray-200 drop-shadow-sm sm:text-2xl">
-              Explore travel plans shared by others!
+              Explore aspiring travel plans !
             </h2>
           </div>
         </div>
