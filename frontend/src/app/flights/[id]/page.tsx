@@ -39,8 +39,7 @@ interface Flight {
   has_meals: boolean;
 }
 
-const AIRCRAFT_URL = "http://aircraft";
-const BOOKING_URL = "http://booking";
+const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL
 
 const passengerSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
