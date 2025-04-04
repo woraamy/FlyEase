@@ -6,9 +6,8 @@ from typing import Dict, Any, List
 from langchain.vectorstores.pgvector import PGVector
 from langchain_huggingface import HuggingFaceEmbeddings
 
-# Constants
-COLLECTION_NAME = "flights"
-CONNECTION_STRING = "postgresql+psycopg2://postgres:test@localhost:6543/vector_db"
+from .config import CONNECTION_POSTGRES, COLLECTION_NAME
+
 
 def store_query_in_vector_db(query: str, response: str = None, metadata: Dict[str, Any] = None):
     """Store user query and response in vector database with metadata"""
@@ -26,7 +25,7 @@ def store_query_in_vector_db(query: str, response: str = None, metadata: Dict[st
     try:
         # Use the older PGVector implementation
         vector_store = PGVector(
-            connection_string=CONNECTION_STRING,
+            connection_string=CONNECTION_POSTGRES,
             collection_name=COLLECTION_NAME,
             embedding_function=embeddings  # Use embedding_function for older version
         )

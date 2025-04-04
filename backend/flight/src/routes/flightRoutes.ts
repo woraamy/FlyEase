@@ -22,6 +22,7 @@ router.get("/", async (req, res) => {
 router.get("/search", async (req, res) => {
     const { departure_airport_city, arrival_airport_city, departure_date, arrival_date, travel_class_name } = req.query;
 
+
     const query = flightRepo.createQueryBuilder("flight")
         .leftJoinAndSelect("flight.departure_airport", "departure_airport")
         .leftJoinAndSelect("flight.arrival_airport", "arrival_airport")
