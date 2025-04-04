@@ -1,14 +1,17 @@
 // app/flights/page.tsx
 import { Suspense } from 'react';
-import { getFlights } from '@/app/action';
+import { getFlights } from '@/app/actions';
 import FlightList from '@/components/FlightList';
 import SearchForm from '@/components/SearchForm';
 import Loading from '@/components/Loading';
 
+
+export const dynamic = "force-dynamic";
+
 export default async function Flights() {
   let initialFlights = [];
   try {
-    initialFlights = await getFlights();
+    initialFlights = await getFlights() || [];
   } catch (error) {
     console.error('Error loading flights:', error);
   }

@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import { searchFlights} from "@/app/action";
+import { searchFlights} from "@/app/actions";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import {

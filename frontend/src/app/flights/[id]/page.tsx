@@ -11,7 +11,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth, SignInButton } from "@clerk/nextjs";
 
-import { getFlightById } from "@/app/action";
+import { getFlightById } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -39,8 +39,7 @@ interface Flight {
   has_meals: boolean;
 }
 
-const AIRCRAFT_URL = process.env.NEXT_PUBLIC_AIRCRAFT_URL;
-const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL;
+const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL
 
 const passengerSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),

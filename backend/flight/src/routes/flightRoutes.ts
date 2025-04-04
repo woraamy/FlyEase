@@ -4,7 +4,8 @@ import { AppDataSource } from "../data-source";
 import { MoreThan } from "typeorm";
 import axios from "axios";
 
-
+const RECOMMEND_URL = process.env.RECOMMEND_URL;
+const AIRCRAFT_URL = process.env.AIRCRAFT_URL;
 export const router = Router();
 export const flightRepo = AppDataSource.getRepository(Flight);
 
@@ -66,7 +67,6 @@ router.get("/search", async (req, res) => {
         }
 
         const flights = await query.getMany();
-        // console.log("Flights found:", flights); // Debug log
 
         var flightResult: any = [];
         
@@ -74,7 +74,7 @@ router.get("/search", async (req, res) => {
             res.status(200).json(flights);
             return;
         } else {
-            const data = await fetch(`http://localhost:4001/aircraft/class-details`);
+            const data = await fetch(`${AIRCRAFT_URL}/aircraft/class-details`);
             const flightNumberMap = await data.json();
             // loop through the flights and check if the travel class is available
             for (const flight of flights) {
@@ -182,7 +182,7 @@ router.post('/recommend', async (req, res) => {
         // console.log('Sending recommendation request:', JSON.stringify(requestData));
 
         const response = await axios.post(
-            'http://localhost:5001/recommend/new_user',
+            `${RECOMMEND_URL}/recommend/new_user`,
             requestData,
             {
                 headers: {

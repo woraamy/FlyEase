@@ -1,0 +1,43 @@
+#
+# To deploy:
+#
+# kubectl apply -f scripts/deploy.yaml
+#
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: travel-plan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: travel-plan
+  template:
+    metadata:
+      labels:
+        app: travel-plan
+    spec:
+      containers: 
+      - name: travel-plan
+        image: travel-plan:1
+        imagePullPolicy: Never
+        env:
+        - name: PORT
+          value: "4000"
+        - name: DATABASE_URL
+          value: $MONGO_DATABASE_URL
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: travel-plan
+spec:
+  selector:
+    app: travel-plan
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 4000

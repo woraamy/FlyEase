@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PacmanLoader } from "react-spinners";
-import { fetchQuery } from '@/app/action';
+import { fetchQuery } from '@/app/actions';
 import { QueryResponse } from '@/types/chatbot';
 import ChatHistory from '@/components/ChatHistory';
 import QueryForm from '@/components/QueryForm';

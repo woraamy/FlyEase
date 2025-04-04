@@ -2,10 +2,9 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CalendarDays, MapPin, Plane } from "lucide-react";
 import Link from "next/link";
+import { FlightRecCard } from "@/components/FightRecCard";
+import { getFlightByArrCity, getTravelPlanById } from "@/app/actions";
 
-import { FlightRecCard } from "@/components/FightRecCard"; // Ensure correct path
-import { getTravelPlanById } from "@/app/action";
-import { getFlightByArrCity } from "@/app/action"; // Ensure correct path
 
 // Interfaces (Airport, Flight, TravelPlan) remain the same as before
 interface Airport { code: string; name: string; city: string; }
@@ -13,7 +12,7 @@ interface Flight { id: number; flight_number: string; departure_airport: Airport
 interface TravelPlan { _id: string; header_topic: string; departure_city: string; departure_country: string; arrival_city: string; arrival_country: string; introduction: string; header_img: string; paragraphs: Record<string, string>; createdAt: string; }
 
 
-export default async function TravelPlanDetailPage({ params }: { params: Promise<{ id: string }>}) {
+export default async function TravelPlanDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   let travelPlan: TravelPlan | null = null;
@@ -23,8 +22,8 @@ export default async function TravelPlanDetailPage({ params }: { params: Promise
   try {
     const planResponse = await getTravelPlanById(id);
     if (!planResponse.ok) {
-        if (planResponse.status === 404) notFound();
-        throw new Error(`Failed to fetch travel plan: ${planResponse.statusText}`);
+      if (planResponse.status === 404) notFound();
+      throw new Error(`Failed to fetch travel plan: ${planResponse.statusText}`);
     }
     travelPlan = await planResponse.json();
     if (!travelPlan) notFound();
@@ -36,19 +35,19 @@ export default async function TravelPlanDetailPage({ params }: { params: Promise
   }
 
   // ... (Error handling render remains the same) ...
-   if (fetchError || !travelPlan) {
-     return (
-       <main className="flex min-h-[calc(100vh-200px)] items-center justify-center bg-gray-100 p-4"> {/* Keep error page background simple */}
-         <div className="text-center text-red-600 bg-red-50 p-6 rounded-lg border border-red-200 shadow-md">
-           <h1 className="text-xl font-semibold mb-2">Error Loading Plan</h1>
-           <p>{fetchError || "The requested travel plan could not be loaded."}</p>
-           <Link href="/travel-plans" className="mt-4 inline-block text-blue-600 hover:underline">
-             Back to Travel Plans
-           </Link>
-         </div>
-       </main>
-     );
-   }
+  if (fetchError || !travelPlan) {
+    return (
+      <main className="flex min-h-[calc(100vh-200px)] items-center justify-center bg-gray-100 p-4"> {/* Keep error page background simple */}
+        <div className="text-center text-red-600 bg-red-50 p-6 rounded-lg border border-red-200 shadow-md">
+          <h1 className="text-xl font-semibold mb-2">Error Loading Plan</h1>
+          <p>{fetchError || "The requested travel plan could not be loaded."}</p>
+          <Link href="/travel-plans" className="mt-4 inline-block text-blue-600 hover:underline">
+            Back to Travel Plans
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   const paragraphEntries = Object.entries(travelPlan.paragraphs || {});
 
@@ -72,17 +71,17 @@ export default async function TravelPlanDetailPage({ params }: { params: Promise
                   priority
                   sizes="(max-width: 1024px) 100vw, 66vw"
                 />
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"></div>
-                 <div className="absolute bottom-0 left-0 p-6 md:p-8">
-                    <h1 className="text-3xl font-bold text-white drop-shadow-lg sm:text-4xl lg:text-5xl">
-                        {travelPlan.header_topic}
-                    </h1>
-                 </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 p-6 md:p-8">
+                  <h1 className="text-3xl font-bold text-white drop-shadow-lg sm:text-4xl lg:text-5xl">
+                    {travelPlan.header_topic}
+                  </h1>
+                </div>
               </div>
 
               {/* Content */}
               <div className="p-6 md:p-8 lg:p-10 space-y-6">
-                 {/* Meta Info */}
+                {/* Meta Info */}
                 <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-x-6 gap-y-2 text-sm text-muted-foreground border-b pb-4">
                   <div className="flex items-center gap-1.5">
                     <MapPin className="h-4 w-4 text-primary" />
@@ -105,15 +104,15 @@ export default async function TravelPlanDetailPage({ params }: { params: Promise
 
                 {/* Paragraphs with images */}
                 <div className="space-y-10 pt-6 border-t">
-                   <h2 className="text-2xl font-semibold text-gray-800 mb-4">Plan Details</h2>
-                   {/* ... (Paragraph mapping logic remains the same) ... */}
-                   {paragraphEntries.map(([imagePath, text], index) => (
-                    <div key={index} className={`flex flex-col md:flex-row md:items-start gap-6 md:gap-8 ${ index % 2 !== 0 ? "md:flex-row-reverse" : "" }`}>
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">Plan Details</h2>
+                  {/* ... (Paragraph mapping logic remains the same) ... */}
+                  {paragraphEntries.map(([imagePath, text], index) => (
+                    <div key={index} className={`flex flex-col md:flex-row md:items-start gap-6 md:gap-8 ${index % 2 !== 0 ? "md:flex-row-reverse" : ""}`}>
                       <div className="relative h-64 w-full md:w-1/2 flex-shrink-0 overflow-hidden rounded-lg shadow-md border">
-                         <Image src={imagePath || "/placeholder.svg"} alt={`Detail image ${index + 1} for ${travelPlan.header_topic}`} fill className="object-cover transition-transform duration-300 hover:scale-105" sizes="(max-width: 768px) 100vw, 50vw" />
+                        <Image src={imagePath || "/placeholder.svg"} alt={`Detail image ${index + 1} for ${travelPlan.header_topic}`} fill className="object-cover transition-transform duration-300 hover:scale-105" sizes="(max-width: 768px) 100vw, 50vw" />
                       </div>
                       <div className="md:w-1/2">
-                         <p className="text-base leading-relaxed text-gray-700">{String(text)}</p>
+                        <p className="text-base leading-relaxed text-gray-700">{String(text)}</p>
                       </div>
                     </div>
                   ))}
@@ -123,27 +122,27 @@ export default async function TravelPlanDetailPage({ params }: { params: Promise
           </div> {/* End Main Content Col */}
 
           {/* Sidebar - 1/3 width */}
-           {/* Card uses bg-white, contrasting against gradient */}
+          {/* Card uses bg-white, contrasting against gradient */}
           <div className="lg:col-span-1">
             <div className="sticky top-6 rounded-lg bg-white p-6 shadow-xl border"> {/* Added shadow-xl */}
               <h2 className="mb-5 text-xl font-semibold text-gray-800 border-b pb-3">
                 Recommended Flights
               </h2>
               <div className="space-y-4">
-                 {/* ... (Flight mapping logic remains the same) ... */}
-                  {flights && flights.length > 0 ? (
+                {/* ... (Flight mapping logic remains the same) ... */}
+                {flights && flights.length > 0 ? (
                   flights.map((flight) => (
                     <Link href={`/flights/${flight.id}`} key={flight.id} className="block outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md">
-                        <FlightRecCard
-                          from={flight.departure_airport.city}
-                          to={flight.arrival_airport.city}
-                          departureTime={flight.departure_time}
-                          arrivalTime={flight.arrival_time}
-                          departureAirport={flight.departure_airport.code}
-                          arrivalAirport={flight.arrival_airport.code}
-                          price={flight.base_price}
-                          // airline={flight.airline_name}
-                        />
+                      <FlightRecCard
+                        from={flight.departure_airport.city}
+                        to={flight.arrival_airport.city}
+                        departureTime={flight.departure_time}
+                        arrivalTime={flight.arrival_time}
+                        departureAirport={flight.departure_airport.code}
+                        arrivalAirport={flight.arrival_airport.code}
+                        price={flight.base_price}
+                      // airline={flight.airline_name}
+                      />
                     </Link>
                   ))
                 ) : (

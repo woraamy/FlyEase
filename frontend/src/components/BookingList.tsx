@@ -1,6 +1,6 @@
 // Update the server component to use our client component
 import { ClientBookingsList } from "@/components/ClientBookingsList"
-import { getBookingsWithFlightDetails } from "@/app/action"
+import { getBookingsWithFlightDetails } from "@/app/actions"
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 

@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { TravelPlanCard } from "@/components/TravelPlanCard";
-// Removed unused import: import mockTravelPlans from "@/data/mockTravelPlan.json"
-import { getTravelPlans } from "../action"; // Assuming this action exists and works
+import { getTravelPlans } from "@/app/actions";
 
 // Define a type for the plan object for better type safety
 interface Plan {
@@ -13,6 +12,8 @@ interface Plan {
   introduction: string;
   header_img: string;
 }
+
+export const dynamic = "force-dynamic";
 
 export default async function TravelPlansPage() {
   let initialTravelPlans: Plan[] = []; // Use the Plan interface

@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(routeAPI)
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 if (!PORT) {
     throw new Error("Env PORT are Not Define");

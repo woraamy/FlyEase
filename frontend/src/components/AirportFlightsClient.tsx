@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getFlightsByAirportCode, getAirports } from '@/app/action';
+import { getFlightsByAirportCode, getAirports } from '@/app/actions';
 import { Airport, Flight } from '@/types/flight';
 import FlightCard from '@/components/FlightCard';
 import Loading from '@/components/Loading';
