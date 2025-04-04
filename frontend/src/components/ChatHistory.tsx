@@ -141,7 +141,7 @@ export default function ChatHistory({ history }: ChatHistoryProps) {
                         {item.query}
                       </div>
                       <Badge variant="secondary" className="absolute -top-2.5 -left-1 text-xs bg-background px-1.5"> {/* Adjusted badge positioning */}
-                        {isLoaded && user ? (user.fullName || "You") : "You"}
+                        {isLoaded && user ? ("You") : "You"}
                       </Badge>
                     </CardContent>
                   </div>
