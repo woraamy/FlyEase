@@ -10,9 +10,8 @@
 kubectl delete -f ingress.yaml
 kubectl delete -f chatbot.yaml
 kubectl delete -f recommend.yaml
-
-envsubst < aircraft.yaml | kubectl delete -f -
-envsubst < booking.yaml | kubectl delete -f -
-envsubst < flight.yaml | kubectl delete -f -
-envsubst < travel-plan.yaml | kubectl delete -f -
-envsubst < frontend.yaml | kubectl delete -f -
+kubectl delete -f ingress.yaml
+kubectl delete -f aircraft.yaml 
+kubectl delete -f booking.yaml
+kubectl delete -f travel-plan.yaml
+kubectl delete -f frontend.yaml
