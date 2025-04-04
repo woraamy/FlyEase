@@ -14,7 +14,7 @@ export async function POST(request: Request) {
         let booking_id: number;
         // create booking without payment 
         try {
-            const response = await fetch(`${bookingURL}/booking/check/${flightInfo.selectedSeat}/${flightInfo.flight_number}`, {
+            const response = await fetch(`${bookingURL}/booking/check/${flightInfo.selectedSeatId}/${flightInfo.flight_number}/${flightInfo.selectedSeatClass}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -26,7 +26,6 @@ export async function POST(request: Request) {
                 return NextResponse.json({ message: 'Error fetching booking data' }, { status: 500 });
             }
             
-            // Parse the response to get the booking ID
             const data= await response.json();
             booking_id = data.booking_id;
 
@@ -38,7 +37,7 @@ export async function POST(request: Request) {
 
         // Create a new product in Stripe
         const { id } = await stripe.prices.create({
-            unit_amount: Math.round(price * 100),
+            unit_amount: price,
             currency: 'usd',
             product_data: {
                 name: `Flight ${flightInfo.flight_number} - ${passengerInfo.firstName} ${passengerInfo.lastName}`
@@ -52,7 +51,7 @@ export async function POST(request: Request) {
             payment_method_types: ['card'],
             line_items: [
                 {
-                    price: price,
+                    price: id,
                     quantity: 1,
                 },
             ],
@@ -60,18 +59,20 @@ export async function POST(request: Request) {
                 metadata: {
                     booking_id: booking_id,
                     flight_number: flightInfo.flight_number,
-                    selectedSeat: flightInfo.selectedSeat,
+                    selectedSeatClass: flightInfo.selectedSeatClass,
+                    selectedSeatId: flightInfo.selectedSeatId,
                     selectedMeal: flightInfo.selectedMeal,
                     selectedService: flightInfo.selectedService,
-                    selectedBaggage: flightInfo.selectedBaggage,
+                    selectedBaggage: flightInfo.SelectedBaggage,
+                    clerkUserId: passengerInfo.clerkUserId,
                     first_name: passengerInfo.firstName,
                     last_name: passengerInfo.lastName,
                     age: passengerInfo.age,
-                    gender:passengerInfo.gender,
+                    gender: passengerInfo.gender,
                     contact_number: passengerInfo.contactNumber,
                     email: passengerInfo.email,
                     passport_number: passengerInfo.passportNumber,
-                    nationality:passengerInfo.nationality,
+                    nationality: passengerInfo.nationality,
                 },
             },
             mode: 'payment',

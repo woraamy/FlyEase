@@ -3,6 +3,7 @@ import { Flight } from "../entity/Flight";
 import { AppDataSource } from "../data-source";
 import { MoreThan } from "typeorm";
 import axios from "axios";
+import { C } from "vitest/dist/chunks/reporters.d.CfRkRKN2.js";
 
 
 export const router = Router();
@@ -62,6 +63,7 @@ router.get("/search", async (req, res) => {
         }
 
         const flights = await query.getMany();
+        console.log("Flights found:", flights); // Debug log
         return res.json(flights);
     } catch (error) {
         console.error('Error searching flights:', error);
@@ -263,5 +265,27 @@ router.get('/by-airport/:code', async (req, res) => {
 //         res.json([]);
 //     }
 // });
+
+
+// Get Flight by Flight Number
+router.get("/by-number/:flightNumber", async (req: Request, res: Response) => {
+    try {
+      const { flightNumber } = req.params;
+      
+      const flight = await flightRepo.findOne({
+        where: { flight_number: flightNumber },
+        relations: ["departure_airport", "arrival_airport", "class_details", "travel_classes"],
+      });
+  
+      if (!flight) {
+        return res.status(404).json({ error: "Flight not found" });
+      }
+  
+      return res.json(flight);
+    } catch (error) {
+      console.error('Error fetching flight by number:', error);
+      return res.status(500).json({ error: "Something went wrong" });
+    }
+  });
 
 export default router;

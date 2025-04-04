@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne } from "typeorm";
+import { Passenger } from "./Passenger";
 
 //enum for booking status
 export enum BookingStatus {
@@ -16,10 +17,14 @@ export class Booking {
     flight_number: string; // No FK to Flight (Microservice-friendly)
 
     @Column({ length: 5 })
-    seat_number: string;
+    seat_id: string;
 
-    @Column({ nullable: true })
-    passenger_id: number; // No FK to Passenger (Microservice-friendly)
+    @Column({ length: 255 })
+    seat_class: string;
+
+    // FK to Passenger 
+    @ManyToOne(() => Passenger, (passenger) => passenger.id, { onDelete: "CASCADE" , nullable: true, eager: true })
+    passenger: number; 
 
     @Column({ length: 6, unique: true , nullable: true})
     booking_code: string;
@@ -33,5 +38,12 @@ export class Booking {
     @CreateDateColumn({ type: "timestamp" })
     created_at: Date;
 
+    @Column({ length: 255, nullable: true })
+    selected_meal: string;
 
+    @Column({ length: 255, nullable: true })
+    selected_service: string;
+
+    @Column({ length: 255, nullable: true })
+    selected_baggage: string;
 }

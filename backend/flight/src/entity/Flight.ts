@@ -58,4 +58,3 @@ export class Flight {
     @OneToMany(() => FlightClassDetail, (fcd) => fcd.flight)
     class_details: FlightClassDetail[];
 }
-

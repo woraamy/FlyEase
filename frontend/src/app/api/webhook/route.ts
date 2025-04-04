@@ -1,7 +1,7 @@
 import { stripe } from '@/lib/stripe';
 import { NextResponse } from 'next/server';
 
-const bookingURL = process.env.BOOKING_URL;
+const bookingURL = process.env.NEXT_PUBLIC_BOOKING_URL;
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 if (!bookingURL) {
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
     switch (event.type) {
             // reserved spot status confirmed
         case 'payment_intent.succeeded':
+            console.log("POST /success begin")
             const paymentIntent = event.data.object.metadata;
 
             // Handle successful payment intent here
@@ -42,8 +43,12 @@ export async function POST(request: Request) {
             .then((response) => {
                 if (!response.ok) {
                     console.log('Error please contact support response:', response);
+                    console.log('Error please contact support body:', response.body);
+                    return
                 }
+                
                 console.log('Payment intent succeeded successfully');
+                console.log(response.body)
             }
             )
             break;
